@@ -1,0 +1,17 @@
+{
+  "model_name": "distilbert-base-uncased",
+  "train_samples": 19301,
+  "val_samples": 2570,
+  "test_samples": 3857,
+  "device": "cuda",
+  "test": {
+    "mae": 0.4456,
+    "rmse": 0.6118,
+    "r2": 0.6798,
+    "spearman_rho": 0.828,
+    "spearman_pvalue": 0.0,
+    "within_one_star_accuracy": 0.972,
+    "exact_accuracy": 0.6674,
+    "n_samples": 3857
+  }
+}

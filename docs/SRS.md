@@ -1,0 +1,311 @@
+# Software Requirements Specification (SRS)
+
+**Project:** RExA — Explainable Reasoning Analysis of Descriptive Answers
+**Document type:** Final Year Project SRS (IEEE 830-inspired structure)
+**Version:** 1.0
+
+---
+
+## 1. Introduction
+
+### 1.1 Purpose
+
+This document specifies the functional and non-functional requirements for **EARAS**, a
+web-based platform that automatically assesses students' descriptive/short-answer
+responses using the **REXA** reasoning-analysis engine. It is intended for the project
+supervisor, evaluation committee, and future maintainers of the system.
+
+### 1.2 Scope
+
+EARAS allows instructors and teaching assistants to:
+
+- Maintain a bank of exam/quiz **questions**, each with a reference answer and a list of
+  required concepts.
+- Submit **student answers** (individually or in batch) for automatic analysis.
+- Receive a **1–5 star rating** for each answer, broken down into four interpretable
+  dimensions (concept coverage, reasoning depth, role structure, support quality), with
+  natural-language explanations.
+- **Compare** two answers side by side, or benchmark REXA against classical baselines
+  (keyword overlap, TF-IDF cosine similarity).
+- Manually **annotate** ground-truth labels for a sample of submissions, to evaluate REXA
+  and to build a dataset for a future trained model.
+- View **analytics** (aggregate stars, coverage trend, sentence-role distribution) and
+  export **PDF/Markdown reports**.
+
+Out of scope for this version: multi-tenant/multi-institution deployment, real-time
+collaborative grading, plagiarism detection, and support for non-English answers.
+
+### 1.3 Definitions, Acronyms, and Abbreviations
+
+| Term | Meaning |
+|------|---------|
+| RExA | Explainable Reasoning Analysis of Descriptive Answers (platform + scoring pipeline) |
+| Concept | A required idea/keyword phrase the reference answer expects the student to mention |
+| Sentence role | The rhetorical function of a sentence: Claim, Evidence, Explanation, Conclusion, or Other |
+| Support pair | A relationship (`Supports` / `Neutral` / `Contradicts`) between two consecutive sentences |
+| Reasoning depth | A 0–1 score capturing how completely a Claim → Evidence → Explanation → Conclusion chain is present |
+| Star rating | The final 1–5 scale score produced by REXA for a student answer |
+| Model version | A named, versioned configuration of the scoring pipeline (heuristic or trained) tracked in the system |
+| JWT | JSON Web Token, used for stateless authentication |
+| ORM | Object-Relational Mapper (SQLAlchemy) |
+
+### 1.4 References
+
+- `backend/app/services/rexa_pipeline.py` — reference implementation of the scoring logic
+  described functionally in this document.
+- `docs/architecture.md` — system architecture and data model.
+- `docs/annotation_protocol.md` — ground-truth labeling protocol used for evaluation.
+
+### 1.5 Overview
+
+Section 2 gives an overall description of the product, its users, and constraints.
+Section 3 lists detailed functional requirements grouped by feature area. Section 4
+covers non-functional requirements. Section 5 defines actors and use cases.
+
+---
+
+## 2. Overall Description
+
+### 2.1 Product Perspective
+
+EARAS is a new, self-contained system (not an add-on to an existing LMS), though its API
+is designed so that a future integration (e.g. importing questions/submissions from an
+LMS via CSV or API) would not require restructuring the core data model. It consists of:
+
+- A **single-page frontend application** (React) consumed by instructors/analysts through
+  a browser.
+- A **REST API backend** (FastAPI) that owns all business logic, persistence, and the
+  REXA scoring pipeline.
+- A **relational database** (PostgreSQL in production/Docker, SQLite for local
+  development) storing users, questions, submissions, analysis runs, annotations, and
+  model version metadata.
+
+### 2.2 Product Functions (Summary)
+
+1. User authentication and role-based access control.
+2. Question bank CRUD (create, read, update, delete).
+3. Single-answer analysis via the REXA pipeline, with optional persistence.
+4. Batch analysis of many student answers against one question.
+5. Side-by-side comparison of two answers.
+6. Classical baseline evaluation (keyword overlap, TF-IDF) alongside REXA for benchmarking.
+7. Manual annotation of ground-truth labels for submissions.
+8. Analytics dashboard (aggregate stats, trends, distributions).
+9. PDF/Markdown report generation and download.
+10. Model version registry and activation (admin only).
+
+### 2.3 User Classes and Characteristics
+
+| Role | Description | Typical tasks |
+|------|-------------|----------------|
+| **Admin** | Full system access | Manage questions, activate model versions, view/annotate everything, manage users implicitly via seeded accounts |
+| **Analyst** | Course instructor / TA | Create/edit questions, run single/batch analyses, annotate submissions, view reports and dashboard |
+| **Viewer** | Read-only stakeholder (e.g. auditor, student proxy) | View dashboard, reports, and analyses; cannot create/edit/delete |
+
+### 2.4 Operating Environment
+
+- **Server:** Any environment capable of running Python 3.11 (bare metal, VM, or Docker
+  container). Verified with Docker Compose (`postgres:16-alpine` + Python 3.11-slim).
+- **Client:** Any evergreen desktop browser (Chrome, Edge, Firefox) with JavaScript
+  enabled; the UI is responsive down to tablet widths.
+- **Database:** PostgreSQL 16 (production/Docker) or SQLite 3 (local development).
+
+### 2.5 Design and Implementation Constraints
+
+- The default REXA pipeline (`MODEL_MODE=heuristic`) must run with **no GPU and no paid
+  external API**, using only `scikit-learn`, `difflib`, and regex — a hard constraint for
+  a reproducible, cost-free academic submission that graders can run on their own
+  machines.
+- All API responses must follow a consistent envelope: `{ data, message, success }`, to
+  keep the frontend's error handling and typing simple and uniform.
+- Authentication is stateless (JWT bearer tokens); the backend does not maintain server-side
+  sessions.
+- The system must remain functional with SQLite for local development, and with
+  PostgreSQL for Docker/production, without code changes (only a `DATABASE_URL` change).
+
+### 2.6 Assumptions and Dependencies
+
+- Student answers are plain English text (no support for other languages, handwriting
+  OCR, or non-text inputs such as diagrams).
+- Reference answers and required concepts are authored by an instructor/analyst and are
+  assumed to be accurate; REXA does not validate the reference answer itself.
+- The heuristic pipeline's accuracy is bounded by the quality of its keyword/cue-word
+  banks; a supervised/trained model (future work, see `docs/evaluation_report.md`) is
+  expected to improve on edge cases the heuristics miss.
+
+---
+
+## 3. Functional Requirements
+
+Requirements are grouped by feature area and numbered `FR-<area>-<n>` for traceability.
+
+### 3.1 Authentication & Authorization (FR-AUTH)
+
+| ID | Requirement |
+|----|-------------|
+| FR-AUTH-1 | The system shall allow a user to register with name, email, password, and password confirmation. |
+| FR-AUTH-2 | The system shall reject registration if the password and confirmation do not match. |
+| FR-AUTH-3 | The system shall allow a registered user to log in with email and password, returning a signed JWT and the user's profile. |
+| FR-AUTH-4 | The system shall reject login attempts with incorrect credentials with a generic error message (no user enumeration). |
+| FR-AUTH-5 | The system shall require a valid Bearer JWT for all endpoints except `/auth/login`, `/auth/register`, and `/health`. |
+| FR-AUTH-6 | The system shall expose the currently authenticated user's profile via `GET /auth/me`. |
+| FR-AUTH-7 | The system shall enforce role-based access: only `admin`/`analyst` roles may create, update, or delete questions and annotations; only `admin` may manage model versions. |
+| FR-AUTH-8 | The system shall seed two demo accounts (`admin@earas.edu` / `Admin1234`, `analyst@earas.edu` / `Analyst1234`) on first startup if they do not already exist. |
+
+### 3.2 Question Bank Management (FR-Q)
+
+| ID | Requirement |
+|----|-------------|
+| FR-Q-1 | The system shall allow authorized users to create a question with a title, prompt text, reference answer, list of required concepts, and optional course label. |
+| FR-Q-2 | The system shall allow listing questions with pagination and free-text search. |
+| FR-Q-3 | The system shall allow retrieving, updating, and deleting a single question by ID. |
+| FR-Q-4 | Deleting a question shall cascade-delete its associated submissions and analysis runs. |
+
+### 3.3 REXA Analysis (FR-RX)
+
+| ID | Requirement |
+|----|-------------|
+| FR-RX-1 | The system shall accept a student answer together with either an existing `question_id` or an ad-hoc `question_text` + `reference_answer` pair. |
+| FR-RX-2 | The system shall split the student answer into sentences and classify each sentence's role as Claim, Evidence, Explanation, Conclusion, or Other. |
+| FR-RX-3 | The system shall compute concept coverage: for each required concept, determine whether it is present (directly or via fuzzy match) in the student answer, and report covered/missing lists and a coverage percentage. |
+| FR-RX-4 | The system shall analyze consecutive sentence pairs and classify their relation as Supports, Neutral, or Contradicts using cue-word heuristics. |
+| FR-RX-5 | The system shall compute a reasoning-depth score (0–1) reflecting the presence of a Claim→Evidence→Explanation chain, support ratio, and answer length. |
+| FR-RX-6 | The system shall compute a 1–5 star rating as a weighted aggregate of concept coverage, reasoning depth, role diversity, and support ratio (minus a contradiction penalty). |
+| FR-RX-7 | The system shall generate at least one human-readable explanation string for every analysis, describing the main driver(s) of the score. |
+| FR-RX-8 | The system shall optionally persist the submission and analysis result (`save: true`, the default) and return an `analysis_id`/`submission_id` for later retrieval. |
+| FR-RX-9 | The system shall allow retrieving a paginated history of past analysis runs, and a single run by ID. |
+
+### 3.4 Batch Analysis & Comparison (FR-BATCH)
+
+| ID | Requirement |
+|----|-------------|
+| FR-BATCH-1 | The system shall accept a list of student answers for one question and run REXA on each, returning per-answer results. |
+| FR-BATCH-2 | The system shall accept two student answers for one question and run REXA on both, returning both results plus a diff summary describing key differences. |
+| FR-BATCH-3 | The system shall provide an endpoint to run classical baselines (Keyword Overlap, TF-IDF Cosine Similarity, and Embedding Similarity if available) against a reference/student answer pair and return both the baseline scores and REXA's own star rating for comparison. |
+
+### 3.5 Annotation Lab (FR-ANNOT)
+
+| ID | Requirement |
+|----|-------------|
+| FR-ANNOT-1 | The system shall allow authorized users to create a human annotation for a submission, recording sentence roles, concepts present, support pairs, a depth score, a star label, and free-text notes. |
+| FR-ANNOT-2 | The system shall allow listing annotations, optionally filtered by `submission_id`, with pagination. |
+| FR-ANNOT-3 | The system shall allow retrieving, updating, and deleting a single annotation by ID. |
+| FR-ANNOT-4 | Annotation labels shall follow the protocol defined in `docs/annotation_protocol.md`, to keep inter-annotator agreement measurable. |
+
+### 3.6 Analytics (FR-AN)
+
+| ID | Requirement |
+|----|-------------|
+| FR-AN-1 | The system shall report total analyses, total questions, total submissions, and the average star rating across all analyses. |
+| FR-AN-2 | The system shall report a list of recent analyses (question title, student name, stars, date). |
+| FR-AN-3 | The system shall report a coverage/star trend over time (grouped by date). |
+| FR-AN-4 | The system shall report the distribution of sentence roles observed across all analyzed answers. |
+
+### 3.7 Reports (FR-REP)
+
+| ID | Requirement |
+|----|-------------|
+| FR-REP-1 | The system shall generate a downloadable PDF report for a given analysis run, including the star rating, dimension scores, and explanations. |
+| FR-REP-2 | The system shall generate a Markdown report for a given analysis run, suitable for embedding elsewhere (e.g. an LMS comment). |
+
+### 3.8 Model Version Registry (FR-MODEL)
+
+| ID | Requirement |
+|----|-------------|
+| FR-MODEL-1 | The system shall allow an admin to register a new model version with a name, version string, description, and metrics. |
+| FR-MODEL-2 | The system shall allow an admin to mark exactly one model version as "active" at a time. |
+| FR-MODEL-3 | The system shall allow listing all registered model versions and deleting one. |
+
+---
+
+## 4. Non-Functional Requirements
+
+| ID | Category | Requirement |
+|----|----------|-------------|
+| NFR-1 | Performance | A single REXA analysis (typical answer of 3–10 sentences) shall complete in well under 1 second on commodity hardware (the heuristic pipeline is O(n·m) in sentence count × concept count, no network calls). |
+| NFR-2 | Portability | The backend shall run unmodified against either SQLite (dev) or PostgreSQL (Docker/production) by changing only the `DATABASE_URL` environment variable. |
+| NFR-3 | Reproducibility | The entire stack (database + API) shall be startable with a single `docker compose up --build` command and no manual database provisioning steps. |
+| NFR-4 | Security | Passwords shall be hashed with bcrypt before storage; JWTs shall be signed with a configurable secret (`JWT_SECRET`) and expire after a configurable period (`ACCESS_TOKEN_EXPIRE_MINUTES`, default 7 days for demo convenience). |
+| NFR-5 | Usability | Every analysis result shall be accompanied by at least one plain-English explanation string; no score shall be presented to the end user without supporting rationale. |
+| NFR-6 | Maintainability | Each REXA pipeline stage shall be implemented behind a narrow `Protocol` interface so it can be replaced (e.g. by a trained model) without modifying routers, schemas, or the frontend contract. |
+| NFR-7 | Consistency | All API success/error responses shall follow the `{ data, message, success }` envelope, so the frontend can handle all endpoints uniformly. |
+| NFR-8 | Extensibility | Adding a new sentence role, cue word, or baseline method shall require changes only within `app/services/`, not within routers or the database schema. |
+| NFR-9 | Availability (demo) | The API container shall wait for the database to become reachable before starting, so `docker compose up` succeeds reliably on the first attempt. |
+| NFR-10 | Accessibility | The frontend shall support both light and dark themes and use accessible component primitives (Radix UI) for keyboard/screen-reader support. |
+
+---
+
+## 5. Actors and Use Cases
+
+### 5.1 Actors
+
+- **Admin** — full access; manages model versions, questions, users (via seed accounts),
+  and can perform every Analyst action.
+- **Analyst** (instructor/TA) — manages questions, runs analyses (single/batch/compare),
+  annotates submissions, views reports and dashboard.
+- **Viewer** — read-only stakeholder; can view the dashboard, reports, and analysis
+  history but cannot create, edit, or delete records.
+
+### 5.2 Use Case Summary
+
+| Use Case | Primary Actor | Description |
+|----------|----------------|--------------|
+| UC-1 Register / Log in | All | Create an account or authenticate to obtain a JWT. |
+| UC-2 Manage question bank | Admin, Analyst | Create, edit, delete questions with reference answers and concepts. |
+| UC-3 Analyze a single answer | Admin, Analyst, Viewer* | Submit a student answer and receive a REXA star rating with explanations. |
+| UC-4 Run batch analysis | Admin, Analyst | Analyze many student answers against one question at once. |
+| UC-5 Compare two answers | Admin, Analyst | Run REXA on two answers and view a side-by-side diff. |
+| UC-6 Evaluate against baselines | Admin, Analyst | Compare REXA's rating against Keyword Overlap and TF-IDF baselines. |
+| UC-7 Annotate a submission | Admin, Analyst | Record ground-truth sentence roles, concepts, support pairs, depth, and stars for a submission. |
+| UC-8 View analytics dashboard | All | View aggregate stats, coverage trend, and role distribution. |
+| UC-9 Export a report | Admin, Analyst, Viewer* | Download a PDF or Markdown report for an analysis run. |
+| UC-10 Manage model versions | Admin | Register and activate model versions. |
+
+\* Viewer access to analysis creation is read/inspect only in the current implementation;
+write actions (UC-3's *creation* step, UC-4, UC-5) require Analyst/Admin.
+
+### 5.3 Detailed Use Case — UC-3: Analyze a Single Answer
+
+- **Actor:** Analyst
+- **Preconditions:** Actor is authenticated; a question exists in the bank (or the actor
+  supplies an ad-hoc question/reference answer).
+- **Main flow:**
+  1. Actor opens the **Analysis** page and selects a question from the bank (or enters an
+     ad-hoc question + reference answer + concepts).
+  2. Actor pastes or types the student's answer text.
+  3. Actor submits the form; the frontend calls `POST /api/analyze`.
+  4. The backend resolves the question context, runs the REXA pipeline, and (by default)
+     persists the submission and analysis run.
+  5. The backend returns the star rating, dimension scores, concept coverage,
+     sentence-role highlights, support pairs, and explanations.
+  6. The frontend renders the result, including highlighted sentences and dimension bars.
+- **Alternative flows:**
+  - 3a. If neither `question_id` nor `question_text`+`reference_answer` is supplied, the
+    backend returns a 422 validation error and the frontend displays it inline.
+  - 4a. If `save=false` is passed, no `Submission`/`AnalysisRun` rows are created; only the
+    computed result is returned.
+- **Postconditions:** An `AnalysisRun` (and possibly a new `Question`/`Submission`) exists
+  in the database; the result is visible in the Reports and Dashboard pages.
+
+### 5.4 Detailed Use Case — UC-7: Annotate a Submission
+
+- **Actor:** Analyst
+- **Preconditions:** At least one analyzed submission exists.
+- **Main flow:**
+  1. Actor opens the **Annotation Lab** and selects a previously analyzed submission.
+  2. For each sentence, the actor assigns a ground-truth role label.
+  3. The actor marks which required concepts are actually present, marks support/
+     contradiction pairs, and assigns an overall depth score and star rating following
+     `docs/annotation_protocol.md`.
+  4. Actor submits the annotation; the frontend calls `POST /api/annotations`.
+  5. The backend persists the `Annotation` row linked to the submission and annotator.
+- **Postconditions:** The annotation is available for inter-annotator agreement analysis
+  and for comparison against REXA's own output (see `docs/evaluation_report.md`).
+
+---
+
+## 6. Traceability Note
+
+Every functional requirement in Section 3 maps directly onto an implemented FastAPI router
+and SQLAlchemy model in `backend/app/`, and onto a corresponding page/service in
+`src/pages/app/` and `src/services/` on the frontend, so that requirements, code, and UI
+can be cross-checked during the viva. See `docs/api.md` for the endpoint-level mapping.

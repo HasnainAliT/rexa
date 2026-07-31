@@ -1,0 +1,24 @@
+{
+  "module": "reasoning_depth",
+  "backend": "sklearn",
+  "train_size": 30,
+  "val_size": 10,
+  "test_size": 10,
+  "train_time_seconds": 2.539,
+  "val_metrics": {
+    "mae": 0.034,
+    "rmse": 0.0388,
+    "r2": 0.9897,
+    "spearman_rho": 0.9394,
+    "spearman_pvalue": 0.0001,
+    "n_samples": 10
+  },
+  "test_metrics": {
+    "mae": 0.0286,
+    "rmse": 0.0416,
+    "r2": 0.9887,
+    "spearman_rho": 0.9515,
+    "spearman_pvalue": 0.0,
+    "n_samples": 10
+  }
+}

@@ -1,0 +1,19 @@
+# Core dependencies - CPU-only, no GPU required. This is the primary,
+# always-available training path used by every script in ml/scripts/.
+scikit-learn>=1.4
+numpy>=1.26
+pandas>=2.2
+pyyaml>=6.0
+joblib>=1.3
+scipy>=1.11
+matplotlib>=3.8
+seaborn>=0.13
+
+# Optional / Colab: DistilBERT fine-tuning (see docs/colab_distilbert.md)
+# Install in Colab or a GPU env:
+#   pip install torch transformers datasets accelerate evaluate sentencepiece
+torch>=2.2; platform_system!="Windows" or python_version<"3.14"
+transformers>=4.40
+datasets>=2.19
+accelerate>=0.30
+evaluate>=0.4

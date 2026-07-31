@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EARAS/REXA Answer Annotation Schema",
+  "description": "Schema describing the fields captured for every annotated student answer used to train the REXA ML modules. Matches the records found in data/raw/sample_answers.json and data/processed/{train,val,test}.json.",
+  "type": "object",
+  "required": [
+    "id",
+    "question_id",
+    "student_answer",
+    "reference_answer",
+    "concepts",
+    "sentence_roles",
+    "concepts_present",
+    "support_pairs",
+    "depth_score",
+    "stars"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique answer identifier, e.g. 'a001'."
+    },
+    "question_id": {
+      "type": "string",
+      "description": "Foreign key into sample_questions.json id field, e.g. 'q01'."
+    },
+    "student_answer": {
+      "type": "string",
+      "description": "Full raw text of the student's descriptive answer."
+    },
+    "reference_answer": {
+      "type": "string",
+      "description": "Model/reference answer for the associated question, duplicated here for convenience."
+    },
+    "concepts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Full list of concepts the question expects a strong answer to cover."
+    },
+    "sentence_roles": {
+      "type": "array",
+      "description": "Ordered list of the student's sentences with an assigned discourse role.",
+      "items": {
+        "type": "object",
+        "required": ["text", "role"],
+        "properties": {
+          "text": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["Claim", "Evidence", "Explanation", "Conclusion", "Other"]
+          }
+        }
+      }
+    },
+    "concepts_present": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Subset of 'concepts' judged to be present/covered in the student answer."
+    },
+    "support_pairs": {
+      "type": "array",
+      "description": "Pairwise relation labels between consecutive (or related) sentences, indexed into sentence_roles.",
+      "items": {
+        "type": "object",
+        "required": ["i", "j", "label"],
+        "properties": {
+          "i": { "type": "integer", "description": "Index of the source sentence in sentence_roles." },
+          "j": { "type": "integer", "description": "Index of the target sentence in sentence_roles." },
+          "label": {
+            "type": "string",
+            "enum": ["Supports", "Contradicts", "Neutral"]
+          }
+        }
+      }
+    },
+    "depth_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Continuous reasoning-depth score in [0, 1] capturing how well-formed the Claim->Evidence->Explanation->Conclusion chain is."
+    },
+    "stars": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Overall holistic quality rating on a 1-5 star scale (ground truth target for the star-prediction module)."
+    },
+    "stars_continuous": {
+      "type": "number",
+      "minimum": 1.0,
+      "maximum": 5.0,
+      "description": "Optional unrounded star value, useful for regression-style training/evaluation."
+    },
+    "quality_tier": {
+      "type": "string",
+      "enum": ["excellent", "good", "average", "weak", "poor"],
+      "description": "Coarse authoring tier used when constructing the sample dataset. Not present in real annotator-labeled data."
+    }
+  }
+}

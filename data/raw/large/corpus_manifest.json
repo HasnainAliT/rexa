@@ -1,0 +1,20 @@
+{
+  "total": 25728,
+  "train": 18014,
+  "val": 3857,
+  "test": 3857,
+  "sources": {
+    "asap2": 17307,
+    "aera-asap-sas": 8421
+  },
+  "star_min": 1.0,
+  "star_max": 5.0,
+  "citations": [
+    "Learning Agency Lab ASAP 2.0 / Kaggle AES 2.0 (jatinmehra/Automated-Essay-Scoring-2.0)",
+    "ASAP-SAS via AERA (jiazhengli/AERA) \u2014 Hewlett Foundation Short Answer Scoring"
+  ],
+  "labeling": {
+    "stars": "gold human scores mapped to 1\u20135",
+    "roles_support_concepts_depth": "silver labels from RExA heuristic pipeline"
+  }
+}

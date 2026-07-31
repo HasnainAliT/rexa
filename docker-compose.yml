@@ -1,0 +1,80 @@
+# EARAS / REXA - Docker Compose
+#
+# For this Final Year Project, Docker Compose is used to run the PostgreSQL
+# database and the FastAPI backend ("api") for a production-like setup.
+#
+# The React/Vite frontend is NOT containerized by default - for FYP
+# development and demos it is simplest and fastest to run it locally with
+# `npm run dev` (hot reload, instant feedback for the viva). An optional,
+# fully commented-out `frontend` service (Nginx serving the static Vite
+# build) is included below if you ever want to containerize it too.
+#
+# Usage:
+#   1. Copy .env.example to .env at the repo root and adjust values.
+#   2. docker compose up --build
+#   3. API available at http://localhost:8000 (docs at /docs)
+#   4. Run the frontend separately: npm install && npm run dev
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: earas-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-earas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-earas}
+      POSTGRES_DB: ${POSTGRES_DB:-earas}
+    ports:
+      - "5432:5432"
+    volumes:
+      - earas_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-earas} -d ${POSTGRES_DB:-earas}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: earas-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-earas}:${POSTGRES_PASSWORD:-earas}@db:5432/${POSTGRES_DB:-earas}
+      JWT_SECRET: ${JWT_SECRET:-change-this-to-a-long-random-secret-in-production}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-10080}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      MODEL_MODE: ${MODEL_MODE:-heuristic}
+      PROJECT_NAME: ${PROJECT_NAME:-EARAS / REXA API}
+      API_PREFIX: ${API_PREFIX:-/api}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------
+  # OPTIONAL: containerized frontend (static Vite build served by Nginx).
+  # Uncomment if you want `docker compose up` to also serve the frontend
+  # instead of running `npm run dev` locally. Requires Dockerfile.frontend
+  # and nginx.conf at the repo root (both included in this project).
+  # ---------------------------------------------------------------------
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.frontend
+  #     args:
+  #       VITE_API_BASE_URL: http://localhost:8000/api
+  #   container_name: earas-frontend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5173:80"
+  #   depends_on:
+  #     - api
+
+volumes:
+  earas_postgres_data:
+    driver: local

@@ -1,0 +1,2594 @@
+[
+  {
+    "id": "a001",
+    "question_id": "q01",
+    "student_answer": "Encapsulation is the principle of bundling an object's data and behavior together while restricting direct access to its internal state. For example, access modifiers like private, protected, and public are used to control which fields and methods can be seen from outside the class. This is because hiding the internal fields prevents other parts of the program from making the object enter an invalid state. For instance, a class can expose getter and setter methods instead of allowing direct access to a private field. This matters because the setter can validate incoming values before the internal state is ever changed. In conclusion, encapsulation and access modifiers work together to achieve data hiding and reduce coupling between classes.",
+    "reference_answer": "Encapsulation is the OOP principle of bundling data and the methods that operate on that data within a single unit, typically a class, while restricting direct access to some of the object's components. Access modifiers such as private, protected, and public control the visibility of fields and methods, enforcing information hiding. By making fields private and exposing controlled access through getters and setters, a class can validate changes to its internal state and hide implementation details from the outside world. This reduces coupling between classes and makes code easier to maintain and refactor.",
+    "concepts": [
+      "encapsulation",
+      "access modifiers",
+      "getters and setters",
+      "data hiding",
+      "private fields"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Encapsulation is the principle of bundling an object's data and behavior together while restricting direct access to its internal state.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, access modifiers like private, protected, and public are used to control which fields and methods can be seen from outside the class.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because hiding the internal fields prevents other parts of the program from making the object enter an invalid state.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, a class can expose getter and setter methods instead of allowing direct access to a private field.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This matters because the setter can validate incoming values before the internal state is ever changed.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, encapsulation and access modifiers work together to achieve data hiding and reduce coupling between classes.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "encapsulation",
+      "access modifiers",
+      "data hiding",
+      "private fields"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9315,
+    "stars": 4,
+    "stars_continuous": 4.18,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a002",
+    "question_id": "q01",
+    "student_answer": "Encapsulation is the principle of bundling an object's data and behavior together while restricting direct access to its internal state. For example, access modifiers like private, protected, and public are used to control which fields and methods can be seen from outside the class. This is because hiding the internal fields prevents other parts of the program from making the object enter an invalid state. For instance, a class can expose getter and setter methods instead of allowing direct access to a private field. In conclusion, encapsulation and access modifiers work together to achieve data hiding and reduce coupling between classes.",
+    "reference_answer": "Encapsulation is the OOP principle of bundling data and the methods that operate on that data within a single unit, typically a class, while restricting direct access to some of the object's components. Access modifiers such as private, protected, and public control the visibility of fields and methods, enforcing information hiding. By making fields private and exposing controlled access through getters and setters, a class can validate changes to its internal state and hide implementation details from the outside world. This reduces coupling between classes and makes code easier to maintain and refactor.",
+    "concepts": [
+      "encapsulation",
+      "access modifiers",
+      "getters and setters",
+      "data hiding",
+      "private fields"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Encapsulation is the principle of bundling an object's data and behavior together while restricting direct access to its internal state.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, access modifiers like private, protected, and public are used to control which fields and methods can be seen from outside the class.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because hiding the internal fields prevents other parts of the program from making the object enter an invalid state.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, a class can expose getter and setter methods instead of allowing direct access to a private field.",
+        "role": "Evidence"
+      },
+      {
+        "text": "In conclusion, encapsulation and access modifiers work together to achieve data hiding and reduce coupling between classes.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "encapsulation",
+      "access modifiers",
+      "data hiding",
+      "private fields"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9334,
+    "stars": 4,
+    "stars_continuous": 4.2,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a003",
+    "question_id": "q01",
+    "student_answer": "Encapsulation is the principle of bundling an object's data and behavior together while restricting direct access to its internal state. For example, access modifiers like private, protected, and public are used to control which fields and methods can be seen from outside the class. Object-oriented programming is one of the most widely taught paradigms in computer science.",
+    "reference_answer": "Encapsulation is the OOP principle of bundling data and the methods that operate on that data within a single unit, typically a class, while restricting direct access to some of the object's components. Access modifiers such as private, protected, and public control the visibility of fields and methods, enforcing information hiding. By making fields private and exposing controlled access through getters and setters, a class can validate changes to its internal state and hide implementation details from the outside world. This reduces coupling between classes and makes code easier to maintain and refactor.",
+    "concepts": [
+      "encapsulation",
+      "access modifiers",
+      "getters and setters",
+      "data hiding",
+      "private fields"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Encapsulation is the principle of bundling an object's data and behavior together while restricting direct access to its internal state.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, access modifiers like private, protected, and public are used to control which fields and methods can be seen from outside the class.",
+        "role": "Evidence"
+      },
+      {
+        "text": "Object-oriented programming is one of the most widely taught paradigms in computer science.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [
+      "encapsulation",
+      "access modifiers",
+      "data hiding",
+      "private fields"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.5339,
+    "stars": 3,
+    "stars_continuous": 3.46,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a004",
+    "question_id": "q01",
+    "student_answer": "Object-oriented programming is one of the most widely taught paradigms in computer science. Encapsulation is the principle of bundling an object's data and behavior together while restricting direct access to its internal state.",
+    "reference_answer": "Encapsulation is the OOP principle of bundling data and the methods that operate on that data within a single unit, typically a class, while restricting direct access to some of the object's components. Access modifiers such as private, protected, and public control the visibility of fields and methods, enforcing information hiding. By making fields private and exposing controlled access through getters and setters, a class can validate changes to its internal state and hide implementation details from the outside world. This reduces coupling between classes and makes code easier to maintain and refactor.",
+    "concepts": [
+      "encapsulation",
+      "access modifiers",
+      "getters and setters",
+      "data hiding",
+      "private fields"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Object-oriented programming is one of the most widely taught paradigms in computer science.",
+        "role": "Other"
+      },
+      {
+        "text": "Encapsulation is the principle of bundling an object's data and behavior together while restricting direct access to its internal state.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "encapsulation",
+      "access modifiers",
+      "data hiding"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.2502,
+    "stars": 2,
+    "stars_continuous": 2.45,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a005",
+    "question_id": "q01",
+    "student_answer": "Object-oriented programming is one of the most widely taught paradigms in computer science.",
+    "reference_answer": "Encapsulation is the OOP principle of bundling data and the methods that operate on that data within a single unit, typically a class, while restricting direct access to some of the object's components. Access modifiers such as private, protected, and public control the visibility of fields and methods, enforcing information hiding. By making fields private and exposing controlled access through getters and setters, a class can validate changes to its internal state and hide implementation details from the outside world. This reduces coupling between classes and makes code easier to maintain and refactor.",
+    "concepts": [
+      "encapsulation",
+      "access modifiers",
+      "getters and setters",
+      "data hiding",
+      "private fields"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Object-oriented programming is one of the most widely taught paradigms in computer science.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [],
+    "support_pairs": [],
+    "depth_score": 0.0253,
+    "stars": 1,
+    "stars_continuous": 1.01,
+    "quality_tier": "poor"
+  },
+  {
+    "id": "a006",
+    "question_id": "q02",
+    "student_answer": "Inheritance allows a class to acquire the properties and methods of another class, while polymorphism allows objects of different classes to be treated through a common interface. For example, a Vehicle base class can be extended by Car and Truck subclasses that reuse its shared fields and methods. This is because inheritance promotes code reuse by letting subclasses build on a common parent instead of duplicating logic. For instance, each subclass can override a method such as move() to provide its own specific behavior. This happens because polymorphism lets the program call the same method name and have the correct overridden version execute at runtime. However, deep inheritance hierarchies can make code harder to understand and maintain. In conclusion, inheritance provides structural reuse while polymorphism provides behavioral flexibility, and abstract classes often combine both.",
+    "reference_answer": "Inheritance allows a class to acquire the fields and methods of another class, enabling code reuse through a parent-child relationship. Polymorphism allows objects of different classes to be treated through a common interface, most commonly via method overriding, so that the same method call can produce different behavior depending on the runtime type of the object. Abstract classes and interfaces often combine both concepts by defining a shared contract that subclasses implement in their own way.",
+    "concepts": [
+      "inheritance",
+      "polymorphism",
+      "method overriding",
+      "abstract classes",
+      "code reuse"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Inheritance allows a class to acquire the properties and methods of another class, while polymorphism allows objects of different classes to be treated through a common interface.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, a Vehicle base class can be extended by Car and Truck subclasses that reuse its shared fields and methods.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because inheritance promotes code reuse by letting subclasses build on a common parent instead of duplicating logic.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, each subclass can override a method such as move() to provide its own specific behavior.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This happens because polymorphism lets the program call the same method name and have the correct overridden version execute at runtime.",
+        "role": "Explanation"
+      },
+      {
+        "text": "However, deep inheritance hierarchies can make code harder to understand and maintain.",
+        "role": "Other"
+      },
+      {
+        "text": "In conclusion, inheritance provides structural reuse while polymorphism provides behavioral flexibility, and abstract classes often combine both.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "inheritance",
+      "polymorphism",
+      "method overriding",
+      "abstract classes",
+      "code reuse"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Contradicts"
+      },
+      {
+        "i": 5,
+        "j": 6,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9165,
+    "stars": 4,
+    "stars_continuous": 4.42,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a007",
+    "question_id": "q02",
+    "student_answer": "Inheritance allows a class to acquire the properties and methods of another class, while polymorphism allows objects of different classes to be treated through a common interface. For example, a Vehicle base class can be extended by Car and Truck subclasses that reuse its shared fields and methods. This is because inheritance promotes code reuse by letting subclasses build on a common parent instead of duplicating logic. In conclusion, inheritance provides structural reuse while polymorphism provides behavioral flexibility, and abstract classes often combine both.",
+    "reference_answer": "Inheritance allows a class to acquire the fields and methods of another class, enabling code reuse through a parent-child relationship. Polymorphism allows objects of different classes to be treated through a common interface, most commonly via method overriding, so that the same method call can produce different behavior depending on the runtime type of the object. Abstract classes and interfaces often combine both concepts by defining a shared contract that subclasses implement in their own way.",
+    "concepts": [
+      "inheritance",
+      "polymorphism",
+      "method overriding",
+      "abstract classes",
+      "code reuse"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Inheritance allows a class to acquire the properties and methods of another class, while polymorphism allows objects of different classes to be treated through a common interface.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, a Vehicle base class can be extended by Car and Truck subclasses that reuse its shared fields and methods.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because inheritance promotes code reuse by letting subclasses build on a common parent instead of duplicating logic.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, inheritance provides structural reuse while polymorphism provides behavioral flexibility, and abstract classes often combine both.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "inheritance",
+      "polymorphism",
+      "abstract classes",
+      "code reuse"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.8749,
+    "stars": 4,
+    "stars_continuous": 4.04,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a008",
+    "question_id": "q02",
+    "student_answer": "Inheritance allows a class to acquire the properties and methods of another class, while polymorphism allows objects of different classes to be treated through a common interface. For example, a Vehicle base class can be extended by Car and Truck subclasses that reuse its shared fields and methods. This is because inheritance promotes code reuse by letting subclasses build on a common parent instead of duplicating logic.",
+    "reference_answer": "Inheritance allows a class to acquire the fields and methods of another class, enabling code reuse through a parent-child relationship. Polymorphism allows objects of different classes to be treated through a common interface, most commonly via method overriding, so that the same method call can produce different behavior depending on the runtime type of the object. Abstract classes and interfaces often combine both concepts by defining a shared contract that subclasses implement in their own way.",
+    "concepts": [
+      "inheritance",
+      "polymorphism",
+      "method overriding",
+      "abstract classes",
+      "code reuse"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Inheritance allows a class to acquire the properties and methods of another class, while polymorphism allows objects of different classes to be treated through a common interface.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, a Vehicle base class can be extended by Car and Truck subclasses that reuse its shared fields and methods.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because inheritance promotes code reuse by letting subclasses build on a common parent instead of duplicating logic.",
+        "role": "Explanation"
+      }
+    ],
+    "concepts_present": [
+      "inheritance",
+      "polymorphism",
+      "abstract classes",
+      "code reuse"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      }
+    ],
+    "depth_score": 0.799,
+    "stars": 4,
+    "stars_continuous": 4.16,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a009",
+    "question_id": "q02",
+    "student_answer": "Many popular programming languages such as Java, C++, and Python support these object-oriented features. Inheritance allows a class to acquire the properties and methods of another class, while polymorphism allows objects of different classes to be treated through a common interface.",
+    "reference_answer": "Inheritance allows a class to acquire the fields and methods of another class, enabling code reuse through a parent-child relationship. Polymorphism allows objects of different classes to be treated through a common interface, most commonly via method overriding, so that the same method call can produce different behavior depending on the runtime type of the object. Abstract classes and interfaces often combine both concepts by defining a shared contract that subclasses implement in their own way.",
+    "concepts": [
+      "inheritance",
+      "polymorphism",
+      "method overriding",
+      "abstract classes",
+      "code reuse"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Many popular programming languages such as Java, C++, and Python support these object-oriented features.",
+        "role": "Other"
+      },
+      {
+        "text": "Inheritance allows a class to acquire the properties and methods of another class, while polymorphism allows objects of different classes to be treated through a common interface.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "inheritance",
+      "polymorphism",
+      "abstract classes"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.2294,
+    "stars": 2,
+    "stars_continuous": 2.35,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a010",
+    "question_id": "q02",
+    "student_answer": "Many popular programming languages such as Java, C++, and Python support these object-oriented features.",
+    "reference_answer": "Inheritance allows a class to acquire the fields and methods of another class, enabling code reuse through a parent-child relationship. Polymorphism allows objects of different classes to be treated through a common interface, most commonly via method overriding, so that the same method call can produce different behavior depending on the runtime type of the object. Abstract classes and interfaces often combine both concepts by defining a shared contract that subclasses implement in their own way.",
+    "concepts": [
+      "inheritance",
+      "polymorphism",
+      "method overriding",
+      "abstract classes",
+      "code reuse"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Many popular programming languages such as Java, C++, and Python support these object-oriented features.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [],
+    "support_pairs": [],
+    "depth_score": 0.0354,
+    "stars": 1,
+    "stars_continuous": 1.06,
+    "quality_tier": "poor"
+  },
+  {
+    "id": "a011",
+    "question_id": "q03",
+    "student_answer": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity. For example, first normal form (1NF) requires that each column hold only atomic, indivisible values. This is because storing multiple values in a single column makes querying and updating the data unreliable. For instance, third normal form (3NF) removes transitive functional dependencies so that non-key attributes depend only on the primary key. This matters because it prevents update anomalies where changing one fact requires updating many rows. In conclusion, applying 1NF, 2NF, and 3NF step by step reduces redundancy and keeps the database consistent.",
+    "reference_answer": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity. First normal form (1NF) requires atomic column values, second normal form (2NF) removes partial dependencies on a composite key, and third normal form (3NF) removes transitive functional dependencies so non-key attributes depend only on the primary key. Applying these forms step by step prevents update, insert, and delete anomalies.",
+    "concepts": [
+      "normalization",
+      "1NF",
+      "2NF",
+      "3NF",
+      "redundancy",
+      "functional dependency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, first normal form (1NF) requires that each column hold only atomic, indivisible values.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because storing multiple values in a single column makes querying and updating the data unreliable.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, third normal form (3NF) removes transitive functional dependencies so that non-key attributes depend only on the primary key.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This matters because it prevents update anomalies where changing one fact requires updating many rows.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, applying 1NF, 2NF, and 3NF step by step reduces redundancy and keeps the database consistent.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "normalization",
+      "1NF",
+      "2NF",
+      "3NF",
+      "redundancy",
+      "functional dependency"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Contradicts"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.8904,
+    "stars": 4,
+    "stars_continuous": 4.29,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a012",
+    "question_id": "q03",
+    "student_answer": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity. For example, first normal form (1NF) requires that each column hold only atomic, indivisible values. This is because storing multiple values in a single column makes querying and updating the data unreliable. In conclusion, applying 1NF, 2NF, and 3NF step by step reduces redundancy and keeps the database consistent.",
+    "reference_answer": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity. First normal form (1NF) requires atomic column values, second normal form (2NF) removes partial dependencies on a composite key, and third normal form (3NF) removes transitive functional dependencies so non-key attributes depend only on the primary key. Applying these forms step by step prevents update, insert, and delete anomalies.",
+    "concepts": [
+      "normalization",
+      "1NF",
+      "2NF",
+      "3NF",
+      "redundancy",
+      "functional dependency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, first normal form (1NF) requires that each column hold only atomic, indivisible values.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because storing multiple values in a single column makes querying and updating the data unreliable.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, applying 1NF, 2NF, and 3NF step by step reduces redundancy and keeps the database consistent.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "normalization",
+      "1NF",
+      "2NF",
+      "3NF",
+      "redundancy"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9152,
+    "stars": 4,
+    "stars_continuous": 4.3,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a013",
+    "question_id": "q03",
+    "student_answer": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity. For example, first normal form (1NF) requires that each column hold only atomic, indivisible values. This is because storing multiple values in a single column makes querying and updating the data unreliable.",
+    "reference_answer": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity. First normal form (1NF) requires atomic column values, second normal form (2NF) removes partial dependencies on a composite key, and third normal form (3NF) removes transitive functional dependencies so non-key attributes depend only on the primary key. Applying these forms step by step prevents update, insert, and delete anomalies.",
+    "concepts": [
+      "normalization",
+      "1NF",
+      "2NF",
+      "3NF",
+      "redundancy",
+      "functional dependency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, first normal form (1NF) requires that each column hold only atomic, indivisible values.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because storing multiple values in a single column makes querying and updating the data unreliable.",
+        "role": "Explanation"
+      }
+    ],
+    "concepts_present": [
+      "normalization",
+      "1NF",
+      "2NF",
+      "3NF",
+      "redundancy"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      }
+    ],
+    "depth_score": 0.7693,
+    "stars": 4,
+    "stars_continuous": 4.07,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a014",
+    "question_id": "q03",
+    "student_answer": "Databases are used in almost every modern software application. Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity.",
+    "reference_answer": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity. First normal form (1NF) requires atomic column values, second normal form (2NF) removes partial dependencies on a composite key, and third normal form (3NF) removes transitive functional dependencies so non-key attributes depend only on the primary key. Applying these forms step by step prevents update, insert, and delete anomalies.",
+    "concepts": [
+      "normalization",
+      "1NF",
+      "2NF",
+      "3NF",
+      "redundancy",
+      "functional dependency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Databases are used in almost every modern software application.",
+        "role": "Other"
+      },
+      {
+        "text": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "normalization",
+      "redundancy"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.2541,
+    "stars": 2,
+    "stars_continuous": 2.05,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a015",
+    "question_id": "q03",
+    "student_answer": "Databases are used in almost every modern software application.",
+    "reference_answer": "Normalization is the process of organizing relational database tables to reduce data redundancy and improve data integrity. First normal form (1NF) requires atomic column values, second normal form (2NF) removes partial dependencies on a composite key, and third normal form (3NF) removes transitive functional dependencies so non-key attributes depend only on the primary key. Applying these forms step by step prevents update, insert, and delete anomalies.",
+    "concepts": [
+      "normalization",
+      "1NF",
+      "2NF",
+      "3NF",
+      "redundancy",
+      "functional dependency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Databases are used in almost every modern software application.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [],
+    "support_pairs": [],
+    "depth_score": 0.0056,
+    "stars": 1,
+    "stars_continuous": 1.0,
+    "quality_tier": "poor"
+  },
+  {
+    "id": "a016",
+    "question_id": "q04",
+    "student_answer": "ACID properties describe the guarantees that a database transaction provides to keep data reliable. For example, atomicity ensures that a transaction either completes fully or has no effect at all, such as a bank transfer that debits one account and credits another. This is because if only half the operations succeeded, the database would be left in an inconsistent state. For instance, isolation ensures that concurrent transactions do not see each other's uncommitted changes. This matters because without isolation, two transactions running at the same time could produce incorrect results. However, strict isolation levels can reduce throughput under heavy concurrent load. In conclusion, atomicity, consistency, isolation, and durability together make transactions safe even in the presence of failures or concurrency.",
+    "reference_answer": "ACID properties describe the guarantees that a database transaction provides to keep data reliable: atomicity ensures a transaction fully completes or has no effect, consistency ensures the database moves between valid states, isolation ensures concurrent transactions do not interfere with each other, and durability ensures committed changes survive system failures. Together these properties make transactions safe under concurrency and failure.",
+    "concepts": [
+      "atomicity",
+      "consistency",
+      "isolation",
+      "durability",
+      "transactions"
+    ],
+    "sentence_roles": [
+      {
+        "text": "ACID properties describe the guarantees that a database transaction provides to keep data reliable.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, atomicity ensures that a transaction either completes fully or has no effect at all, such as a bank transfer that debits one account and credits another.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because if only half the operations succeeded, the database would be left in an inconsistent state.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, isolation ensures that concurrent transactions do not see each other's uncommitted changes.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This matters because without isolation, two transactions running at the same time could produce incorrect results.",
+        "role": "Explanation"
+      },
+      {
+        "text": "However, strict isolation levels can reduce throughput under heavy concurrent load.",
+        "role": "Other"
+      },
+      {
+        "text": "In conclusion, atomicity, consistency, isolation, and durability together make transactions safe even in the presence of failures or concurrency.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "atomicity",
+      "consistency",
+      "isolation",
+      "durability",
+      "transactions"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Contradicts"
+      },
+      {
+        "i": 5,
+        "j": 6,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9542,
+    "stars": 5,
+    "stars_continuous": 4.6,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a017",
+    "question_id": "q04",
+    "student_answer": "ACID properties describe the guarantees that a database transaction provides to keep data reliable. For example, atomicity ensures that a transaction either completes fully or has no effect at all, such as a bank transfer that debits one account and credits another. This is because if only half the operations succeeded, the database would be left in an inconsistent state. In conclusion, atomicity, consistency, isolation, and durability together make transactions safe even in the presence of failures or concurrency.",
+    "reference_answer": "ACID properties describe the guarantees that a database transaction provides to keep data reliable: atomicity ensures a transaction fully completes or has no effect, consistency ensures the database moves between valid states, isolation ensures concurrent transactions do not interfere with each other, and durability ensures committed changes survive system failures. Together these properties make transactions safe under concurrency and failure.",
+    "concepts": [
+      "atomicity",
+      "consistency",
+      "isolation",
+      "durability",
+      "transactions"
+    ],
+    "sentence_roles": [
+      {
+        "text": "ACID properties describe the guarantees that a database transaction provides to keep data reliable.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, atomicity ensures that a transaction either completes fully or has no effect at all, such as a bank transfer that debits one account and credits another.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because if only half the operations succeeded, the database would be left in an inconsistent state.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, atomicity, consistency, isolation, and durability together make transactions safe even in the presence of failures or concurrency.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "atomicity",
+      "consistency",
+      "isolation",
+      "durability",
+      "transactions"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9218,
+    "stars": 5,
+    "stars_continuous": 4.6,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a018",
+    "question_id": "q04",
+    "student_answer": "ACID properties describe the guarantees that a database transaction provides to keep data reliable. For example, atomicity ensures that a transaction either completes fully or has no effect at all, such as a bank transfer that debits one account and credits another. Relational databases such as PostgreSQL and MySQL implement these guarantees.",
+    "reference_answer": "ACID properties describe the guarantees that a database transaction provides to keep data reliable: atomicity ensures a transaction fully completes or has no effect, consistency ensures the database moves between valid states, isolation ensures concurrent transactions do not interfere with each other, and durability ensures committed changes survive system failures. Together these properties make transactions safe under concurrency and failure.",
+    "concepts": [
+      "atomicity",
+      "consistency",
+      "isolation",
+      "durability",
+      "transactions"
+    ],
+    "sentence_roles": [
+      {
+        "text": "ACID properties describe the guarantees that a database transaction provides to keep data reliable.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, atomicity ensures that a transaction either completes fully or has no effect at all, such as a bank transfer that debits one account and credits another.",
+        "role": "Evidence"
+      },
+      {
+        "text": "Relational databases such as PostgreSQL and MySQL implement these guarantees.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [
+      "atomicity"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.5255,
+    "stars": 2,
+    "stars_continuous": 2.45,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a019",
+    "question_id": "q04",
+    "student_answer": "Relational databases such as PostgreSQL and MySQL implement these guarantees. ACID properties describe the guarantees that a database transaction provides to keep data reliable.",
+    "reference_answer": "ACID properties describe the guarantees that a database transaction provides to keep data reliable: atomicity ensures a transaction fully completes or has no effect, consistency ensures the database moves between valid states, isolation ensures concurrent transactions do not interfere with each other, and durability ensures committed changes survive system failures. Together these properties make transactions safe under concurrency and failure.",
+    "concepts": [
+      "atomicity",
+      "consistency",
+      "isolation",
+      "durability",
+      "transactions"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Relational databases such as PostgreSQL and MySQL implement these guarantees.",
+        "role": "Other"
+      },
+      {
+        "text": "ACID properties describe the guarantees that a database transaction provides to keep data reliable.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.2551,
+    "stars": 2,
+    "stars_continuous": 1.52,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a020",
+    "question_id": "q04",
+    "student_answer": "Relational databases such as PostgreSQL and MySQL implement these guarantees.",
+    "reference_answer": "ACID properties describe the guarantees that a database transaction provides to keep data reliable: atomicity ensures a transaction fully completes or has no effect, consistency ensures the database moves between valid states, isolation ensures concurrent transactions do not interfere with each other, and durability ensures committed changes survive system failures. Together these properties make transactions safe under concurrency and failure.",
+    "concepts": [
+      "atomicity",
+      "consistency",
+      "isolation",
+      "durability",
+      "transactions"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Relational databases such as PostgreSQL and MySQL implement these guarantees.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [],
+    "support_pairs": [],
+    "depth_score": 0.0331,
+    "stars": 1,
+    "stars_continuous": 1.05,
+    "quality_tier": "poor"
+  },
+  {
+    "id": "a021",
+    "question_id": "q05",
+    "student_answer": "The OSI model divides network communication into seven layers, each responsible for a specific function. For example, the physical layer handles raw bit transmission over a medium, while the network layer is responsible for routing packets between devices using IP addresses. This is because separating these responsibilities allows hardware and addressing concerns to be handled independently. For instance, the transport layer, using protocols like TCP, provides reliable delivery and flow control between endpoints. This matters because reliable delivery would otherwise have to be reimplemented by every application. In conclusion, the layered OSI model, from the application layer down to the physical layer, allows each layer to be developed and changed independently.",
+    "reference_answer": "The OSI model divides network communication into seven layers, each responsible for a specific function, from the physical layer that transmits raw bits, through the network layer that routes packets using IP addresses, up to the application layer that provides services directly to end user software. The transport layer, using protocols like TCP, provides reliable delivery and flow control between endpoints. This layered design allows each layer to evolve independently.",
+    "concepts": [
+      "OSI model",
+      "physical layer",
+      "network layer",
+      "transport layer",
+      "application layer"
+    ],
+    "sentence_roles": [
+      {
+        "text": "The OSI model divides network communication into seven layers, each responsible for a specific function.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, the physical layer handles raw bit transmission over a medium, while the network layer is responsible for routing packets between devices using IP addresses.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because separating these responsibilities allows hardware and addressing concerns to be handled independently.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, the transport layer, using protocols like TCP, provides reliable delivery and flow control between endpoints.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This matters because reliable delivery would otherwise have to be reimplemented by every application.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, the layered OSI model, from the application layer down to the physical layer, allows each layer to be developed and changed independently.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "OSI model",
+      "physical layer",
+      "network layer",
+      "transport layer",
+      "application layer"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9671,
+    "stars": 5,
+    "stars_continuous": 4.68,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a022",
+    "question_id": "q05",
+    "student_answer": "The OSI model divides network communication into seven layers, each responsible for a specific function. For example, the physical layer handles raw bit transmission over a medium, while the network layer is responsible for routing packets between devices using IP addresses. This is because separating these responsibilities allows hardware and addressing concerns to be handled independently. In conclusion, the layered OSI model, from the application layer down to the physical layer, allows each layer to be developed and changed independently.",
+    "reference_answer": "The OSI model divides network communication into seven layers, each responsible for a specific function, from the physical layer that transmits raw bits, through the network layer that routes packets using IP addresses, up to the application layer that provides services directly to end user software. The transport layer, using protocols like TCP, provides reliable delivery and flow control between endpoints. This layered design allows each layer to evolve independently.",
+    "concepts": [
+      "OSI model",
+      "physical layer",
+      "network layer",
+      "transport layer",
+      "application layer"
+    ],
+    "sentence_roles": [
+      {
+        "text": "The OSI model divides network communication into seven layers, each responsible for a specific function.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, the physical layer handles raw bit transmission over a medium, while the network layer is responsible for routing packets between devices using IP addresses.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because separating these responsibilities allows hardware and addressing concerns to be handled independently.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, the layered OSI model, from the application layer down to the physical layer, allows each layer to be developed and changed independently.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "OSI model",
+      "physical layer",
+      "network layer",
+      "transport layer",
+      "application layer"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.908,
+    "stars": 5,
+    "stars_continuous": 4.53,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a023",
+    "question_id": "q05",
+    "student_answer": "The OSI model divides network communication into seven layers, each responsible for a specific function. For example, the physical layer handles raw bit transmission over a medium, while the network layer is responsible for routing packets between devices using IP addresses. The OSI model was created as a conceptual framework by the ISO.",
+    "reference_answer": "The OSI model divides network communication into seven layers, each responsible for a specific function, from the physical layer that transmits raw bits, through the network layer that routes packets using IP addresses, up to the application layer that provides services directly to end user software. The transport layer, using protocols like TCP, provides reliable delivery and flow control between endpoints. This layered design allows each layer to evolve independently.",
+    "concepts": [
+      "OSI model",
+      "physical layer",
+      "network layer",
+      "transport layer",
+      "application layer"
+    ],
+    "sentence_roles": [
+      {
+        "text": "The OSI model divides network communication into seven layers, each responsible for a specific function.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, the physical layer handles raw bit transmission over a medium, while the network layer is responsible for routing packets between devices using IP addresses.",
+        "role": "Evidence"
+      },
+      {
+        "text": "The OSI model was created as a conceptual framework by the ISO.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [
+      "OSI model",
+      "physical layer",
+      "network layer",
+      "transport layer",
+      "application layer"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.4961,
+    "stars": 4,
+    "stars_continuous": 3.59,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a024",
+    "question_id": "q05",
+    "student_answer": "The OSI model was created as a conceptual framework by the ISO. The OSI model divides network communication into seven layers, each responsible for a specific function.",
+    "reference_answer": "The OSI model divides network communication into seven layers, each responsible for a specific function, from the physical layer that transmits raw bits, through the network layer that routes packets using IP addresses, up to the application layer that provides services directly to end user software. The transport layer, using protocols like TCP, provides reliable delivery and flow control between endpoints. This layered design allows each layer to evolve independently.",
+    "concepts": [
+      "OSI model",
+      "physical layer",
+      "network layer",
+      "transport layer",
+      "application layer"
+    ],
+    "sentence_roles": [
+      {
+        "text": "The OSI model was created as a conceptual framework by the ISO.",
+        "role": "Other"
+      },
+      {
+        "text": "The OSI model divides network communication into seven layers, each responsible for a specific function.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "OSI model",
+      "network layer"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.2103,
+    "stars": 2,
+    "stars_continuous": 1.93,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a025",
+    "question_id": "q05",
+    "student_answer": "The OSI model was created as a conceptual framework by the ISO.",
+    "reference_answer": "The OSI model divides network communication into seven layers, each responsible for a specific function, from the physical layer that transmits raw bits, through the network layer that routes packets using IP addresses, up to the application layer that provides services directly to end user software. The transport layer, using protocols like TCP, provides reliable delivery and flow control between endpoints. This layered design allows each layer to evolve independently.",
+    "concepts": [
+      "OSI model",
+      "physical layer",
+      "network layer",
+      "transport layer",
+      "application layer"
+    ],
+    "sentence_roles": [
+      {
+        "text": "The OSI model was created as a conceptual framework by the ISO.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [
+      "OSI model"
+    ],
+    "support_pairs": [],
+    "depth_score": 0.0048,
+    "stars": 1,
+    "stars_continuous": 1.22,
+    "quality_tier": "poor"
+  },
+  {
+    "id": "a026",
+    "question_id": "q06",
+    "student_answer": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed. For example, TCP is connection-oriented and establishes a handshake before transferring data, guaranteeing reliable, in-order delivery. This is because TCP retransmits lost packets and acknowledges received ones, which adds reliability at the cost of overhead. For instance, UDP is connectionless and sends packets without guaranteeing delivery, which results in lower latency. This matters because applications like video streaming or online gaming prefer low latency over perfect reliability. However, UDP is not always unreliable in practice, since applications can add their own retransmission logic on top of it. In conclusion, TCP is preferred when reliability matters, while UDP is preferred when speed and low latency matter more.",
+    "reference_answer": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed. TCP is connection-oriented, establishing a handshake and guaranteeing reliable, in-order delivery through acknowledgements and retransmission. UDP is connectionless and sends packets without delivery guarantees, resulting in lower latency that suits real-time applications such as video streaming and gaming.",
+    "concepts": [
+      "TCP",
+      "UDP",
+      "reliability",
+      "connection-oriented",
+      "connectionless",
+      "latency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, TCP is connection-oriented and establishes a handshake before transferring data, guaranteeing reliable, in-order delivery.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because TCP retransmits lost packets and acknowledges received ones, which adds reliability at the cost of overhead.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, UDP is connectionless and sends packets without guaranteeing delivery, which results in lower latency.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This matters because applications like video streaming or online gaming prefer low latency over perfect reliability.",
+        "role": "Explanation"
+      },
+      {
+        "text": "However, UDP is not always unreliable in practice, since applications can add their own retransmission logic on top of it.",
+        "role": "Other"
+      },
+      {
+        "text": "In conclusion, TCP is preferred when reliability matters, while UDP is preferred when speed and low latency matter more.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "TCP",
+      "UDP",
+      "reliability",
+      "connection-oriented",
+      "connectionless",
+      "latency"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Contradicts"
+      },
+      {
+        "i": 5,
+        "j": 6,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9094,
+    "stars": 4,
+    "stars_continuous": 4.38,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a027",
+    "question_id": "q06",
+    "student_answer": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed. For example, TCP is connection-oriented and establishes a handshake before transferring data, guaranteeing reliable, in-order delivery. This is because TCP retransmits lost packets and acknowledges received ones, which adds reliability at the cost of overhead. For instance, UDP is connectionless and sends packets without guaranteeing delivery, which results in lower latency. In conclusion, TCP is preferred when reliability matters, while UDP is preferred when speed and low latency matter more.",
+    "reference_answer": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed. TCP is connection-oriented, establishing a handshake and guaranteeing reliable, in-order delivery through acknowledgements and retransmission. UDP is connectionless and sends packets without delivery guarantees, resulting in lower latency that suits real-time applications such as video streaming and gaming.",
+    "concepts": [
+      "TCP",
+      "UDP",
+      "reliability",
+      "connection-oriented",
+      "connectionless",
+      "latency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, TCP is connection-oriented and establishes a handshake before transferring data, guaranteeing reliable, in-order delivery.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because TCP retransmits lost packets and acknowledges received ones, which adds reliability at the cost of overhead.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, UDP is connectionless and sends packets without guaranteeing delivery, which results in lower latency.",
+        "role": "Evidence"
+      },
+      {
+        "text": "In conclusion, TCP is preferred when reliability matters, while UDP is preferred when speed and low latency matter more.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "TCP",
+      "UDP",
+      "reliability",
+      "connection-oriented",
+      "connectionless",
+      "latency"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9581,
+    "stars": 5,
+    "stars_continuous": 4.64,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a028",
+    "question_id": "q06",
+    "student_answer": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed. For example, TCP is connection-oriented and establishes a handshake before transferring data, guaranteeing reliable, in-order delivery. This is because TCP retransmits lost packets and acknowledges received ones, which adds reliability at the cost of overhead.",
+    "reference_answer": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed. TCP is connection-oriented, establishing a handshake and guaranteeing reliable, in-order delivery through acknowledgements and retransmission. UDP is connectionless and sends packets without delivery guarantees, resulting in lower latency that suits real-time applications such as video streaming and gaming.",
+    "concepts": [
+      "TCP",
+      "UDP",
+      "reliability",
+      "connection-oriented",
+      "connectionless",
+      "latency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, TCP is connection-oriented and establishes a handshake before transferring data, guaranteeing reliable, in-order delivery.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because TCP retransmits lost packets and acknowledges received ones, which adds reliability at the cost of overhead.",
+        "role": "Explanation"
+      }
+    ],
+    "concepts_present": [
+      "TCP",
+      "UDP",
+      "reliability",
+      "connection-oriented"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      }
+    ],
+    "depth_score": 0.7822,
+    "stars": 4,
+    "stars_continuous": 3.87,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a029",
+    "question_id": "q06",
+    "student_answer": "Both protocols operate on top of the Internet Protocol (IP). TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed.",
+    "reference_answer": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed. TCP is connection-oriented, establishing a handshake and guaranteeing reliable, in-order delivery through acknowledgements and retransmission. UDP is connectionless and sends packets without delivery guarantees, resulting in lower latency that suits real-time applications such as video streaming and gaming.",
+    "concepts": [
+      "TCP",
+      "UDP",
+      "reliability",
+      "connection-oriented",
+      "connectionless",
+      "latency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Both protocols operate on top of the Internet Protocol (IP).",
+        "role": "Other"
+      },
+      {
+        "text": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "TCP",
+      "UDP",
+      "reliability"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Contradicts"
+      }
+    ],
+    "depth_score": 0.2092,
+    "stars": 2,
+    "stars_continuous": 1.89,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a030",
+    "question_id": "q06",
+    "student_answer": "Both protocols operate on top of the Internet Protocol (IP).",
+    "reference_answer": "TCP and UDP are both transport-layer protocols, but they make very different trade-offs between reliability and speed. TCP is connection-oriented, establishing a handshake and guaranteeing reliable, in-order delivery through acknowledgements and retransmission. UDP is connectionless and sends packets without delivery guarantees, resulting in lower latency that suits real-time applications such as video streaming and gaming.",
+    "concepts": [
+      "TCP",
+      "UDP",
+      "reliability",
+      "connection-oriented",
+      "connectionless",
+      "latency"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Both protocols operate on top of the Internet Protocol (IP).",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [],
+    "support_pairs": [],
+    "depth_score": 0.0562,
+    "stars": 1,
+    "stars_continuous": 1.16,
+    "quality_tier": "poor"
+  },
+  {
+    "id": "a031",
+    "question_id": "q07",
+    "student_answer": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle. For example, the waterfall model moves sequentially through fixed phases such as requirements, design, implementation, and testing, only moving forward once each phase is complete. This is because waterfall assumes requirements are well understood upfront and rarely change during development. For instance, agile methodology breaks work into short iterations called sprints, delivering working software incrementally and gathering feedback along the way. This matters because iterative development allows teams to adapt to changing requirements instead of committing to a rigid plan. In conclusion, waterfall offers predictability for well-defined projects, while agile offers flexibility for projects with evolving requirements.",
+    "reference_answer": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle. Waterfall moves sequentially through fixed phases such as requirements, design, implementation, and testing, assuming requirements are well understood upfront. Agile breaks work into short iterations called sprints, delivering working software incrementally and adapting to feedback and changing requirements along the way.",
+    "concepts": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development",
+      "sprints",
+      "requirements phase"
+    ],
+    "sentence_roles": [
+      {
+        "text": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, the waterfall model moves sequentially through fixed phases such as requirements, design, implementation, and testing, only moving forward once each phase is complete.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because waterfall assumes requirements are well understood upfront and rarely change during development.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, agile methodology breaks work into short iterations called sprints, delivering working software incrementally and gathering feedback along the way.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This matters because iterative development allows teams to adapt to changing requirements instead of committing to a rigid plan.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, waterfall offers predictability for well-defined projects, while agile offers flexibility for projects with evolving requirements.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development",
+      "sprints",
+      "requirements phase"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9665,
+    "stars": 5,
+    "stars_continuous": 4.67,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a032",
+    "question_id": "q07",
+    "student_answer": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle. For example, the waterfall model moves sequentially through fixed phases such as requirements, design, implementation, and testing, only moving forward once each phase is complete. This is because waterfall assumes requirements are well understood upfront and rarely change during development. For instance, agile methodology breaks work into short iterations called sprints, delivering working software incrementally and gathering feedback along the way. In conclusion, waterfall offers predictability for well-defined projects, while agile offers flexibility for projects with evolving requirements.",
+    "reference_answer": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle. Waterfall moves sequentially through fixed phases such as requirements, design, implementation, and testing, assuming requirements are well understood upfront. Agile breaks work into short iterations called sprints, delivering working software incrementally and adapting to feedback and changing requirements along the way.",
+    "concepts": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development",
+      "sprints",
+      "requirements phase"
+    ],
+    "sentence_roles": [
+      {
+        "text": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, the waterfall model moves sequentially through fixed phases such as requirements, design, implementation, and testing, only moving forward once each phase is complete.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because waterfall assumes requirements are well understood upfront and rarely change during development.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, agile methodology breaks work into short iterations called sprints, delivering working software incrementally and gathering feedback along the way.",
+        "role": "Evidence"
+      },
+      {
+        "text": "In conclusion, waterfall offers predictability for well-defined projects, while agile offers flexibility for projects with evolving requirements.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development",
+      "sprints",
+      "requirements phase"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9637,
+    "stars": 5,
+    "stars_continuous": 4.67,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a033",
+    "question_id": "q07",
+    "student_answer": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle. For example, the waterfall model moves sequentially through fixed phases such as requirements, design, implementation, and testing, only moving forward once each phase is complete. This is because waterfall assumes requirements are well understood upfront and rarely change during development.",
+    "reference_answer": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle. Waterfall moves sequentially through fixed phases such as requirements, design, implementation, and testing, assuming requirements are well understood upfront. Agile breaks work into short iterations called sprints, delivering working software incrementally and adapting to feedback and changing requirements along the way.",
+    "concepts": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development",
+      "sprints",
+      "requirements phase"
+    ],
+    "sentence_roles": [
+      {
+        "text": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, the waterfall model moves sequentially through fixed phases such as requirements, design, implementation, and testing, only moving forward once each phase is complete.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because waterfall assumes requirements are well understood upfront and rarely change during development.",
+        "role": "Explanation"
+      }
+    ],
+    "concepts_present": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development",
+      "requirements phase"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      }
+    ],
+    "depth_score": 0.7828,
+    "stars": 4,
+    "stars_continuous": 4.08,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a034",
+    "question_id": "q07",
+    "student_answer": "Both models aim to deliver working software to end users. The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle.",
+    "reference_answer": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle. Waterfall moves sequentially through fixed phases such as requirements, design, implementation, and testing, assuming requirements are well understood upfront. Agile breaks work into short iterations called sprints, delivering working software incrementally and adapting to feedback and changing requirements along the way.",
+    "concepts": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development",
+      "sprints",
+      "requirements phase"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Both models aim to deliver working software to end users.",
+        "role": "Other"
+      },
+      {
+        "text": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.256,
+    "stars": 2,
+    "stars_continuous": 2.48,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a035",
+    "question_id": "q07",
+    "student_answer": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle..",
+    "reference_answer": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle. Waterfall moves sequentially through fixed phases such as requirements, design, implementation, and testing, assuming requirements are well understood upfront. Agile breaks work into short iterations called sprints, delivering working software incrementally and adapting to feedback and changing requirements along the way.",
+    "concepts": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development",
+      "sprints",
+      "requirements phase"
+    ],
+    "sentence_roles": [
+      {
+        "text": "The waterfall model and agile methodology represent two very different approaches to organizing the software development lifecycle..",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "waterfall model",
+      "agile methodology",
+      "iterative development"
+    ],
+    "support_pairs": [],
+    "depth_score": 0.2001,
+    "stars": 2,
+    "stars_continuous": 2.32,
+    "quality_tier": "poor"
+  },
+  {
+    "id": "a036",
+    "question_id": "q08",
+    "student_answer": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases. For example, a linear search that checks every element once has O(n) time complexity, where n is the number of elements. This is because in the worst case, the algorithm may need to inspect every single element before finding the target or concluding it's absent. For instance, binary search on a sorted array runs in O(log n) time, whereas a naive nested-loop comparison runs in O(n^2) time. This matters because as input size grows, an O(n^2) algorithm becomes dramatically slower than an O(log n) or O(n) algorithm. In conclusion, Big-O notation, focused on worst-case analysis, helps compare algorithms independent of hardware or implementation details.",
+    "reference_answer": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases, typically focusing on worst-case analysis. A linear search runs in O(n) time because it may inspect every element, binary search on sorted data runs in O(log n) time, and a naive nested-loop comparison runs in O(n^2) time. Big-O allows algorithms to be compared independent of hardware or implementation details.",
+    "concepts": [
+      "big-O notation",
+      "time complexity",
+      "worst-case analysis",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, a linear search that checks every element once has O(n) time complexity, where n is the number of elements.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because in the worst case, the algorithm may need to inspect every single element before finding the target or concluding it's absent.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, binary search on a sorted array runs in O(log n) time, whereas a naive nested-loop comparison runs in O(n^2) time.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This matters because as input size grows, an O(n^2) algorithm becomes dramatically slower than an O(log n) or O(n) algorithm.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, Big-O notation, focused on worst-case analysis, helps compare algorithms independent of hardware or implementation details.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "big-O notation",
+      "time complexity",
+      "worst-case analysis",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Contradicts"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9406,
+    "stars": 5,
+    "stars_continuous": 4.54,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a037",
+    "question_id": "q08",
+    "student_answer": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases. For example, a linear search that checks every element once has O(n) time complexity, where n is the number of elements. This is because in the worst case, the algorithm may need to inspect every single element before finding the target or concluding it's absent. In conclusion, Big-O notation, focused on worst-case analysis, helps compare algorithms independent of hardware or implementation details.",
+    "reference_answer": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases, typically focusing on worst-case analysis. A linear search runs in O(n) time because it may inspect every element, binary search on sorted data runs in O(log n) time, and a naive nested-loop comparison runs in O(n^2) time. Big-O allows algorithms to be compared independent of hardware or implementation details.",
+    "concepts": [
+      "big-O notation",
+      "time complexity",
+      "worst-case analysis",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, a linear search that checks every element once has O(n) time complexity, where n is the number of elements.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because in the worst case, the algorithm may need to inspect every single element before finding the target or concluding it's absent.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, Big-O notation, focused on worst-case analysis, helps compare algorithms independent of hardware or implementation details.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "big-O notation",
+      "time complexity",
+      "worst-case analysis",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.8871,
+    "stars": 4,
+    "stars_continuous": 4.42,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a038",
+    "question_id": "q08",
+    "student_answer": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases. For example, a linear search that checks every element once has O(n) time complexity, where n is the number of elements. This is because in the worst case, the algorithm may need to inspect every single element before finding the target or concluding it's absent.",
+    "reference_answer": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases, typically focusing on worst-case analysis. A linear search runs in O(n) time because it may inspect every element, binary search on sorted data runs in O(log n) time, and a naive nested-loop comparison runs in O(n^2) time. Big-O allows algorithms to be compared independent of hardware or implementation details.",
+    "concepts": [
+      "big-O notation",
+      "time complexity",
+      "worst-case analysis",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, a linear search that checks every element once has O(n) time complexity, where n is the number of elements.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because in the worst case, the algorithm may need to inspect every single element before finding the target or concluding it's absent.",
+        "role": "Explanation"
+      }
+    ],
+    "concepts_present": [
+      "big-O notation",
+      "time complexity",
+      "worst-case analysis",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      }
+    ],
+    "depth_score": 0.7789,
+    "stars": 4,
+    "stars_continuous": 4.38,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a039",
+    "question_id": "q08",
+    "student_answer": "Time complexity is usually taught alongside space complexity in algorithms courses. Big-O notation describes how the running time of an algorithm grows as the size of its input increases.",
+    "reference_answer": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases, typically focusing on worst-case analysis. A linear search runs in O(n) time because it may inspect every element, binary search on sorted data runs in O(log n) time, and a naive nested-loop comparison runs in O(n^2) time. Big-O allows algorithms to be compared independent of hardware or implementation details.",
+    "concepts": [
+      "big-O notation",
+      "time complexity",
+      "worst-case analysis",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Time complexity is usually taught alongside space complexity in algorithms courses.",
+        "role": "Other"
+      },
+      {
+        "text": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "big-O notation",
+      "time complexity",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.2127,
+    "stars": 3,
+    "stars_continuous": 2.64,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a040",
+    "question_id": "q08",
+    "student_answer": "Time complexity is usually taught alongside space complexity in algorithms courses.",
+    "reference_answer": "Big-O notation describes how the running time of an algorithm grows as the size of its input increases, typically focusing on worst-case analysis. A linear search runs in O(n) time because it may inspect every element, binary search on sorted data runs in O(log n) time, and a naive nested-loop comparison runs in O(n^2) time. Big-O allows algorithms to be compared independent of hardware or implementation details.",
+    "concepts": [
+      "big-O notation",
+      "time complexity",
+      "worst-case analysis",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Time complexity is usually taught alongside space complexity in algorithms courses.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [
+      "time complexity",
+      "linear time",
+      "logarithmic time",
+      "quadratic time"
+    ],
+    "support_pairs": [],
+    "depth_score": 0.0566,
+    "stars": 2,
+    "stars_continuous": 2.23,
+    "quality_tier": "poor"
+  },
+  {
+    "id": "a041",
+    "question_id": "q09",
+    "student_answer": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms, but they differ in how they partition data and in their stability. For example, quicksort selects a pivot element and partitions the array so that smaller elements go left and larger elements go right, then recursively sorts each side. This is because a good pivot choice keeps the partitions balanced, giving quicksort an average-case time complexity of O(n log n). For instance, merge sort splits the array in half, recursively sorts each half, and merges the results, which makes it a stable sort. This matters because stability preserves the relative order of equal elements, which quicksort does not guarantee. In conclusion, merge sort offers predictable performance and stability, while quicksort is often faster in practice due to lower constant factors.",
+    "reference_answer": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms. Quicksort selects a pivot and partitions elements around it, achieving O(n log n) average-case time but O(n^2) worst-case time on adversarial input. Merge sort always splits the array in half and merges sorted halves, giving guaranteed O(n log n) performance and stability, meaning equal elements retain their relative order.",
+    "concepts": [
+      "quicksort",
+      "merge sort",
+      "divide and conquer",
+      "pivot",
+      "stability",
+      "average-case complexity"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms, but they differ in how they partition data and in their stability.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, quicksort selects a pivot element and partitions the array so that smaller elements go left and larger elements go right, then recursively sorts each side.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because a good pivot choice keeps the partitions balanced, giving quicksort an average-case time complexity of O(n log n).",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, merge sort splits the array in half, recursively sorts each half, and merges the results, which makes it a stable sort.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This matters because stability preserves the relative order of equal elements, which quicksort does not guarantee.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, merge sort offers predictable performance and stability, while quicksort is often faster in practice due to lower constant factors.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "quicksort",
+      "merge sort",
+      "divide and conquer",
+      "pivot",
+      "stability",
+      "average-case complexity"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9489,
+    "stars": 5,
+    "stars_continuous": 4.58,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a042",
+    "question_id": "q09",
+    "student_answer": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms, but they differ in how they partition data and in their stability. For example, quicksort selects a pivot element and partitions the array so that smaller elements go left and larger elements go right, then recursively sorts each side. This is because a good pivot choice keeps the partitions balanced, giving quicksort an average-case time complexity of O(n log n). In conclusion, merge sort offers predictable performance and stability, while quicksort is often faster in practice due to lower constant factors.",
+    "reference_answer": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms. Quicksort selects a pivot and partitions elements around it, achieving O(n log n) average-case time but O(n^2) worst-case time on adversarial input. Merge sort always splits the array in half and merges sorted halves, giving guaranteed O(n log n) performance and stability, meaning equal elements retain their relative order.",
+    "concepts": [
+      "quicksort",
+      "merge sort",
+      "divide and conquer",
+      "pivot",
+      "stability",
+      "average-case complexity"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms, but they differ in how they partition data and in their stability.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, quicksort selects a pivot element and partitions the array so that smaller elements go left and larger elements go right, then recursively sorts each side.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because a good pivot choice keeps the partitions balanced, giving quicksort an average-case time complexity of O(n log n).",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, merge sort offers predictable performance and stability, while quicksort is often faster in practice due to lower constant factors.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "quicksort",
+      "merge sort",
+      "divide and conquer",
+      "pivot",
+      "stability",
+      "average-case complexity"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.8971,
+    "stars": 4,
+    "stars_continuous": 4.47,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a043",
+    "question_id": "q09",
+    "student_answer": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms, but they differ in how they partition data and in their stability. For example, quicksort selects a pivot element and partitions the array so that smaller elements go left and larger elements go right, then recursively sorts each side. Both algorithms are commonly implemented in standard library sorting functions.",
+    "reference_answer": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms. Quicksort selects a pivot and partitions elements around it, achieving O(n log n) average-case time but O(n^2) worst-case time on adversarial input. Merge sort always splits the array in half and merges sorted halves, giving guaranteed O(n log n) performance and stability, meaning equal elements retain their relative order.",
+    "concepts": [
+      "quicksort",
+      "merge sort",
+      "divide and conquer",
+      "pivot",
+      "stability",
+      "average-case complexity"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms, but they differ in how they partition data and in their stability.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, quicksort selects a pivot element and partitions the array so that smaller elements go left and larger elements go right, then recursively sorts each side.",
+        "role": "Evidence"
+      },
+      {
+        "text": "Both algorithms are commonly implemented in standard library sorting functions.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [
+      "quicksort",
+      "merge sort",
+      "divide and conquer",
+      "pivot",
+      "stability"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.5209,
+    "stars": 3,
+    "stars_continuous": 3.44,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a044",
+    "question_id": "q09",
+    "student_answer": "Both algorithms are commonly implemented in standard library sorting functions. Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms, but they differ in how they partition data and in their stability.",
+    "reference_answer": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms. Quicksort selects a pivot and partitions elements around it, achieving O(n log n) average-case time but O(n^2) worst-case time on adversarial input. Merge sort always splits the array in half and merges sorted halves, giving guaranteed O(n log n) performance and stability, meaning equal elements retain their relative order.",
+    "concepts": [
+      "quicksort",
+      "merge sort",
+      "divide and conquer",
+      "pivot",
+      "stability",
+      "average-case complexity"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Both algorithms are commonly implemented in standard library sorting functions.",
+        "role": "Other"
+      },
+      {
+        "text": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms, but they differ in how they partition data and in their stability.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "quicksort",
+      "merge sort",
+      "divide and conquer",
+      "stability"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Contradicts"
+      }
+    ],
+    "depth_score": 0.2126,
+    "stars": 2,
+    "stars_continuous": 2.17,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a045",
+    "question_id": "q09",
+    "student_answer": "Both algorithms are commonly implemented in standard library sorting functions.",
+    "reference_answer": "Quicksort and merge sort are both efficient divide-and-conquer sorting algorithms. Quicksort selects a pivot and partitions elements around it, achieving O(n log n) average-case time but O(n^2) worst-case time on adversarial input. Merge sort always splits the array in half and merges sorted halves, giving guaranteed O(n log n) performance and stability, meaning equal elements retain their relative order.",
+    "concepts": [
+      "quicksort",
+      "merge sort",
+      "divide and conquer",
+      "pivot",
+      "stability",
+      "average-case complexity"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Both algorithms are commonly implemented in standard library sorting functions.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [],
+    "support_pairs": [],
+    "depth_score": 0.0337,
+    "stars": 1,
+    "stars_continuous": 1.05,
+    "quality_tier": "poor"
+  },
+  {
+    "id": "a046",
+    "question_id": "q10",
+    "student_answer": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed. For example, a stack follows a last-in-first-out (LIFO) order, where the push operation adds an element to the top and pop removes the most recently added element. This is because LIFO behavior makes stacks useful for tasks like function call tracking and undo operations. For instance, a queue follows a first-in-first-out (FIFO) order, where enqueue adds an element at the back and dequeue removes one from the front. This matters because FIFO behavior makes queues useful for tasks like task scheduling and breadth-first search. However, a naive array-based queue implementation can require shifting elements unless a circular buffer is used. In conclusion, choosing between a stack and a queue depends on whether the problem requires LIFO or FIFO ordering of elements.",
+    "reference_answer": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed. A stack follows last-in-first-out (LIFO) order using push and pop operations, making it useful for function call tracking and undo operations. A queue follows first-in-first-out (FIFO) order using enqueue and dequeue operations, making it useful for task scheduling and breadth-first search.",
+    "concepts": [
+      "stack",
+      "queue",
+      "LIFO",
+      "FIFO",
+      "push and pop",
+      "enqueue and dequeue"
+    ],
+    "sentence_roles": [
+      {
+        "text": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, a stack follows a last-in-first-out (LIFO) order, where the push operation adds an element to the top and pop removes the most recently added element.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because LIFO behavior makes stacks useful for tasks like function call tracking and undo operations.",
+        "role": "Explanation"
+      },
+      {
+        "text": "For instance, a queue follows a first-in-first-out (FIFO) order, where enqueue adds an element at the back and dequeue removes one from the front.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This matters because FIFO behavior makes queues useful for tasks like task scheduling and breadth-first search.",
+        "role": "Explanation"
+      },
+      {
+        "text": "However, a naive array-based queue implementation can require shifting elements unless a circular buffer is used.",
+        "role": "Other"
+      },
+      {
+        "text": "In conclusion, choosing between a stack and a queue depends on whether the problem requires LIFO or FIFO ordering of elements.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "stack",
+      "queue",
+      "LIFO",
+      "FIFO",
+      "push and pop",
+      "enqueue and dequeue"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Supports"
+      },
+      {
+        "i": 3,
+        "j": 4,
+        "label": "Supports"
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "label": "Contradicts"
+      },
+      {
+        "i": 5,
+        "j": 6,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.9384,
+    "stars": 5,
+    "stars_continuous": 4.53,
+    "quality_tier": "excellent"
+  },
+  {
+    "id": "a047",
+    "question_id": "q10",
+    "student_answer": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed. For example, a stack follows a last-in-first-out (LIFO) order, where the push operation adds an element to the top and pop removes the most recently added element. This is because LIFO behavior makes stacks useful for tasks like function call tracking and undo operations. In conclusion, choosing between a stack and a queue depends on whether the problem requires LIFO or FIFO ordering of elements.",
+    "reference_answer": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed. A stack follows last-in-first-out (LIFO) order using push and pop operations, making it useful for function call tracking and undo operations. A queue follows first-in-first-out (FIFO) order using enqueue and dequeue operations, making it useful for task scheduling and breadth-first search.",
+    "concepts": [
+      "stack",
+      "queue",
+      "LIFO",
+      "FIFO",
+      "push and pop",
+      "enqueue and dequeue"
+    ],
+    "sentence_roles": [
+      {
+        "text": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, a stack follows a last-in-first-out (LIFO) order, where the push operation adds an element to the top and pop removes the most recently added element.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because LIFO behavior makes stacks useful for tasks like function call tracking and undo operations.",
+        "role": "Explanation"
+      },
+      {
+        "text": "In conclusion, choosing between a stack and a queue depends on whether the problem requires LIFO or FIFO ordering of elements.",
+        "role": "Conclusion"
+      }
+    ],
+    "concepts_present": [
+      "stack",
+      "queue",
+      "LIFO",
+      "FIFO",
+      "push and pop"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "label": "Neutral"
+      }
+    ],
+    "depth_score": 0.8973,
+    "stars": 4,
+    "stars_continuous": 4.21,
+    "quality_tier": "good"
+  },
+  {
+    "id": "a048",
+    "question_id": "q10",
+    "student_answer": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed. For example, a stack follows a last-in-first-out (LIFO) order, where the push operation adds an element to the top and pop removes the most recently added element. This is because LIFO behavior makes stacks useful for tasks like function call tracking and undo operations.",
+    "reference_answer": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed. A stack follows last-in-first-out (LIFO) order using push and pop operations, making it useful for function call tracking and undo operations. A queue follows first-in-first-out (FIFO) order using enqueue and dequeue operations, making it useful for task scheduling and breadth-first search.",
+    "concepts": [
+      "stack",
+      "queue",
+      "LIFO",
+      "FIFO",
+      "push and pop",
+      "enqueue and dequeue"
+    ],
+    "sentence_roles": [
+      {
+        "text": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed.",
+        "role": "Claim"
+      },
+      {
+        "text": "For example, a stack follows a last-in-first-out (LIFO) order, where the push operation adds an element to the top and pop removes the most recently added element.",
+        "role": "Evidence"
+      },
+      {
+        "text": "This is because LIFO behavior makes stacks useful for tasks like function call tracking and undo operations.",
+        "role": "Explanation"
+      }
+    ],
+    "concepts_present": [
+      "stack",
+      "queue",
+      "LIFO",
+      "push and pop"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Supports"
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "label": "Supports"
+      }
+    ],
+    "depth_score": 0.8199,
+    "stars": 4,
+    "stars_continuous": 4.06,
+    "quality_tier": "average"
+  },
+  {
+    "id": "a049",
+    "question_id": "q10",
+    "student_answer": "Both stacks and queues can be implemented using arrays or linked lists. A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed.",
+    "reference_answer": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed. A stack follows last-in-first-out (LIFO) order using push and pop operations, making it useful for function call tracking and undo operations. A queue follows first-in-first-out (FIFO) order using enqueue and dequeue operations, making it useful for task scheduling and breadth-first search.",
+    "concepts": [
+      "stack",
+      "queue",
+      "LIFO",
+      "FIFO",
+      "push and pop",
+      "enqueue and dequeue"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Both stacks and queues can be implemented using arrays or linked lists.",
+        "role": "Other"
+      },
+      {
+        "text": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed.",
+        "role": "Claim"
+      }
+    ],
+    "concepts_present": [
+      "stack",
+      "queue"
+    ],
+    "support_pairs": [
+      {
+        "i": 0,
+        "j": 1,
+        "label": "Contradicts"
+      }
+    ],
+    "depth_score": 0.2272,
+    "stars": 2,
+    "stars_continuous": 1.71,
+    "quality_tier": "weak"
+  },
+  {
+    "id": "a050",
+    "question_id": "q10",
+    "student_answer": "Both stacks and queues can be implemented using arrays or linked lists.",
+    "reference_answer": "A stack and a queue are both linear data structures, but they differ in the order in which elements are added and removed. A stack follows last-in-first-out (LIFO) order using push and pop operations, making it useful for function call tracking and undo operations. A queue follows first-in-first-out (FIFO) order using enqueue and dequeue operations, making it useful for task scheduling and breadth-first search.",
+    "concepts": [
+      "stack",
+      "queue",
+      "LIFO",
+      "FIFO",
+      "push and pop",
+      "enqueue and dequeue"
+    ],
+    "sentence_roles": [
+      {
+        "text": "Both stacks and queues can be implemented using arrays or linked lists.",
+        "role": "Other"
+      }
+    ],
+    "concepts_present": [],
+    "support_pairs": [],
+    "depth_score": 0.0028,
+    "stars": 1,
+    "stars_continuous": 1.0,
+    "quality_tier": "poor"
+  }
+]

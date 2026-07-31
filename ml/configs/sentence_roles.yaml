@@ -1,0 +1,35 @@
+# Config for Module 1: Sentence Roles classifier
+# (Claim / Evidence / Explanation / Conclusion / Other)
+
+module: sentence_roles
+backend: sklearn   # sklearn | transformers
+
+sklearn:
+  max_features: 3000
+  ngram_range: [1, 2]
+  C: 2.0
+
+transformers:
+  enabled: false
+  model_name: distilbert-base-uncased
+  num_labels: 5
+  max_length: 64
+  learning_rate: 2.0e-5
+  num_train_epochs: 4
+  batch_size: 8
+
+data:
+  train_split: train
+  val_split: val
+  test_split: test
+
+output:
+  checkpoint_dir: checkpoints/sentence_roles
+  metrics_file: checkpoints/sentence_roles/metrics.json
+
+labels:
+  - Claim
+  - Evidence
+  - Explanation
+  - Conclusion
+  - Other

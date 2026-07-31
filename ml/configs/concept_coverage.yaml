@@ -1,0 +1,31 @@
+# Config for Module 2: Concept Coverage classifier
+# Binary classification: is a given concept covered by the student answer?
+
+module: concept_coverage
+backend: sklearn   # sklearn | transformers
+
+sklearn:
+  max_features: 2000
+  ngram_range: [1, 2]
+  C: 1.0
+
+transformers:
+  enabled: false
+  model_name: distilbert-base-uncased
+  max_length: 128
+  learning_rate: 2.0e-5
+  num_train_epochs: 4
+  batch_size: 8
+
+data:
+  train_split: train
+  val_split: val
+  test_split: test
+
+output:
+  checkpoint_dir: checkpoints/concept_coverage
+  metrics_file: checkpoints/concept_coverage/metrics.json
+
+labels:
+  - not_covered
+  - covered

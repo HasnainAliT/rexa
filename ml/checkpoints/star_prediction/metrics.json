@@ -1,0 +1,30 @@
+{
+  "module": "star_prediction",
+  "backend": "sklearn",
+  "train_size": 30,
+  "val_size": 10,
+  "test_size": 10,
+  "train_time_seconds": 2.219,
+  "val_metrics": {
+    "mae": 0.3517,
+    "rmse": 0.406,
+    "r2": 0.9278,
+    "spearman_rho": 0.8909,
+    "spearman_pvalue": 0.0005,
+    "n_samples": 10,
+    "exact_accuracy": 0.6,
+    "within_one_star_accuracy": 1.0,
+    "quadratic_weighted_kappa": 0.9048
+  },
+  "test_metrics": {
+    "mae": 0.3782,
+    "rmse": 0.526,
+    "r2": 0.8554,
+    "spearman_rho": 0.8788,
+    "spearman_pvalue": 0.0008,
+    "n_samples": 10,
+    "exact_accuracy": 0.7,
+    "within_one_star_accuracy": 1.0,
+    "quadratic_weighted_kappa": 0.9239
+  }
+}

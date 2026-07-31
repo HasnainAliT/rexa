@@ -1,0 +1,62 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Backend (Python / FastAPI)
+backend/.venv/
+backend/*.db
+backend/.env
+
+# ML training artifacts
+ml/.venv/
+ml/checkpoints/**/__pycache__/
+
+# Large weight files exceed GitHub's 100MB limit — keep locally / Colab zip
+ml/checkpoints/**/model.safetensors
+ml/checkpoints/**/model.bin
+ml/checkpoints/**/pytorch_model.bin
+ml/checkpoints/**/*.pt
+ml/checkpoints/**/*.pth
+ml/checkpoints/**/optimizer.pt
+ml/checkpoints/**/training_args.bin
+ml/checkpoints/**/runs/
+*.zip
+
+# Python (shared)
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+
+# Processed / cached data
+data/processed/*.pkl
+data/processed/large/
+data/processed/large/_labeling_checkpoint.jsonl
+
+# Large raw corpora (re-download; see data/raw/large/README.md)
+data/raw/large/*.csv
+data/raw/large/*.json
+!data/raw/large/README.md
+!data/raw/large/corpus_manifest.json

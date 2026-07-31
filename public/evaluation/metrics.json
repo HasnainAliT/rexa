@@ -1,0 +1,143 @@
+{
+  "objectives": [
+    {
+      "id": 1,
+      "title": "Classify sentences of descriptive answers into different reasoning levels",
+      "covered_by": [
+        "Sentence Roles module",
+        "Reasoning Engine role coloring",
+        "Figure 03"
+      ],
+      "metrics": {
+        "accuracy": 0.9588,
+        "macro_f1": 0.9446,
+        "weighted_f1": 0.9608
+      }
+    },
+    {
+      "id": 2,
+      "title": "Analyze how an answer progresses from basic explanation to deeper reasoning",
+      "covered_by": [
+        "Reasoning Depth module",
+        "Support & Contradiction links",
+        "Figure 04"
+      ],
+      "metrics": {
+        "mae": 0.0721,
+        "rmse": 0.0964,
+        "r2": 0.7499,
+        "spearman_rho": 0.8405,
+        "spearman_pvalue": 0.0,
+        "n_samples": 3857
+      }
+    },
+    {
+      "id": 3,
+      "title": "Present explainable visual output to show reasoning patterns in answers",
+      "covered_by": [
+        "Reasoning Engine UI",
+        "Concept coverage chips",
+        "Dimension bars + explanations",
+        "Figure 08"
+      ],
+      "metrics": {
+        "star_mae": 0.6032,
+        "within_one_star": 0.8325,
+        "baseline_mae": 1.3862
+      }
+    }
+  ],
+  "corpus": {
+    "train": 18014,
+    "val": 3857,
+    "test": 3857,
+    "total": 25728,
+    "sources": [
+      "asap2 (HF/Kaggle AES 2.0)",
+      "aera-asap-sas (HF AERA)"
+    ]
+  },
+  "manifest": {
+    "total": 25728,
+    "train": 18014,
+    "val": 3857,
+    "test": 3857,
+    "sources": {
+      "asap2": 17307,
+      "aera-asap-sas": 8421
+    },
+    "star_min": 1.0,
+    "star_max": 5.0,
+    "citations": [
+      "Learning Agency Lab ASAP 2.0 / Kaggle AES 2.0 (jatinmehra/Automated-Essay-Scoring-2.0)",
+      "ASAP-SAS via AERA (jiazhengli/AERA) \u2014 Hewlett Foundation Short Answer Scoring"
+    ],
+    "labeling": {
+      "stars": "gold human scores mapped to 1\u20135",
+      "roles_support_concepts_depth": "silver labels from RExA heuristic pipeline"
+    }
+  },
+  "modules": {
+    "sentence_roles": {
+      "accuracy": 0.9588,
+      "macro_f1": 0.9446,
+      "per_class_f1": {
+        "Claim": 0.9462732919254658,
+        "Evidence": 0.9961077844311377,
+        "Explanation": 0.9952969484851799,
+        "Conclusion": 0.8174876478514748,
+        "Other": 0.9678857223080163
+      }
+    },
+    "concept_coverage": {
+      "accuracy": 0.8568,
+      "macro_f1": 0.6846
+    },
+    "support_contradiction": {
+      "accuracy": 1.0,
+      "note": "Measured against silver labels from heuristic teacher"
+    },
+    "reasoning_depth": {
+      "mae": 0.0721,
+      "rmse": 0.0964,
+      "r2": 0.7499,
+      "spearman_rho": 0.8405,
+      "spearman_pvalue": 0.0,
+      "n_samples": 3857
+    },
+    "star_prediction": {
+      "rexa": {
+        "mae": 0.6032,
+        "rmse": 0.7683,
+        "r2": 0.4943,
+        "spearman_rho": 0.7427,
+        "spearman_pvalue": 0.0,
+        "n_samples": 3857,
+        "exact_accuracy": 0.0,
+        "within_one_star_accuracy": 0.8325,
+        "quadratic_weighted_kappa": 0.0
+      },
+      "keyword_baseline": {
+        "mae": 1.3862,
+        "rmse": 1.7099,
+        "r2": -1.5049,
+        "spearman_rho": -0.2423,
+        "spearman_pvalue": 0.0,
+        "n_samples": 3857,
+        "exact_accuracy": 0.0275,
+        "within_one_star_accuracy": 0.4037,
+        "quadratic_weighted_kappa": 0.0
+      }
+    }
+  },
+  "figures": [
+    "01_dataset_preprocessing.png",
+    "02_preprocessing_pipeline.png",
+    "03_obj1_sentence_roles_metrics.png",
+    "04_obj2_reasoning_depth.png",
+    "05_before_after_star_results.png",
+    "06_module_metrics_overview.png",
+    "07_training_curves_mae.png",
+    "08_obj3_explainable_visuals.png"
+  ]
+}

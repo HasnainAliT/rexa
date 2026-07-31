@@ -1,0 +1,8 @@
+{
+  "mae": 0.0721,
+  "rmse": 0.0964,
+  "r2": 0.7499,
+  "spearman_rho": 0.8405,
+  "spearman_pvalue": 0.0,
+  "n_samples": 3857
+}

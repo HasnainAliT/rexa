@@ -1,0 +1,11 @@
+{
+  "mae": 0.6032,
+  "rmse": 0.7683,
+  "r2": 0.4943,
+  "spearman_rho": 0.7427,
+  "spearman_pvalue": 0.0,
+  "n_samples": 3857,
+  "exact_accuracy": 0.0,
+  "within_one_star_accuracy": 0.8325,
+  "quadratic_weighted_kappa": 0.0
+}

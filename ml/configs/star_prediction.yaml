@@ -1,0 +1,31 @@
+# Config for Module 5: Star Prediction regressor
+# Predicts a holistic 1-5 star rating from (student_answer, reference_answer).
+
+module: star_prediction
+backend: sklearn   # sklearn | transformers
+
+sklearn:
+  max_features: 3000
+  ngram_range: [1, 2]
+  n_estimators: 250
+  learning_rate: 0.05
+  max_depth: 3
+
+transformers:
+  enabled: false
+  model_name: distilbert-base-uncased
+  max_length: 256
+  learning_rate: 2.0e-5
+  num_train_epochs: 4
+  batch_size: 8
+
+data:
+  train_split: train
+  val_split: val
+  test_split: test
+
+output:
+  checkpoint_dir: checkpoints/star_prediction
+  metrics_file: checkpoints/star_prediction/metrics.json
+
+target_range: [1.0, 5.0]

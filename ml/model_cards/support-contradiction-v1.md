@@ -1,0 +1,63 @@
+# Model Card: Support & Contradiction Classifier
+
+**Version:** trained-v1 (auto-generated 2026-07-29 18:05)
+**Task:** 3-class classification (Supports / Contradicts / Neutral) of adjacent sentence pairs
+**Backend:** sklearn
+
+## Intended Use
+
+Labels the logical relation between consecutive sentences, replacing `CueBasedSupportAnalyzer`.
+
+This model is a trainable counterpart to a stage in the heuristic REXA
+pipeline (`backend/app/services/rexa_pipeline.py`). It is intended to
+eventually replace that stage once validated on real annotated data; until
+then the heuristic remains the default in production (`MODEL_MODE=heuristic`).
+
+## Training Data
+
+- Source: `data/processed/train.json` (see `data/README.md`)
+- Train size: 72
+- Validation size: 23
+- Test size: 22
+- Training time: 5.512s
+
+The bundled sample dataset is synthetic (hand-authored CS/SE exam answers at
+five quality tiers). Before production use, retrain on real, human-annotated
+student answers collected via `data/annotations/annotation_guidelines.md`.
+
+## Validation Metrics
+
+| Metric | Value |
+|---|---|
+| accuracy | 0.9565 |
+| macro_f1 | 0.9232 |
+| weighted_f1 | 0.9528 |
+
+## Test Metrics
+
+| Metric | Value |
+|---|---|
+| accuracy | 0.9545 |
+| macro_f1 | 0.921 |
+| weighted_f1 | 0.9582 |
+
+## Limitations
+
+- Trained on a small (n=50) synthetic sample dataset; metrics will not
+  generalize to real student answers or other course domains without
+  retraining on representative data.
+- TF-IDF features do not capture semantic paraphrase (e.g., a correct answer
+  phrased very differently from the training vocabulary may be
+  under-scored). Consider a transformer backend (`--backend transformers`)
+  once sufficient labeled data is available.
+- No fairness/bias auditing has been performed across student demographics,
+  languages, or writing styles.
+
+## How to Reproduce
+
+```bash
+cd ml
+python scripts/prepare_data.py
+python scripts/train_support_contradiction.py
+python scripts/export_model_card.py --module support_contradiction
+```
