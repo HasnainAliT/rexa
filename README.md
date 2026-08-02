@@ -315,11 +315,10 @@ the Keyword Overlap and TF-IDF baselines.
 
 ## Free public website (for reviewers)
 
-Deploy once on Render (free) so anyone can open the app with one link — no install.
+**No credit card:** deploy on **Hugging Face Spaces** (Docker).  
+See **[docs/deploy_free.md](docs/deploy_free.md)** — skip Render/Vercel if they ask for a card.
 
-See **[docs/deploy_free.md](docs/deploy_free.md)** → connect GitHub repo `HasnainAliT/rexa` as a Blueprint.
-
-Demo accounts after deploy: `admin@earas.edu` / `Admin1234`
+Demo accounts: `admin@earas.edu` / `Admin1234`
 
 ## Research notebook & DistilBERT (comparative)
 

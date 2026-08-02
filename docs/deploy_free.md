@@ -1,37 +1,65 @@
-# Free public deploy (clickable website link)
+# Free public website (no credit card)
 
-This puts **frontend + API on one URL** so anyone can open RExA in the browser
-(no install, no GitHub clone).
+Goal: a link anyone can open, like  
+`https://huggingface.co/spaces/YOUR_USERNAME/rexa`
 
-## Recommended: Render (free)
+**Do not use Render / Vercel if they ask for a card.**  
+Use **Hugging Face Spaces** instead (free Docker, usually **no card**).
 
-1. Open [https://dashboard.render.com](https://dashboard.render.com) and sign up (GitHub login is easiest).
-2. Click **New +** → **Blueprint**
-3. Connect the repo: **HasnainAliT/rexa**
-4. Render reads [`render.yaml`](../render.yaml) and builds the Docker image.
-5. Wait for the first deploy (often 10–20 minutes).
-6. Open the service URL, e.g. `https://rexa-xxxx.onrender.com`
+---
 
-**Demo login**
+## Hugging Face Spaces (recommended — free, no card)
+
+### 1) Create account
+1. Open [https://huggingface.co/join](https://huggingface.co/join)
+2. Sign up with email or GitHub  
+3. Confirm email if asked
+
+### 2) Create a Space
+1. Open [https://huggingface.co/new-space](https://huggingface.co/new-space)
+2. **Space name:** `rexa`
+3. **License:** MIT (or any)
+4. **SDK:** **Docker**
+5. **Hardware:** **CPU basic** (Free)
+6. **Visibility:** **Public**
+7. Create Space
+
+### 3) Get a write token
+1. [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+2. **Create new token** → type **Write** → create  
+3. Copy the token (starts with `hf_...`)
+
+### 4) Deploy from this project (PowerShell)
+
+In the project folder, replace `YOUR_HF_USERNAME` and paste your token when asked:
+
+```powershell
+cd "C:\Users\Hasnain Ali Talpur\Projects\earas"
+.\scripts\deploy_hf_space.ps1 -HfUsername "YOUR_HF_USERNAME"
+```
+
+Or tell me your Hugging Face **username** after you create the Space, and I can run the deploy for you (you paste the token once).
+
+### 5) Open your public link
+
+After the build turns green (5–15 minutes):
+
+`https://huggingface.co/spaces/YOUR_HF_USERNAME/rexa`
+
+**Login**
 
 - `admin@earas.edu` / `Admin1234`
 - `analyst@earas.edu` / `Analyst1234`
 
-### Notes
+---
 
-- Free instances **sleep** after ~15 minutes idle; the first click after sleep can take ~30–60s.
-- DistilBERT is **off** in this deploy (`USE_DISTILBERT_STARS=false`) to fit free RAM.
-- Core RExA sklearn modules ship in the image when `MODEL_MODE=trained`.
+## Why not Render / Vercel?
 
-## Share this
+Many accounts now must add a **credit card** even for “free” plans.  
+Hugging Face Spaces free CPU does **not** require that for a normal student account.
 
-After deploy, send your classmates/supervisor only the **https://….onrender.com** link.
+---
 
-## Local check of the same Docker image
+## After you deploy
 
-```powershell
-docker build -t rexa .
-docker run --rm -p 8000:8000 rexa
-```
-
-Then open http://localhost:8000
+You can still change code on your PC → push GitHub → re-run the HF deploy script (or push to the Space remote) to update the live site.
