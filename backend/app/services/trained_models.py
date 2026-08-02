@@ -114,20 +114,26 @@ def _load_distilbert_stars():
 
 
 class TrainedRexaPipeline:
-    """REXA pipeline backed by trained sklearn (+ optional DistilBERT stars)."""
+    """Core RExA pipeline backed by trained sklearn (+ optional DistilBERT comparative stars)."""
 
     MODEL_VERSION = "trained-large-aes-v1"
 
     def __init__(self) -> None:
+        from app.config import settings
+
         self.splitter = RegexSentenceSplitter()
         self.role_model = _load_joblib(_resolve_checkpoint("sentence_roles"))
         self.concept_model = _load_joblib(_resolve_checkpoint("concept_coverage"))
         self.support_model = _load_joblib(_resolve_checkpoint("support_contradiction"))
         self.depth_model = _load_joblib(_resolve_checkpoint("reasoning_depth"))
         self.star_model = _load_joblib(_resolve_checkpoint("star_prediction"))
-        self.distilbert_stars = _load_distilbert_stars()
-        if self.distilbert_stars is not None:
+        # Comparative experiment only — enabled via USE_DISTILBERT_STARS=true
+        self.use_distilbert = bool(settings.USE_DISTILBERT_STARS)
+        self.distilbert_stars = _load_distilbert_stars() if self.use_distilbert else None
+        if self.use_distilbert and self.distilbert_stars is not None:
             self.MODEL_VERSION = "trained-distilbert-v1"
+        else:
+            self.MODEL_VERSION = "trained-large-aes-v1"
 
     def _classify_roles(self, sentences: list[Sentence]) -> None:
         if not sentences:
@@ -246,7 +252,7 @@ class TrainedRexaPipeline:
             coverage_pct, depth_score, sentences, support_pairs
         )
 
-        # Prefer DistilBERT star head when available (Colab-trained checkpoint)
+        # Optional comparative DistilBERT head (USE_DISTILBERT_STARS=true)
         if self.distilbert_stars is not None:
             try:
                 stars = float(self.distilbert_stars.predict([student_answer])[0])

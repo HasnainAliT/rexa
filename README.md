@@ -21,8 +21,10 @@ The RExA reasoning-analysis pipeline:
    plain-English explanations.
 
 > This repository contains the full stack: a React + TypeScript frontend, a FastAPI +
-> SQLAlchemy backend implementing the REXA pipeline, and Docker Compose tooling for running
-> PostgreSQL and the API in a production-like environment.
+> SQLAlchemy backend implementing the RExA pipeline, Docker Compose tooling, and the
+> canonical Colab research notebook
+> [`ml/notebooks/05_rexa_v2_core_pipeline.ipynb`](ml/notebooks/05_rexa_v2_core_pipeline.ipynb)
+> (Core RExA + DistilBERT/DeBERTa/BART comparative experiments).
 
 ---
 
@@ -57,7 +59,7 @@ answer. These approaches:
   did, which is unhelpful for feedback and indefensible in an academic setting.
 - Cannot detect internal contradictions within a student's own answer.
 
-**EARAS/REXA** addresses this gap by evaluating answers along multiple *interpretable*
+**RExA** addresses this gap by evaluating answers along multiple *interpretable*
 dimensions (concept coverage, reasoning depth, sentence-role structure, support quality)
 and by generating explicit, human-readable explanations for every score, while remaining
 fast and dependency-light enough to run entirely on CPU with no GPU or paid API required —
@@ -147,7 +149,7 @@ sequence diagram, see **[docs/architecture.md](docs/architecture.md)**.
 
 ## Quick Start
 
-There are two ways to run EARAS locally. **Option A** (fully local, no Docker) is the
+There are two ways to run RExA locally. **Option A** (fully local, no Docker) is the
 fastest for day-to-day development and demos. **Option B** uses Docker Compose to run
 PostgreSQL and the API in containers, which is closer to a production deployment.
 
@@ -234,7 +236,7 @@ schema and seeds two accounts:
 | Analyst | `analyst@earas.edu`   | `Analyst1234` |
 
 > ⚠️ These are development/demo credentials only. Change them (or disable seeding) before
-> deploying EARAS anywhere beyond local development or an academic demo environment.
+> deploying RExA anywhere beyond local development or an academic demo environment.
 
 ## Project Structure
 
@@ -311,11 +313,15 @@ frontend. See **[docs/architecture.md](docs/architecture.md)** for a full walkth
 **[docs/evaluation_report.md](docs/evaluation_report.md)** for how REXA compares against
 the Keyword Overlap and TF-IDF baselines.
 
-## DistilBERT (optional, Google Colab)
+## Research notebook & DistilBERT (comparative)
 
-For a stronger transformer-based star scorer on the ASAP corpora, see
-[docs/colab_distilbert.md](docs/colab_distilbert.md) and the notebook
-`ml/notebooks/04_distilbert_colab.ipynb`.
+| Item | Role |
+|------|------|
+| [`ml/notebooks/05_rexa_v2_core_pipeline.ipynb`](ml/notebooks/05_rexa_v2_core_pipeline.ipynb) | **Main** Colab research notebook — Core RExA + comparative experiments |
+| [`docs/rexa_v2_notebook_integration.md`](docs/rexa_v2_notebook_integration.md) | How notebook, app, and models fit together |
+| DistilBERT ([`docs/colab_distilbert.md`](docs/colab_distilbert.md)) | **Comparative** score baseline only — not the proposed system |
+
+Set `USE_DISTILBERT_STARS=false` (default) so the API serves **Core RExA**.
 
 ## Documentation
 
@@ -325,11 +331,14 @@ Full FYP documentation lives in [`docs/`](docs/):
 |----------|-------------|
 | [`docs/SRS.md`](docs/SRS.md) | Software Requirements Specification — functional & non-functional requirements, actors, use cases |
 | [`docs/architecture.md`](docs/architecture.md) | System architecture, sequence diagrams, data model (ER diagram) |
+| [`docs/rexa_v2_notebook_integration.md`](docs/rexa_v2_notebook_integration.md) | Core RExA notebook integration + proposed vs comparative models |
+| [`docs/objectives_and_results.md`](docs/objectives_and_results.md) | Objectives, figures, before/after metrics |
 | [`docs/user_manual.md`](docs/user_manual.md) | Page-by-page user manual for the frontend |
 | [`docs/annotation_protocol.md`](docs/annotation_protocol.md) | Protocol for labeling sentence roles, concepts, support, depth, and stars |
 | [`docs/demo_script.md`](docs/demo_script.md) | 10-minute viva demo walkthrough |
 | [`docs/viva_slides_outline.md`](docs/viva_slides_outline.md) | Slide-by-slide outline for the defense presentation |
-| [`docs/evaluation_report.md`](docs/evaluation_report.md) | Experimental setup and REXA vs. baseline results |
+| [`docs/evaluation_report.md`](docs/evaluation_report.md) | Experimental setup and RExA vs. baseline results |
+| [`docs/colab_distilbert.md`](docs/colab_distilbert.md) | DistilBERT comparative experiment (Colab) |
 | [`docs/api.md`](docs/api.md) | API endpoint reference summary |
 
 Backend-specific implementation notes (pipeline internals, endpoint list, Docker

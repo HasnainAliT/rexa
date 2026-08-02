@@ -1,5 +1,12 @@
 # RExA FYP — Objectives, Graphs & Results
 
+**Title:** Explainable Reasoning Analysis of Descriptive Answers  
+**Research notebook:** [`ml/notebooks/05_rexa_v2_core_pipeline.ipynb`](../ml/notebooks/05_rexa_v2_core_pipeline.ipynb)  
+**Integration notes:** [`rexa_v2_notebook_integration.md`](rexa_v2_notebook_integration.md)
+
+> **Proposed system** = Core RExA (roles / coverage / depth / explainable UI).  
+> **Comparative experiment** = DistilBERT score regression (do not present as the main contribution).
+
 ## Three project objectives
 
 | # | Objective | How RExA covers it | Key evidence |

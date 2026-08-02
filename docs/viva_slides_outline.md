@@ -12,6 +12,8 @@ count to your allotted time slot; suggested cuts are marked *(optional)*.
 
 - Project title: **RExA: Explainable Reasoning Analysis of Descriptive Answers**
 - Short name: **RExA**
+- Research notebook: `ml/notebooks/05_rexa_v2_core_pipeline.ipynb`
+- Proposed = Core RExA · Comparative = DistilBERT / DeBERTa / BART
 - Your name, registration number, supervisor's name, institution, date.
 
 ### Slide 2 — Agenda

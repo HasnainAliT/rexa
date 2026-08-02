@@ -22,8 +22,10 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
-    # REXA
+    # RExA
     MODEL_MODE: str = "heuristic"
+    # DistilBERT is a comparative scoring experiment — off by default so Core RExA serves demos
+    USE_DISTILBERT_STARS: bool = False
 
     @property
     def cors_origins_list(self) -> List[str]:

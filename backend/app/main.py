@@ -109,15 +109,16 @@ def seed_database() -> None:
             )
             db.add(
                 ModelVersion(
-                    name="RExA Large AES/SAS Ensemble",
+                    name="RExA Core (Large Ensemble)",
                     version="trained-large-aes-v1",
                     description=(
-                        "Trained on ~25.7k public ASAP 2.0 + ASAP-SAS (AERA) responses. "
-                        "Gold stars from human scores; structural labels are silver."
+                        "Proposed Core RExA pipeline modules (roles, coverage, support, depth, stars) "
+                        "trained on ~25.7k ASAP 2.0 + ASAP-SAS responses. Explainable structural analysis."
                     ),
                     is_active=settings.MODEL_MODE.lower() == "trained",
                     metrics_json={
                         "mode": "trained",
+                        "role": "proposed_system",
                         "corpus_size": 25728,
                         "star_mae": 0.6032,
                         "star_spearman": 0.7427,
@@ -129,21 +130,23 @@ def seed_database() -> None:
                             "reasoning_depth",
                             "star_prediction",
                         ],
+                        "research_notebook": "ml/notebooks/05_rexa_v2_core_pipeline.ipynb",
                     },
                 )
             )
             db.add(
                 ModelVersion(
-                    name="RExA DistilBERT Star Scorer",
+                    name="DistilBERT Score Baseline (Comparative)",
                     version="trained-distilbert-v1",
                     description=(
-                        "DistilBERT (distilbert-base-uncased) fine-tuned on ASAP 2.0 + ASAP-SAS "
-                        "for 1–5 star regression. Train in Google Colab, then place checkpoint under "
-                        "ml/checkpoints/distilbert_stars/model/. Uses sklearn RExA modules for explanations."
+                        "Comparative experiment only — DistilBERT regression for score estimation. "
+                        "Not the proposed Core RExA system. See docs/colab_distilbert.md and "
+                        "ml/notebooks/05_rexa_v2_core_pipeline.ipynb Experiment 1."
                     ),
                     is_active=False,
                     metrics_json={
                         "mode": "trained",
+                        "role": "comparative_experiment",
                         "backend": "transformers",
                         "base_model": "distilbert-base-uncased",
                         "train_guide": "docs/colab_distilbert.md",
@@ -151,6 +154,25 @@ def seed_database() -> None:
                     },
                 )
             )
+
+        # Keep model catalogue aligned with Core RExA vs DistilBERT comparative framing
+        core = db.query(ModelVersion).filter(ModelVersion.version == "trained-large-aes-v1").first()
+        distil = db.query(ModelVersion).filter(ModelVersion.version == "trained-distilbert-v1").first()
+        if core is not None:
+            core.name = "RExA Core (Large Ensemble)"
+            core.description = (
+                "Proposed Core RExA pipeline modules (roles, coverage, support, depth, stars) "
+                "trained on ~25.7k ASAP 2.0 + ASAP-SAS responses. Explainable structural analysis."
+            )
+        if distil is not None:
+            distil.name = "DistilBERT Score Baseline (Comparative)"
+            distil.description = (
+                "Comparative experiment only — DistilBERT regression for score estimation. "
+                "Not the proposed Core RExA system."
+            )
+        if settings.MODEL_MODE.lower() == "trained" and not settings.USE_DISTILBERT_STARS:
+            for m in db.query(ModelVersion).all():
+                m.is_active = m.version == "trained-large-aes-v1"
 
         db.commit()
     finally:

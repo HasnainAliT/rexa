@@ -10,15 +10,18 @@ sequence for the core "analyze" flow, the relational data model, and key design 
 
 ## 1. Architectural Style
 
-EARAS follows a classic **three-tier web architecture**:
+RExA follows a classic **three-tier web architecture**:
 
 1. **Presentation tier** — a React single-page application (SPA).
 2. **Application/logic tier** — a FastAPI REST API implementing authentication, CRUD
-   business logic, and the REXA scoring pipeline.
+   business logic, and the Core RExA scoring pipeline.
 3. **Data tier** — a relational database (PostgreSQL in Docker/production, SQLite for
    local development), accessed exclusively through SQLAlchemy ORM models.
 
-Within the backend, the REXA scoring engine is further structured as a **pipeline of
+Research / Colab experiments (including DistilBERT as a comparative baseline) live in
+`ml/notebooks/05_rexa_v2_core_pipeline.ipynb` — see `docs/rexa_v2_notebook_integration.md`.
+
+Within the backend, the RExA scoring engine is further structured as a **pipeline of
 single-responsibility stages**, each defined behind a narrow `typing.Protocol` interface.
 This follows the **Open/Closed Principle** and **Dependency Inversion**: new stages (e.g.
 a trained sentence-role classifier) can be substituted without modifying the pipeline

@@ -1,7 +1,13 @@
-# EARAS/REXA — ML Training Pipeline
+# RExA — ML Training Pipeline
 
-Trainable counterparts to the five REXA modules that currently run as a
-heuristic pipeline in `backend/app/services/rexa_pipeline.py`:
+**RExA** = Explainable Reasoning Analysis of Descriptive Answers
+
+**Canonical research notebook (teammate Colab pipeline):**  
+[`notebooks/05_rexa_v2_core_pipeline.ipynb`](notebooks/05_rexa_v2_core_pipeline.ipynb)  
+→ see [`../docs/rexa_v2_notebook_integration.md`](../docs/rexa_v2_notebook_integration.md)
+
+Trainable counterparts to the five RExA modules that currently run in
+`backend/app/services/rexa_pipeline.py`:
 
 1. **Sentence Roles** — Claim / Evidence / Explanation / Conclusion / Other
 2. **Concept Coverage** — is a required concept present in the answer?
@@ -34,9 +40,11 @@ ml/
     export_model_card.py        # Regenerate model_cards/*.md from metrics.json
     run_baselines.py            # Keyword-overlap / TF-IDF baselines vs. star labels
   notebooks/
-    01_eda.ipynb                # Dataset exploration
-    02_sentence_roles.ipynb     # Interactive training walkthrough
-    03_evaluation.ipynb         # Trained model vs. baseline comparison
+    01_eda.ipynb                   # Dataset exploration (pilot)
+    02_sentence_roles.ipynb        # Interactive training walkthrough
+    03_evaluation.ipynb            # Trained model vs. baseline comparison
+    04_distilbert_colab.ipynb      # DistilBERT comparative experiment helper
+    05_rexa_v2_core_pipeline.ipynb # MAIN research notebook (Core RExA + comparisons)
   src/
     data_utils.py                # Path resolution + per-module dataset builders
     metrics.py                    # classification / regression / ordinal metrics
@@ -68,16 +76,17 @@ python scripts/train_large_corpus.py
 
 Results: `../data/baselines/large_results.json` and `docs/large_scale_training.md`.
 
-## DistilBERT (Google Colab)
+## DistilBERT (comparative experiment)
 
-Modern transformer star scorer on the same ASAP corpora:
+DistilBERT is a **supervised scoring baseline for comparison**, not the proposed
+Core RExA system (roles + coverage + depth). See the v2 notebook Experiment 1
+and [`../docs/colab_distilbert.md`](../docs/colab_distilbert.md).
 
-- Notebook: [`notebooks/04_distilbert_colab.ipynb`](notebooks/04_distilbert_colab.ipynb)
+- Main pipeline notebook: [`notebooks/05_rexa_v2_core_pipeline.ipynb`](notebooks/05_rexa_v2_core_pipeline.ipynb)
+- Lightweight Colab helper: [`notebooks/04_distilbert_colab.ipynb`](notebooks/04_distilbert_colab.ipynb)
 - Script: `python scripts/train_distilbert_stars.py --source hf`
-- Guide: [`../docs/colab_distilbert.md`](../docs/colab_distilbert.md)
 
-After Colab training, unzip into `checkpoints/distilbert_stars/` and set
-`MODEL_MODE=trained` in the API.
+After Colab training, unzip into `checkpoints/distilbert_stars/` for optional API demos.
 
 ## Quickstart
 

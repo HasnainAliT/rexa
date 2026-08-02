@@ -1,22 +1,26 @@
-# DistilBERT + Google Colab training for RExA
+# DistilBERT + Google Colab — Comparative Experiment for RExA
 
-This guide adds a **modern transformer** (DistilBERT) to your FYP model stack,
-trained on the same public AES/SAS corpora (~25k answers).
+> **Viva framing:** DistilBERT is a **comparative experiment** (supervised score
+> regression). The **proposed system** is Core RExA (sentence roles, coverage,
+> reasoning depth, explainable feedback) — see
+> [`ml/notebooks/05_rexa_v2_core_pipeline.ipynb`](../ml/notebooks/05_rexa_v2_core_pipeline.ipynb)
+> and [`rexa_v2_notebook_integration.md`](rexa_v2_notebook_integration.md).
+
+This guide fine-tunes DistilBERT on public AES/SAS / ASAG-style corpora so you
+can compare it against Core RExA in results tables.
 
 ## Why DistilBERT + Colab?
 
 | Piece | Role |
 |-------|------|
-| **DistilBERT** (`distilbert-base-uncased`) | Contextual language model — stronger than TF-IDF for scoring free-text answers |
-| **Google Colab GPU** | Free T4 GPU so fine-tuning finishes in a reasonable time |
-| **Your laptop / FastAPI** | Serves the saved checkpoint for demos (CPU is fine for inference) |
+| **DistilBERT** | Comparative scoring baseline (not Core RExA) |
+| **Google Colab GPU** | Free T4 GPU for fine-tuning |
+| **Laptop / FastAPI** | Optional demo serving of the checkpoint |
 
-You already have:
+Comparison stack for viva:
 1. Keyword / TF-IDF baselines  
-2. Sklearn RExA models on the large corpus  
-3. **(This)** DistilBERT fine-tuned for star prediction  
-
-That three-level comparison looks strong in a viva.
+2. Core RExA (proposed explainable pipeline)  
+3. DistilBERT regression (this experiment) |
 
 ## Datasets (same as large corpus)
 

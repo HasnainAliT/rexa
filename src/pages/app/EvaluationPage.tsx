@@ -201,6 +201,15 @@ export function EvaluationPage() {
 
         {!isLoading && data && (
           <>
+            <Alert>
+              <AlertDescription>
+                <strong>Proposed system:</strong> Core RExA (roles, coverage, depth,
+                explainable feedback). <strong>DistilBERT</strong> is kept as a
+                comparative scoring experiment — see research notebook{' '}
+                <code className="text-xs">ml/notebooks/05_rexa_v2_core_pipeline.ipynb</code>.
+              </AlertDescription>
+            </Alert>
+
             <section className="space-y-3">
               <h2 className="text-lg font-semibold tracking-tight">Project objectives</h2>
               <div className="grid gap-4 lg:grid-cols-3">
