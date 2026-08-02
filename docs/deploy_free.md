@@ -1,65 +1,42 @@
 # Free public website (no credit card)
 
-Goal: a link anyone can open, like  
-`https://huggingface.co/spaces/YOUR_USERNAME/rexa`
+Your Gradio Space (free — **no Docker / no card**):
 
-**Do not use Render / Vercel if they ask for a card.**  
-Use **Hugging Face Spaces** instead (free Docker, usually **no card**).
+**https://huggingface.co/spaces/Hasnain-ai/RExA**
+
+SDK on Hugging Face must be **Gradio** (Docker is marked Paid on new accounts).
 
 ---
 
-## Hugging Face Spaces (recommended — free, no card)
+## Deploy / update the Space
 
-### 1) Create account
-1. Open [https://huggingface.co/join](https://huggingface.co/join)
-2. Sign up with email or GitHub  
-3. Confirm email if asked
+### 1) Write token
+1. Open [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+2. **Create new token** → permission **Write**
+3. Copy token (`hf_...`)
 
-### 2) Create a Space
-1. Open [https://huggingface.co/new-space](https://huggingface.co/new-space)
-2. **Space name:** `rexa`
-3. **License:** MIT (or any)
-4. **SDK:** **Docker**
-5. **Hardware:** **CPU basic** (Free)
-6. **Visibility:** **Public**
-7. Create Space
-
-### 3) Get a write token
-1. [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
-2. **Create new token** → type **Write** → create  
-3. Copy the token (starts with `hf_...`)
-
-### 4) Deploy from this project (PowerShell)
-
-In the project folder, replace `YOUR_HF_USERNAME` and paste your token when asked:
+### 2) Push the Gradio demo
 
 ```powershell
 cd "C:\Users\Hasnain Ali Talpur\Projects\earas"
-.\scripts\deploy_hf_space.ps1 -HfUsername "YOUR_HF_USERNAME"
+$env:HF_TOKEN = "hf_PASTE_YOUR_TOKEN_HERE"
+.\scripts\deploy_hf_gradio.ps1 -HfUsername "Hasnain-ai" -SpaceName "RExA"
 ```
 
-Or tell me your Hugging Face **username** after you create the Space, and I can run the deploy for you (you paste the token once).
+Or paste the token in chat and ask to deploy (do not commit the token to GitHub).
 
-### 5) Open your public link
+### 3) Share the link
 
-After the build turns green (5–15 minutes):
+After the Space build is green, anyone can open:
 
-`https://huggingface.co/spaces/YOUR_HF_USERNAME/rexa`
+https://huggingface.co/spaces/Hasnain-ai/RExA
 
-**Login**
-
-- `admin@earas.edu` / `Admin1234`
-- `analyst@earas.edu` / `Analyst1234`
+Click **Analyze with RExA**. No login required on the Space.
 
 ---
 
-## Why not Render / Vercel?
+## Notes
 
-Many accounts now must add a **credit card** even for “free” plans.  
-Hugging Face Spaces free CPU does **not** require that for a normal student account.
-
----
-
-## After you deploy
-
-You can still change code on your PC → push GitHub → re-run the HF deploy script (or push to the Space remote) to update the live site.
+- This Gradio Space demos **Core RExA analysis** (roles, coverage, depth, stars).
+- The full React website still runs locally / on GitHub: https://github.com/HasnainAliT/rexa
+- Skip Render/Vercel if they ask for a credit card.
