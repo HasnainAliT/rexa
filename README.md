@@ -313,13 +313,6 @@ frontend. See **[docs/architecture.md](docs/architecture.md)** for a full walkth
 **[docs/evaluation_report.md](docs/evaluation_report.md)** for how REXA compares against
 the Keyword Overlap and TF-IDF baselines.
 
-## Free public website (for reviewers)
-
-**No credit card:** deploy on **Hugging Face Spaces** (Docker).  
-See **[docs/deploy_free.md](docs/deploy_free.md)** — skip Render/Vercel if they ask for a card.
-
-Demo accounts: `admin@earas.edu` / `Admin1234`
-
 ## Research notebook & DistilBERT (comparative)
 
 | Item | Role |
