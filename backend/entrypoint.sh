@@ -46,4 +46,5 @@ print(f"[entrypoint] Database at {host}:{port} did not become reachable within 6
 sys.exit(1)
 PY
 
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+PORT="${PORT:-8000}"
+exec uvicorn app.main:app --host 0.0.0.0 --port "$PORT"

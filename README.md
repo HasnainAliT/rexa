@@ -313,6 +313,14 @@ frontend. See **[docs/architecture.md](docs/architecture.md)** for a full walkth
 **[docs/evaluation_report.md](docs/evaluation_report.md)** for how REXA compares against
 the Keyword Overlap and TF-IDF baselines.
 
+## Free public website (for reviewers)
+
+Deploy once on Render (free) so anyone can open the app with one link — no install.
+
+See **[docs/deploy_free.md](docs/deploy_free.md)** → connect GitHub repo `HasnainAliT/rexa` as a Blueprint.
+
+Demo accounts after deploy: `admin@earas.edu` / `Admin1234`
+
 ## Research notebook & DistilBERT (comparative)
 
 | Item | Role |

@@ -1,0 +1,25 @@
+# Free deploy on Render: https://dashboard.render.com
+# Blueprint → New Blueprint Instance → connect HasnainAliT/rexa
+services:
+  - type: web
+    name: rexa
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: MODEL_MODE
+        value: trained
+      - key: USE_DISTILBERT_STARS
+        value: "false"
+      - key: DATABASE_URL
+        value: sqlite:///./earas.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: PROJECT_NAME
+        value: RExA API
+      - key: API_PREFIX
+        value: /api

@@ -27,8 +27,13 @@ from app.services.rexa_pipeline import (
     SupportPair,
 )
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-ML_ROOT = REPO_ROOT / "ml"
+_BACKEND_ROOT = Path(__file__).resolve().parents[2]  # .../backend or /app in Docker
+_ML_CANDIDATES = (
+    _BACKEND_ROOT.parent / "ml",  # local monorepo: earas/ml
+    _BACKEND_ROOT / "ml",  # Docker image: /app/ml
+)
+ML_ROOT = next((p for p in _ML_CANDIDATES if p.exists()), _ML_CANDIDATES[0])
+REPO_ROOT = ML_ROOT.parent
 CHECKPOINTS = ML_ROOT / "checkpoints"
 CHECKPOINTS_LARGE = CHECKPOINTS / "large"
 ML_SRC = ML_ROOT / "src"

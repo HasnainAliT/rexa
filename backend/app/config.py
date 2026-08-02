@@ -29,7 +29,13 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> List[str]:
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+        raw = [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+        return raw if raw else ["*"]
+
+    @property
+    def cors_allow_credentials(self) -> bool:
+        # Browsers forbid credentials with wildcard origins
+        return self.cors_origins_list != ["*"]
 
     @property
     def is_sqlite(self) -> bool:

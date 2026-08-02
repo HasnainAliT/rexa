@@ -12,7 +12,8 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import Base, SessionLocal, engine
@@ -196,7 +197,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
+    allow_credentials=settings.cors_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -254,6 +255,28 @@ def health_check():
     return {"status": "ok", "service": settings.PROJECT_NAME, "model_mode": settings.MODEL_MODE}
 
 
-@app.get("/", tags=["health"])
-def root():
-    return {"message": f"{settings.PROJECT_NAME} is running. See /docs for API documentation."}
+# Production / free-tier deploy: serve the Vite build from ./static (same origin as /api)
+_STATIC_DIR = Path(__file__).resolve().parents[1] / "static"
+if _STATIC_DIR.is_dir() and (_STATIC_DIR / "index.html").is_file():
+    app.mount(
+        "/assets",
+        StaticFiles(directory=_STATIC_DIR / "assets"),
+        name="assets",
+    )
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def spa_fallback(full_path: str):
+        # Never shadow API / docs
+        if full_path.startswith("api") or full_path in {"docs", "openapi.json", "redoc"}:
+            raise HTTPException(status_code=404, detail="Not found")
+        candidate = _STATIC_DIR / full_path
+        if full_path and candidate.is_file():
+            return FileResponse(candidate)
+        return FileResponse(_STATIC_DIR / "index.html")
+else:
+
+    @app.get("/", tags=["health"])
+    def root():
+        return {
+            "message": f"{settings.PROJECT_NAME} is running. See /docs for API documentation."
+        }
