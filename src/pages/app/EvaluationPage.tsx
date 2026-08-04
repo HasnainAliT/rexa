@@ -22,6 +22,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 interface EvaluationMetrics {
   objectives: Array<{
@@ -77,6 +85,35 @@ const FIGURE_CAPTIONS: Record<string, string> = {
   '06_module_metrics_overview.png': 'Module accuracy / agreement overview',
   '07_training_curves_mae.png': 'Training curves (MAE vs data size)',
   '08_obj3_explainable_visuals.png': 'Obj 3 — Explainable visual output',
+  '09_rexa_module_clf_metrics.png': 'RExA Acc / Precision / Recall / F1',
+  '10_literature_model_comparison.png': 'DAES & literature vs RExA comparison',
+  '11_star_scoring_comparison.png': 'Star scoring: keyword vs RExA vs DistilBERT',
+}
+
+interface ComparisonTables {
+  rexa_clf_table: Array<{
+    Model: string
+    Accuracy: number
+    Precision: number
+    Recall: number
+    'F1-score': number
+  }>
+  literature_table: Array<{
+    Model: string
+    'Accuracy %': number | string
+    'Precision %': number | string
+    'Recall %': number | string
+    'F1 %': number | string
+    Focus: string
+  }>
+  star_table: Array<{
+    Model: string
+    'MAE (↓)': number
+    'Within-1-star % (↑)': number
+    'Exact Acc %': number
+    'Spearman ρ': number
+  }>
+  figures: string[]
 }
 
 function pct(v: number) {
@@ -85,18 +122,25 @@ function pct(v: number) {
 
 export function EvaluationPage() {
   const [data, setData] = useState<EvaluationMetrics | null>(null)
+  const [comparison, setComparison] = useState<ComparisonTables | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let mounted = true
-    fetch('/evaluation/metrics.json')
-      .then((res) => {
+    Promise.all([
+      fetch('/evaluation/metrics.json').then((res) => {
         if (!res.ok) throw new Error('Metrics file not found. Run generate_fyp_figures.py first.')
         return res.json()
-      })
-      .then((json: EvaluationMetrics) => {
-        if (mounted) setData(json)
+      }),
+      fetch('/evaluation/comparison_tables.json')
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null),
+    ])
+      .then(([json, cmp]) => {
+        if (!mounted) return
+        setData(json as EvaluationMetrics)
+        setComparison(cmp as ComparisonTables | null)
       })
       .catch((err) => {
         if (mounted) {
@@ -248,6 +292,209 @@ export function EvaluationPage() {
                 hint={`Baseline MAE ${data.modules.star_prediction.keyword_baseline.mae.toFixed(2)}`}
               />
             </section>
+
+            {comparison && (
+              <section className="space-y-4">
+                <h2 className="text-lg font-semibold tracking-tight">
+                  Accuracy · Precision · Recall · F1
+                </h2>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      Core RExA module metrics (test set)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Model</TableHead>
+                          <TableHead>Accuracy</TableHead>
+                          <TableHead>Precision</TableHead>
+                          <TableHead>Recall</TableHead>
+                          <TableHead>F1-score</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {comparison.rexa_clf_table.map((row) => (
+                          <TableRow key={row.Model}>
+                            <TableCell className="font-medium">{row.Model}</TableCell>
+                            <TableCell>{row.Accuracy}%</TableCell>
+                            <TableCell>{row.Precision}%</TableCell>
+                            <TableCell>{row.Recall}%</TableCell>
+                            <TableCell>{row['F1-score']}%</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      * Support/Contradiction 100% is vs silver heuristic labels — disclose in viva.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">
+                        RExA Acc / P / R / F1 chart
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ChartContainer className="h-72 w-full">
+                        <BarChart
+                          data={comparison.rexa_clf_table.map((r) => ({
+                            name: r.Model.replace('RExA ', '').replace(' (Core)', ''),
+                            Accuracy: r.Accuracy,
+                            Precision: r.Precision,
+                            Recall: r.Recall,
+                            F1: r['F1-score'],
+                          }))}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                          <YAxis domain={[0, 100]} />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="Accuracy" fill="#3b82f6" />
+                          <Bar dataKey="Precision" fill="#10b981" />
+                          <Bar dataKey="Recall" fill="#f59e0b" />
+                          <Bar dataKey="F1" fill="#8b5cf6" />
+                        </BarChart>
+                      </ChartContainer>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">
+                        Literature comparison (DAES & others vs RExA)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ChartContainer className="h-72 w-full">
+                        <BarChart
+                          data={comparison.literature_table
+                            .filter((r) => typeof r['F1 %'] === 'number')
+                            .map((r) => ({
+                              name: String(r.Model)
+                                .replace(' (ours)', '')
+                                .replace('DAES (LDA+T5+SBERT)', 'DAES')
+                                .replace('Ashoka et al. hybrid DL', 'Ashoka')
+                                .replace('RExA Sentence Roles', 'RExA Roles'),
+                              Accuracy: r['Accuracy %'] as number,
+                              Precision: r['Precision %'] as number,
+                              Recall: r['Recall %'] as number,
+                              F1: r['F1 %'] as number,
+                            }))}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                          <YAxis domain={[80, 100]} />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="Accuracy" fill="#3b82f6" />
+                          <Bar dataKey="Precision" fill="#10b981" />
+                          <Bar dataKey="Recall" fill="#f59e0b" />
+                          <Bar dataKey="F1" fill="#8b5cf6" />
+                        </BarChart>
+                      </ChartContainer>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        DAES (IEEE Access 2024) Acc 95% / F1 94%. RExA roles Acc 95.9% / F1
+                        94.5% — plus explainable reasoning analysis.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      Published systems vs RExA (full table)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Model</TableHead>
+                          <TableHead>Accuracy</TableHead>
+                          <TableHead>Precision</TableHead>
+                          <TableHead>Recall</TableHead>
+                          <TableHead>F1</TableHead>
+                          <TableHead>Focus</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {comparison.literature_table.map((row) => (
+                          <TableRow key={row.Model}>
+                            <TableCell className="font-medium">{row.Model}</TableCell>
+                            <TableCell>
+                              {typeof row['Accuracy %'] === 'number'
+                                ? `${row['Accuracy %']}%`
+                                : row['Accuracy %']}
+                            </TableCell>
+                            <TableCell>
+                              {typeof row['Precision %'] === 'number'
+                                ? `${row['Precision %']}%`
+                                : row['Precision %']}
+                            </TableCell>
+                            <TableCell>
+                              {typeof row['Recall %'] === 'number'
+                                ? `${row['Recall %']}%`
+                                : row['Recall %']}
+                            </TableCell>
+                            <TableCell>
+                              {typeof row['F1 %'] === 'number'
+                                ? `${row['F1 %']}%`
+                                : row['F1 %']}
+                            </TableCell>
+                            <TableCell className="max-w-[220px] text-muted-foreground">
+                              {row.Focus}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      Star scoring comparison (keyword vs RExA vs DistilBERT)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Model</TableHead>
+                          <TableHead>MAE (↓)</TableHead>
+                          <TableHead>Within-1-star %</TableHead>
+                          <TableHead>Exact Acc %</TableHead>
+                          <TableHead>Spearman ρ</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {comparison.star_table.map((row) => (
+                          <TableRow key={row.Model}>
+                            <TableCell className="font-medium">{row.Model}</TableCell>
+                            <TableCell>{row['MAE (↓)']}</TableCell>
+                            <TableCell>{row['Within-1-star % (↑)']}%</TableCell>
+                            <TableCell>{row['Exact Acc %']}%</TableCell>
+                            <TableCell>{row['Spearman ρ']}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      DistilBERT is comparative only — Core RExA remains the proposed system.
+                    </p>
+                  </CardContent>
+                </Card>
+              </section>
+            )}
 
             <section className="grid gap-4 lg:grid-cols-2">
               <Card>

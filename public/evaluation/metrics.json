@@ -138,6 +138,9 @@
     "05_before_after_star_results.png",
     "06_module_metrics_overview.png",
     "07_training_curves_mae.png",
-    "08_obj3_explainable_visuals.png"
+    "08_obj3_explainable_visuals.png",
+    "09_rexa_module_clf_metrics.png",
+    "10_literature_model_comparison.png",
+    "11_star_scoring_comparison.png"
   ]
 }

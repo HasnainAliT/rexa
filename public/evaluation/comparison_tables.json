@@ -1,0 +1,103 @@
+{
+  "rexa_clf_table": [
+    {
+      "Model": "RExA Sentence Roles (Core)",
+      "Accuracy": 95.88,
+      "Precision": 91.83,
+      "Recall": 98.29,
+      "F1-score": 94.46
+    },
+    {
+      "Model": "RExA Concept Coverage",
+      "Accuracy": 85.68,
+      "Precision": 64.74,
+      "Recall": 84.98,
+      "F1-score": 68.46
+    },
+    {
+      "Model": "RExA Support/Contradiction*",
+      "Accuracy": 100.0,
+      "Precision": 100.0,
+      "Recall": 100.0,
+      "F1-score": 100.0
+    }
+  ],
+  "literature_table": [
+    {
+      "Model": "DAES (LDA+T5+SBERT)",
+      "Accuracy %": 95.0,
+      "Precision %": 94.0,
+      "Recall %": 95.0,
+      "F1 %": 94.0,
+      "Focus": "Correctness / semantic scoring ensemble"
+    },
+    {
+      "Model": "Ashoka et al. hybrid DL",
+      "Accuracy %": 93.8,
+      "Precision %": 94.1,
+      "Recall %": 92.7,
+      "F1 %": 93.4,
+      "Focus": "Deep learning hybrid scoring"
+    },
+    {
+      "Model": "Bashir et al. (WMD/ML)",
+      "Accuracy %": 88.0,
+      "Precision %": "\u2014",
+      "Recall %": "\u2014",
+      "F1 %": "\u2014",
+      "Focus": "WMD + TF-IDF + ML grading"
+    },
+    {
+      "Model": "Manikandan et al. (WMD)",
+      "Accuracy %": 85.0,
+      "Precision %": "\u2014",
+      "Recall %": "\u2014",
+      "F1 %": "\u2014",
+      "Focus": "Semantic distance scoring"
+    },
+    {
+      "Model": "Singh et al. (ANN)",
+      "Accuracy %": 83.14,
+      "Precision %": "\u2014",
+      "Recall %": "\u2014",
+      "F1 %": "\u2014",
+      "Focus": "Neural grade prediction"
+    },
+    {
+      "Model": "RExA Sentence Roles (ours)",
+      "Accuracy %": 95.88,
+      "Precision %": 91.83,
+      "Recall %": 98.29,
+      "F1 %": 94.46,
+      "Focus": "Explainable reasoning structure (roles), not only score"
+    }
+  ],
+  "star_table": [
+    {
+      "Model": "Keyword baseline (stars)",
+      "MAE (\u2193)": 1.386,
+      "Within-1-star % (\u2191)": 40.37,
+      "Exact Acc %": 2.75,
+      "Spearman \u03c1": -0.242
+    },
+    {
+      "Model": "RExA Core star model",
+      "MAE (\u2193)": 0.603,
+      "Within-1-star % (\u2191)": 83.25,
+      "Exact Acc %": 0.0,
+      "Spearman \u03c1": 0.743
+    },
+    {
+      "Model": "DistilBERT (comparative)",
+      "MAE (\u2193)": 0.446,
+      "Within-1-star % (\u2191)": 97.2,
+      "Exact Acc %": 66.74,
+      "Spearman \u03c1": 0.828
+    }
+  ],
+  "figures": [
+    "09_rexa_module_clf_metrics.png",
+    "10_literature_model_comparison.png",
+    "11_star_scoring_comparison.png"
+  ]
+}

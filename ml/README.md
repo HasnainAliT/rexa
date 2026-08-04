@@ -45,6 +45,7 @@ ml/
     03_evaluation.ipynb            # Trained model vs. baseline comparison
     04_distilbert_colab.ipynb      # DistilBERT comparative experiment helper
     05_rexa_v2_core_pipeline.ipynb # MAIN research notebook (Core RExA + comparisons)
+    06_metrics_and_model_comparison.ipynb # Acc/P/R/F1 tables + literature graphs
   src/
     data_utils.py                # Path resolution + per-module dataset builders
     metrics.py                    # classification / regression / ordinal metrics

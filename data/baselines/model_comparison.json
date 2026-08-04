@@ -1,0 +1,117 @@
+{
+  "note": "Classification Acc/P/R/F1 for RExA modules come from the large ASAP test set (silver/gold labels as documented). Literature numbers are taken from published papers for viva comparison; tasks/datasets differ, so treat as contextual benchmarks, not identical test sets.",
+  "rexa_modules": [
+    {
+      "model": "RExA Sentence Roles (Core)",
+      "role": "proposed",
+      "accuracy": 0.9588,
+      "precision": 0.9183,
+      "recall": 0.9829,
+      "f1": 0.9446,
+      "metric_type": "macro",
+      "source": "data/baselines/large_results.json"
+    },
+    {
+      "model": "RExA Concept Coverage",
+      "role": "proposed",
+      "accuracy": 0.8568,
+      "precision": 0.6474,
+      "recall": 0.8498,
+      "f1": 0.6846,
+      "metric_type": "macro",
+      "source": "data/baselines/large_results.json"
+    },
+    {
+      "model": "RExA Support/Contradiction*",
+      "role": "proposed",
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "metric_type": "macro",
+      "caveat": "Silver labels from heuristic teacher — disclose in viva",
+      "source": "data/baselines/large_results.json"
+    }
+  ],
+  "rexa_scoring": [
+    {
+      "model": "Keyword baseline (stars)",
+      "mae": 1.3862,
+      "within_one_star": 0.4037,
+      "exact_accuracy": 0.0275,
+      "spearman": -0.2423
+    },
+    {
+      "model": "RExA Core star model",
+      "mae": 0.6032,
+      "within_one_star": 0.8325,
+      "exact_accuracy": 0.0,
+      "spearman": 0.7427
+    },
+    {
+      "model": "DistilBERT (comparative)",
+      "mae": 0.4456,
+      "within_one_star": 0.972,
+      "exact_accuracy": 0.6674,
+      "spearman": 0.828
+    }
+  ],
+  "literature": [
+    {
+      "model": "DAES (LDA+T5+SBERT)",
+      "citation": "IEEE Access 2024 — Descriptive Answers Evaluation using NLP approaches",
+      "doi": "10.1109/ACCESS.2024.3417706",
+      "accuracy": 0.95,
+      "precision": 0.94,
+      "recall": 0.95,
+      "f1": 0.94,
+      "focus": "Correctness / semantic scoring ensemble"
+    },
+    {
+      "model": "Ashoka et al. hybrid DL",
+      "citation": "Review citation — Cosine + USE + LLM hybrid",
+      "accuracy": 0.938,
+      "precision": 0.941,
+      "recall": 0.927,
+      "f1": 0.934,
+      "focus": "Deep learning hybrid scoring"
+    },
+    {
+      "model": "Bashir et al. (WMD/ML)",
+      "citation": "IEEE Access 2021 — Subjective Answers Evaluation",
+      "doi": "10.1109/ACCESS.2021.3130902",
+      "accuracy": 0.88,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "focus": "WMD + TF-IDF + ML grading"
+    },
+    {
+      "model": "Manikandan et al. (WMD)",
+      "citation": "Word2Vec + WMD descriptive scoring",
+      "accuracy": 0.85,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "focus": "Semantic distance scoring"
+    },
+    {
+      "model": "Singh et al. (ANN)",
+      "citation": "ANN Streamlit subjective scoring",
+      "accuracy": 0.8314,
+      "precision": null,
+      "recall": null,
+      "f1": null,
+      "focus": "Neural grade prediction"
+    },
+    {
+      "model": "RExA Sentence Roles (ours)",
+      "citation": "This FYP — Core RExA reasoning-role classification",
+      "accuracy": 0.9588,
+      "precision": 0.9183,
+      "recall": 0.9829,
+      "f1": 0.9446,
+      "focus": "Explainable reasoning structure (roles), not only score"
+    }
+  ]
+}

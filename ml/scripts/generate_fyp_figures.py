@@ -388,6 +388,9 @@ def write_metrics_json(results: dict, manifest: dict) -> None:
             "06_module_metrics_overview.png",
             "07_training_curves_mae.png",
             "08_obj3_explainable_visuals.png",
+            "09_rexa_module_clf_metrics.png",
+            "10_literature_model_comparison.png",
+            "11_star_scoring_comparison.png",
         ],
     }
     OUT_METRICS_JSON.write_text(json.dumps(payload, indent=2), encoding="utf-8")
@@ -411,6 +414,12 @@ def main() -> None:
     fig_training_curves()
     fig_explainable_visual_concept()
     write_metrics_json(results, manifest)
+    try:
+        import runpy
+
+        runpy.run_path(str(Path(__file__).with_name("generate_comparison_metrics.py")), run_name="__main__")
+    except Exception as exc:  # noqa: BLE001 — optional companion figures
+        print("comparison metrics skipped:", exc)
     print("All figures ready under docs/figures and public/evaluation/figures")
 
 
