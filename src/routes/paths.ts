@@ -14,7 +14,6 @@ export const ROUTES = {
     REPORTS: '/app/reports',
     SETTINGS: '/app/settings',
     QUESTIONS: '/app/questions',
-    BATCH: '/app/batch',
     ANNOTATION: '/app/annotation',
     COMPARE: '/app/compare',
     MODELS: '/app/models',

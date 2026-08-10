@@ -6,7 +6,6 @@ import {
   FileText,
   GitCompare,
   LayoutDashboard,
-  Layers,
   LineChart,
   Settings,
   Tags,
@@ -42,11 +41,6 @@ export const sidebarNavigation: NavGroup[] = [
         title: 'Questions',
         href: ROUTES.APP.QUESTIONS,
         icon: BookOpen,
-      },
-      {
-        title: 'Batch Eval',
-        href: ROUTES.APP.BATCH,
-        icon: Layers,
       },
       {
         title: 'Compare',
