@@ -15,6 +15,10 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/HOW_TO_RUN.md
 .idea
 .DS_Store
 *.suo
