@@ -1,18 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowRight, Cpu, Mail, Shield } from 'lucide-react'
+import { Cpu, Mail, Shield } from 'lucide-react'
 import type { ModelVersion } from '@/types'
 import { modelsService } from '@/services'
 import { useAuth } from '@/hooks'
 import { getInitials } from '@/utils'
-import { ROUTES } from '@/routes/paths'
 import { PageHeader } from '@/components/common'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { ThemeToggle } from '@/components/common'
-import { Button } from '@/components/ui/button'
 
 export function SettingsPage() {
   const { user } = useAuth()
@@ -117,18 +113,6 @@ export function SettingsPage() {
                         : 'Heuristic model — rule-based reasoning engine'}
                     </p>
                   </div>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    Manage available models
-                  </span>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={ROUTES.APP.MODELS}>
-                      View models
-                      <ArrowRight />
-                    </Link>
-                  </Button>
                 </div>
               </div>
             ) : (

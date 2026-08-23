@@ -2,7 +2,6 @@ import {
   BarChart3,
   BookOpen,
   Brain,
-  Cpu,
   FileText,
   GitCompare,
   LayoutDashboard,
@@ -72,11 +71,6 @@ export const sidebarNavigation: NavGroup[] = [
   {
     label: 'System',
     items: [
-      {
-        title: 'Models',
-        href: ROUTES.APP.MODELS,
-        icon: Cpu,
-      },
       {
         title: 'Settings',
         href: ROUTES.APP.SETTINGS,

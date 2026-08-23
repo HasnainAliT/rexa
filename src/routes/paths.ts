@@ -16,7 +16,6 @@ export const ROUTES = {
     QUESTIONS: '/app/questions',
     ANNOTATION: '/app/annotation',
     COMPARE: '/app/compare',
-    MODELS: '/app/models',
     EVALUATION: '/app/evaluation',
   },
 } as const
