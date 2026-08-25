@@ -7,8 +7,6 @@ import { GuestRoute, ProtectedRoute } from './guards'
 import { ROUTES } from './paths'
 import { LandingPage } from '@/pages/landing/LandingPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
-import { RegisterPage } from '@/pages/auth/RegisterPage'
-import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage'
 import { DashboardPage } from '@/pages/app/DashboardPage'
 import { AnalysisPage } from '@/pages/app/AnalysisPage'
 import { ReasoningPage } from '@/pages/app/ReasoningPage'
@@ -51,11 +49,11 @@ export const router = createBrowserRouter([
           },
           {
             path: 'register',
-            element: <RegisterPage />,
+            element: <Navigate to={ROUTES.AUTH.LOGIN} replace />,
           },
           {
             path: 'forgot-password',
-            element: <ForgotPasswordPage />,
+            element: <Navigate to={ROUTES.AUTH.LOGIN} replace />,
           },
         ],
       },

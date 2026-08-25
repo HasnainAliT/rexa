@@ -59,14 +59,9 @@ export function AppNavbar({
         <div className="flex items-center gap-2">
           <ThemeToggle />
           {variant === 'marketing' ? (
-            <>
-              <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-                <Link to={ROUTES.AUTH.LOGIN}>Sign in</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link to={ROUTES.AUTH.REGISTER}>Get started</Link>
-              </Button>
-            </>
+            <Button size="sm" asChild>
+              <Link to={ROUTES.AUTH.LOGIN}>Sign in</Link>
+            </Button>
           ) : (
             <UserMenu />
           )}

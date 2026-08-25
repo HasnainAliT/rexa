@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Loader2 } from 'lucide-react'
@@ -91,30 +91,11 @@ export function LoginPage() {
           )}
         </FormField>
 
-        <div className="flex items-center justify-end">
-          <Link
-            to={ROUTES.AUTH.FORGOT_PASSWORD}
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            Forgot password?
-          </Link>
-        </div>
-
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="animate-spin" />}
           Sign in
         </Button>
       </form>
-
-      <p className="text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{' '}
-        <Link
-          to={ROUTES.AUTH.REGISTER}
-          className="font-medium text-primary hover:underline"
-        >
-          Create one
-        </Link>
-      </p>
     </div>
   )
 }

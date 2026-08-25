@@ -97,13 +97,10 @@ export function LandingPage() {
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button size="lg" asChild>
-                <Link to={ROUTES.AUTH.REGISTER}>
-                  Get started
+                <Link to={ROUTES.AUTH.LOGIN}>
+                  Sign in
                   <ArrowRight />
                 </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link to={ROUTES.AUTH.LOGIN}>Sign in</Link>
               </Button>
             </div>
           </motion.div>
@@ -201,19 +198,11 @@ export function LandingPage() {
             Ready to see reasoning-based grading in action?
           </h3>
           <p className="mx-auto mt-3 max-w-xl text-primary-foreground/80">
-            Create a free workspace and run your first REXA analysis in
-            minutes.
+            Sign in to run an analysis and inspect the explainable reasoning
+            output.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Button size="lg" variant="secondary" asChild>
-              <Link to={ROUTES.AUTH.REGISTER}>Create an account</Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="ghost"
-              className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-              asChild
-            >
               <Link to={ROUTES.AUTH.LOGIN}>Sign in</Link>
             </Button>
           </div>

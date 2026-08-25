@@ -1,13 +1,10 @@
 import {
-  BarChart3,
   BookOpen,
   Brain,
-  FileText,
   GitCompare,
   LayoutDashboard,
   LineChart,
-  Settings,
-  Tags,
+  PenLine,
 } from 'lucide-react'
 import type { NavGroup } from '@/types'
 import { ROUTES } from './paths'
@@ -20,11 +17,6 @@ export const sidebarNavigation: NavGroup[] = [
         title: 'Dashboard',
         href: ROUTES.APP.DASHBOARD,
         icon: LayoutDashboard,
-      },
-      {
-        title: 'Analysis',
-        href: ROUTES.APP.ANALYSIS,
-        icon: BarChart3,
       },
       {
         title: 'Evaluation',
@@ -42,6 +34,11 @@ export const sidebarNavigation: NavGroup[] = [
         icon: BookOpen,
       },
       {
+        title: 'Analysis',
+        href: ROUTES.APP.ANALYSIS,
+        icon: PenLine,
+      },
+      {
         title: 'Compare',
         href: ROUTES.APP.COMPARE,
         icon: GitCompare,
@@ -55,26 +52,6 @@ export const sidebarNavigation: NavGroup[] = [
         title: 'Reasoning Engine',
         href: ROUTES.APP.REASONING,
         icon: Brain,
-      },
-      {
-        title: 'Annotation Lab',
-        href: ROUTES.APP.ANNOTATION,
-        icon: Tags,
-      },
-      {
-        title: 'Reports',
-        href: ROUTES.APP.REPORTS,
-        icon: FileText,
-      },
-    ],
-  },
-  {
-    label: 'System',
-    items: [
-      {
-        title: 'Settings',
-        href: ROUTES.APP.SETTINGS,
-        icon: Settings,
       },
     ],
   },
