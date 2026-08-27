@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Area,
@@ -12,6 +12,7 @@ import {
   YAxis,
 } from 'recharts'
 import { BarChart3, FileBarChart, Gauge, Target } from 'lucide-react'
+import { CHART_SERIES } from '@/lib/chart-theme'
 import type { DashboardData } from '@/types'
 import { analyticsService } from '@/services'
 import { ROUTES } from '@/routes/paths'
@@ -21,6 +22,7 @@ import {
   LoadingSpinner,
   PageHeader,
   RoleBadge,
+  ROLE_LABELS,
   StarRating,
 } from '@/components/common'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -34,22 +36,35 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
 import { formatDate } from '@/utils'
 
-const ROLE_COLORS = [
-  'var(--color-chart-1)',
-  'var(--color-chart-2)',
-  'var(--color-chart-3)',
-  'var(--color-chart-4)',
-  'var(--color-chart-5)',
-  '#94a3b8',
-  '#64748b',
-]
+const ROLE_COLORS = CHART_SERIES
 
 export function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [sortKey, setSortKey] = useState<'date' | 'stars' | 'question'>('date')
+
+  const recent = useMemo(() => {
+    const unique = new Map(
+      (data?.recentAnalyses ?? []).map((item) => [item.id, item]),
+    )
+    let rows = [...unique.values()]
+    if (query.trim()) {
+      const q = query.toLowerCase()
+      rows = rows.filter((row) => row.questionText.toLowerCase().includes(q))
+    }
+    rows.sort((a, b) => {
+      if (sortKey === 'stars') return b.stars - a.stars
+      if (sortKey === 'question') return a.questionText.localeCompare(b.questionText)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    })
+    return rows
+  }, [data, query, sortKey])
 
   useEffect(() => {
     let mounted = true
@@ -230,9 +245,15 @@ export function DashboardPage() {
                             data={data.roleDistribution}
                             dataKey="count"
                             nameKey="role"
-                            innerRadius={50}
-                            outerRadius={80}
+                            innerRadius={48}
+                            outerRadius={78}
                             paddingAngle={2}
+                            label={(props) => {
+                              const role = String(props.name ?? '')
+                              const count = Number(props.value ?? 0)
+                              return `${ROLE_LABELS[role as keyof typeof ROLE_LABELS] ?? role} ${count}`
+                            }}
+                            labelLine={false}
                           >
                             {data.roleDistribution.map((entry, index) => (
                               <Cell
@@ -241,12 +262,26 @@ export function DashboardPage() {
                               />
                             ))}
                           </Pie>
-                          <Tooltip />
+                          <Tooltip
+                            formatter={(value, name) => [
+                              value,
+                              ROLE_LABELS[name as keyof typeof ROLE_LABELS] ??
+                                String(name),
+                            ]}
+                          />
                         </PieChart>
                       </ChartContainer>
                       <div className="mt-4 flex flex-wrap gap-2">
                         {data.roleDistribution.map((entry) => (
-                          <RoleBadge key={entry.role} role={entry.role} />
+                          <div
+                            key={entry.role}
+                            className="flex items-center gap-1.5 text-xs"
+                          >
+                            <RoleBadge role={entry.role} />
+                            <span className="tabular-nums text-muted-foreground">
+                              {entry.count}
+                            </span>
+                          </div>
                         ))}
                       </div>
                     </>
@@ -256,11 +291,31 @@ export function DashboardPage() {
             </div>
 
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="text-base">Recent analyses</CardTitle>
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                  <Input
+                    placeholder="Search questions…"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    aria-label="Search recent analyses"
+                    className="sm:w-56"
+                  />
+                  <Select
+                    value={sortKey}
+                    onChange={(event) =>
+                      setSortKey(event.target.value as 'date' | 'stars' | 'question')
+                    }
+                    aria-label="Sort recent analyses"
+                  >
+                    <option value="date">Newest</option>
+                    <option value="stars">Stars</option>
+                    <option value="question">Question</option>
+                  </Select>
+                </div>
               </CardHeader>
               <CardContent>
-                {data.recentAnalyses.length === 0 ? (
+                {recent.length === 0 ? (
                   <EmptyState
                     icon={FileBarChart}
                     title="No analyses yet"
@@ -283,7 +338,7 @@ export function DashboardPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {data.recentAnalyses.map((analysis) => (
+                      {recent.map((analysis) => (
                         <TableRow key={analysis.id}>
                           <TableCell className="max-w-xs truncate font-medium">
                             {analysis.questionText}

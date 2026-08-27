@@ -64,4 +64,26 @@ export const batchService = {
       createdAt: new Date().toISOString(),
     }
   },
+
+  async parseUpload(file: File): Promise<{
+    filename: string
+    columns: string[]
+    rows: Record<string, string>[]
+    row_count: number
+  }> {
+    const form = new FormData()
+    form.append('file', file)
+    const response = await apiClient.postForm<
+      ApiResponse<{
+        filename: string
+        columns: string[]
+        rows: Record<string, string>[]
+        row_count: number
+      }>
+    >('/batch/parse-upload', form)
+    if (!response.data?.rows?.length) {
+      throw new Error('No data rows found in this file.')
+    }
+    return response.data
+  },
 }

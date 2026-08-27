@@ -30,6 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { CHART_COLORS } from '@/lib/chart-theme'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface EvaluationMetrics {
   objectives: Array<{
@@ -115,6 +117,13 @@ interface ComparisonTables {
   }>
   figures: string[]
 }
+
+const STATIC_FIGURES = [
+  '08_obj3_explainable_visuals.png',
+  '09_rexa_module_clf_metrics.png',
+  '10_literature_model_comparison.png',
+  '11_star_scoring_comparison.png',
+]
 
 function pct(v: number) {
   return `${(v * 100).toFixed(1)}%`
@@ -244,9 +253,17 @@ export function EvaluationPage() {
         )}
 
         {!isLoading && data && (
-          <>
-            <Alert>
-              <AlertDescription>
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-4">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="metrics">Tables</TabsTrigger>
+              <TabsTrigger value="charts">Charts</TabsTrigger>
+              <TabsTrigger value="figures">Figures</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-6">
+              <Alert>
+                <AlertDescription>
                 <strong>Proposed system:</strong> Core RExA (roles, coverage, depth,
                 explainable feedback). <strong>DistilBERT</strong> is kept as a
                 comparative scoring experiment — see research notebook{' '}
@@ -292,8 +309,10 @@ export function EvaluationPage() {
                 hint={`Baseline MAE ${data.modules.star_prediction.keyword_baseline.mae.toFixed(2)}`}
               />
             </section>
+            </TabsContent>
 
-            {comparison && (
+            <TabsContent value="metrics" className="space-y-4">
+              {comparison && (
               <section className="space-y-4">
                 <h2 className="text-lg font-semibold tracking-tight">
                   Accuracy · Precision · Recall · F1
@@ -328,84 +347,11 @@ export function EvaluationPage() {
                       </TableBody>
                     </Table>
                     <p className="mt-2 text-xs text-muted-foreground">
-                      * Support/Contradiction 100% is vs silver heuristic labels — disclose in viva.
+                      * Support/Contradiction agreement is measured against
+                      heuristic silver labels, so high scores are expected.
                     </p>
                   </CardContent>
                 </Card>
-
-                <div className="grid gap-4 lg:grid-cols-2">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base">
-                        RExA Acc / P / R / F1 chart
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ChartContainer className="h-72 w-full">
-                        <BarChart
-                          data={comparison.rexa_clf_table.map((r) => ({
-                            name: r.Model.replace('RExA ', '').replace(' (Core)', ''),
-                            Accuracy: r.Accuracy,
-                            Precision: r.Precision,
-                            Recall: r.Recall,
-                            F1: r['F1-score'],
-                          }))}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                          <YAxis domain={[0, 100]} />
-                          <Tooltip />
-                          <Legend />
-                          <Bar dataKey="Accuracy" fill="#3b82f6" />
-                          <Bar dataKey="Precision" fill="#10b981" />
-                          <Bar dataKey="Recall" fill="#f59e0b" />
-                          <Bar dataKey="F1" fill="#8b5cf6" />
-                        </BarChart>
-                      </ChartContainer>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base">
-                        Literature comparison (DAES & others vs RExA)
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ChartContainer className="h-72 w-full">
-                        <BarChart
-                          data={comparison.literature_table
-                            .filter((r) => typeof r['F1 %'] === 'number')
-                            .map((r) => ({
-                              name: String(r.Model)
-                                .replace(' (ours)', '')
-                                .replace('DAES (LDA+T5+SBERT)', 'DAES')
-                                .replace('Ashoka et al. hybrid DL', 'Ashoka')
-                                .replace('RExA Sentence Roles', 'RExA Roles'),
-                              Accuracy: r['Accuracy %'] as number,
-                              Precision: r['Precision %'] as number,
-                              Recall: r['Recall %'] as number,
-                              F1: r['F1 %'] as number,
-                            }))}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                          <YAxis domain={[80, 100]} />
-                          <Tooltip />
-                          <Legend />
-                          <Bar dataKey="Accuracy" fill="#3b82f6" />
-                          <Bar dataKey="Precision" fill="#10b981" />
-                          <Bar dataKey="Recall" fill="#f59e0b" />
-                          <Bar dataKey="F1" fill="#8b5cf6" />
-                        </BarChart>
-                      </ChartContainer>
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        DAES (IEEE Access 2024) Acc 95% / F1 94%. RExA roles Acc 95.9% / F1
-                        94.5% — plus explainable reasoning analysis.
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
 
                 <Card>
                   <CardHeader>
@@ -494,9 +440,10 @@ export function EvaluationPage() {
                   </CardContent>
                 </Card>
               </section>
-            )}
+              )}
+            </TabsContent>
 
-            <section className="grid gap-4 lg:grid-cols-2">
+            <TabsContent value="charts" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base">
@@ -511,8 +458,8 @@ export function EvaluationPage() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="Before" fill="#f87171" name="Keyword baseline" />
-                      <Bar dataKey="After" fill="#34d399" name="Trained RExA" />
+                      <Bar dataKey="Before" fill={CHART_COLORS.lavender} name="Keyword baseline" />
+                      <Bar dataKey="After" fill={CHART_COLORS.indigo} name="Trained RExA" />
                     </BarChart>
                   </ChartContainer>
                   <p className="mt-2 text-xs text-muted-foreground">
@@ -537,12 +484,12 @@ export function EvaluationPage() {
                       <YAxis domain={[0.4, 1.5]} />
                       <Tooltip />
                       <Legend />
-                      <Line type="monotone" dataKey="train" stroke="#3b82f6" name="Train MAE" />
-                      <Line type="monotone" dataKey="val" stroke="#10b981" name="Val MAE" />
+                      <Line type="monotone" dataKey="train" stroke={CHART_COLORS.indigo} name="Train MAE" />
+                      <Line type="monotone" dataKey="val" stroke={CHART_COLORS.violet} name="Val MAE" />
                       <Line
                         type="monotone"
                         dataKey="baseline"
-                        stroke="#ef4444"
+                        stroke={CHART_COLORS.lavender}
                         strokeDasharray="4 4"
                         name="Baseline MAE"
                       />
@@ -550,9 +497,83 @@ export function EvaluationPage() {
                   </ChartContainer>
                 </CardContent>
               </Card>
-            </section>
 
-            <section className="grid gap-4 lg:grid-cols-2">
+            {comparison && (
+              <div className="grid gap-4 lg:grid-cols-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      RExA Acc / P / R / F1
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ChartContainer className="h-72 w-full">
+                      <BarChart
+                        data={comparison.rexa_clf_table.map((r) => ({
+                          name: r.Model.replace('RExA ', '').replace(' (Core)', ''),
+                          Accuracy: r.Accuracy,
+                          Precision: r.Precision,
+                          Recall: r.Recall,
+                          F1: r['F1-score'],
+                        }))}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                        <YAxis domain={[0, 100]} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="Accuracy" fill={CHART_COLORS.indigo} />
+                        <Bar dataKey="Precision" fill={CHART_COLORS.violet} />
+                        <Bar dataKey="Recall" fill={CHART_COLORS.sky} />
+                        <Bar dataKey="F1" fill={CHART_COLORS.lavender} />
+                      </BarChart>
+                    </ChartContainer>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      Literature comparison (DAES & others vs RExA)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ChartContainer className="h-72 w-full">
+                      <BarChart
+                        data={comparison.literature_table
+                          .filter((r) => typeof r['F1 %'] === 'number')
+                          .map((r) => ({
+                            name: String(r.Model)
+                              .replace(' (ours)', '')
+                              .replace('DAES (LDA+T5+SBERT)', 'DAES')
+                              .replace('Ashoka et al. hybrid DL', 'Ashoka')
+                              .replace('RExA Sentence Roles', 'RExA Roles'),
+                            Accuracy: r['Accuracy %'] as number,
+                            Precision: r['Precision %'] as number,
+                            Recall: r['Recall %'] as number,
+                            F1: r['F1 %'] as number,
+                          }))}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                        <YAxis domain={[80, 100]} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="Accuracy" fill={CHART_COLORS.indigo} />
+                        <Bar dataKey="Precision" fill={CHART_COLORS.violet} />
+                        <Bar dataKey="Recall" fill={CHART_COLORS.sky} />
+                        <Bar dataKey="F1" fill={CHART_COLORS.lavender} />
+                      </BarChart>
+                    </ChartContainer>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      DAES Acc 95% / F1 94%. RExA roles Acc 95.9% / F1 94.5% —
+                      plus explainable reasoning analysis.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            <div className="grid gap-4 lg:grid-cols-2">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base">
@@ -566,7 +587,7 @@ export function EvaluationPage() {
                       <XAxis dataKey="role" />
                       <YAxis domain={[0, 100]} />
                       <Tooltip />
-                      <Bar dataKey="f1" fill="#8b5cf6" name="F1 (%)" />
+                      <Bar dataKey="f1" fill={CHART_COLORS.violet} name="F1 (%)" />
                     </BarChart>
                   </ChartContainer>
                   <p className="mt-2 text-xs text-muted-foreground">
@@ -587,24 +608,25 @@ export function EvaluationPage() {
                       <XAxis dataKey="name" />
                       <YAxis domain={[0, 100]} />
                       <Tooltip />
-                      <Bar dataKey="value" fill="#3b82f6" name="Score (%)" />
+                      <Bar dataKey="value" fill={CHART_COLORS.indigo} name="Score (%)" />
                     </BarChart>
                   </ChartContainer>
                   <p className="mt-2 text-xs text-muted-foreground">
                     Depth MAE {data.modules.reasoning_depth.mae.toFixed(3)} · Spearman ρ{' '}
                     {data.modules.reasoning_depth.spearman_rho.toFixed(3)}. Support 100% is vs
-                    silver labels — disclose in viva.
+                    heuristic silver labels, so high agreement is expected.
                   </p>
                 </CardContent>
               </Card>
-            </section>
+            </div>
+            </TabsContent>
 
-            <section className="space-y-3">
+            <TabsContent value="figures" className="space-y-3">
               <h2 className="text-lg font-semibold tracking-tight">
                 Static figures (slides / report)
               </h2>
               <div className="grid gap-4 md:grid-cols-2">
-                {(data.figures ?? Object.keys(FIGURE_CAPTIONS)).map((name) => (
+                {STATIC_FIGURES.map((name) => (
                   <Card key={name}>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium">
@@ -621,8 +643,8 @@ export function EvaluationPage() {
                   </Card>
                 ))}
               </div>
-            </section>
-          </>
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </div>

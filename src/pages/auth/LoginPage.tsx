@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks'
 import { loginSchema, type LoginFormValues } from '@/utils'
 import { ROUTES } from '@/routes/paths'
@@ -16,14 +16,16 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const {
     control,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
+    mode: 'onBlur',
   })
 
   const from =
@@ -45,8 +47,8 @@ export function LoginPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2 text-center sm:text-left">
+    <div className="flex min-h-[28rem] flex-col justify-center space-y-6">
+      <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
         <p className="text-sm text-muted-foreground">
           Sign in to continue to your RExA workspace.
@@ -60,7 +62,7 @@ export function LoginPage() {
         </Alert>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <FormField control={control} name="email" label="Email">
           {(field) => (
             <Input
@@ -68,6 +70,7 @@ export function LoginPage() {
               type="email"
               placeholder="you@example.com"
               autoComplete="email"
+              aria-invalid={Boolean(errors.email)}
               name={field.name}
               onChange={field.onChange}
               onBlur={field.onBlur}
@@ -78,20 +81,40 @@ export function LoginPage() {
 
         <FormField control={control} name="password" label="Password">
           {(field) => (
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              name={field.name}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              value={(field.value as string) ?? ''}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                aria-invalid={Boolean(errors.password)}
+                className="pr-10"
+                name={field.name}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                value={(field.value as string) ?? ''}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                onClick={() => setShowPassword((open) => !open)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
           )}
         </FormField>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          className="h-10 w-full bg-indigo-600 text-white hover:bg-indigo-500"
+          disabled={isSubmitting}
+        >
           {isSubmitting && <Loader2 className="animate-spin" />}
           Sign in
         </Button>

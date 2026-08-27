@@ -10,14 +10,16 @@ import {
 import type { AnalysisResult, SupportRelation } from '@/types'
 import { analysisService } from '@/services'
 import { ROUTES } from '@/routes/paths'
+import { overallStatus } from '@/lib/grading'
 import {
+  ConceptChips,
   DimensionBars,
   EmptyState,
+  HighlightedAnswer,
   LoadingSpinner,
   PageHeader,
-  RoleBadge,
   StarRating,
-  getRoleStyles,
+  ThresholdPanel,
 } from '@/components/common'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -34,12 +36,12 @@ const RELATION_META: Record<
   support: {
     label: 'Support',
     icon: CheckCircle2,
-    className: 'text-emerald-600 dark:text-emerald-400',
+    className: 'text-emerald-700 dark:text-emerald-400',
   },
   contradiction: {
     label: 'Contradiction',
     icon: XCircle,
-    className: 'text-rose-600 dark:text-rose-400',
+    className: 'text-rose-700 dark:text-rose-400',
   },
   neutral: {
     label: 'Neutral',
@@ -87,6 +89,8 @@ export function ReasoningPage() {
     }
   }, [id])
 
+  const status = analysis ? overallStatus(analysis) : null
+
   return (
     <div>
       <PageHeader
@@ -131,29 +135,32 @@ export function ReasoningPage() {
           />
         )}
 
-        {!isLoading && !error && analysis && (
+        {!isLoading && !error && analysis && status && (
           <>
-            <div className="grid gap-4 lg:grid-cols-3">
-              <Card className="lg:col-span-2">
+            <div className="grid items-stretch gap-4 lg:grid-cols-3">
+              <Card className="flex flex-col lg:col-span-2">
                 <CardHeader>
                   <CardTitle className="text-base">Dimension scores</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-5">
+                <CardContent className="flex flex-1 flex-col gap-5">
                   <div className="flex items-center gap-3">
                     <StarRating value={analysis.stars} size="lg" />
                     <span className="text-2xl font-bold">
                       {analysis.stars.toFixed(1)}
                     </span>
+                    <Badge variant={status.passed ? 'default' : 'outline'}>
+                      {status.passed ? 'Pass' : 'Needs work'}
+                    </Badge>
                   </div>
                   <DimensionBars dimensions={analysis.dimensions} />
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-base">Reasoning depth</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="flex flex-1 flex-col justify-between gap-3">
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold">
                       {analysis.reasoningDepth.level}/5
@@ -164,6 +171,7 @@ export function ReasoningPage() {
                   </div>
                   <Progress
                     value={(analysis.reasoningDepth.level / 5) * 100}
+                    indicatorClassName="bg-violet-500"
                   />
                   {analysis.reasoningDepth.description && (
                     <p className="text-sm text-muted-foreground">
@@ -176,97 +184,83 @@ export function ReasoningPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Highlighted answer</CardTitle>
+                <CardTitle className="text-base">
+                  Sentence-by-sentence breakdown
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm leading-relaxed">
-                  {analysis.sentenceRoles.map((sentence) => (
-                    <span
-                      key={sentence.index}
-                      className={cn(
-                        'mr-1 rounded px-1 py-0.5',
-                        getRoleStyles(sentence.role),
-                      )}
-                    >
-                      {sentence.text}
-                    </span>
-                  ))}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {Array.from(
-                    new Set(analysis.sentenceRoles.map((s) => s.role)),
-                  ).map((role) => (
-                    <RoleBadge key={role} role={role} />
-                  ))}
-                </div>
+                <HighlightedAnswer sentences={analysis.sentenceRoles} />
               </CardContent>
             </Card>
 
-            <div className="grid gap-4 lg:grid-cols-2">
-              <Card>
+            <div className="grid items-stretch gap-4 lg:grid-cols-2">
+              <Card className="flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-base">
-                    Support &amp; contradiction
+                    Thresholds &amp; grading logic
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  {analysis.supportPairs.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      No alignment pairs were detected for this answer.
-                    </p>
-                  ) : (
-                    <ul className="space-y-3">
-                      {analysis.supportPairs.map((pair, index) => {
-                        const meta = RELATION_META[pair.relation]
-                        const Icon = meta.icon
-                        return (
-                          <li
-                            key={index}
-                            className="space-y-1.5 rounded-md border p-3 text-sm"
-                          >
-                            <div
-                              className={cn(
-                                'flex items-center gap-1.5 text-xs font-medium',
-                                meta.className,
-                              )}
-                            >
-                              <Icon className="h-3.5 w-3.5" />
-                              {meta.label}
-                            </div>
-                            <p>{pair.studentText}</p>
-                            <div className="flex items-start gap-1.5 text-muted-foreground">
-                              <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                              <p>{pair.referenceText}</p>
-                            </div>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  )}
+                <CardContent className="flex-1">
+                  <ThresholdPanel analysis={analysis} />
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-base">Concept coverage</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-2">
-                  {analysis.conceptCoverage.map((concept) => (
-                    <Badge
-                      key={concept.concept}
-                      variant={concept.covered ? 'default' : 'outline'}
-                      className={
-                        concept.covered
-                          ? ''
-                          : 'border-dashed text-muted-foreground'
-                      }
-                    >
-                      {concept.concept}
-                    </Badge>
-                  ))}
+                <CardContent className="flex flex-1 flex-col gap-3">
+                  <p className="text-xs text-muted-foreground">
+                    Solid indigo chips are covered. Dashed orange chips are
+                    missing from the answer.
+                  </p>
+                  <ConceptChips concepts={analysis.conceptCoverage} />
                 </CardContent>
               </Card>
             </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  Support &amp; contradiction
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {analysis.supportPairs.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No alignment pairs were detected for this answer.
+                  </p>
+                ) : (
+                  <ul className="space-y-3">
+                    {analysis.supportPairs.map((pair, index) => {
+                      const meta = RELATION_META[pair.relation]
+                      const Icon = meta.icon
+                      return (
+                        <li
+                          key={index}
+                          className="space-y-1.5 rounded-md border p-3 text-sm"
+                        >
+                          <div
+                            className={cn(
+                              'flex items-center gap-1.5 text-xs font-medium',
+                              meta.className,
+                            )}
+                          >
+                            <Icon className="h-3.5 w-3.5" />
+                            {meta.label}
+                          </div>
+                          <p>{pair.studentText}</p>
+                          <div className="flex items-start gap-1.5 text-muted-foreground">
+                            <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                            <p>{pair.referenceText}</p>
+                          </div>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
 
             {analysis.explanations.length > 0 && (
               <Card>

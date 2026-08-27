@@ -1,5 +1,5 @@
 """Batch analysis, answer comparison, and baseline evaluation routes."""
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -16,8 +16,29 @@ from app.schemas import (
 )
 from app.services.baselines import run_all_baselines
 from app.services.rexa_pipeline import run_rexa_pipeline
+from app.services.spreadsheet_parse import parse_tabular_bytes
 
 router = APIRouter(tags=["batch"])
+
+
+@router.post("/batch/parse-upload")
+async def parse_batch_upload(
+    file: UploadFile = File(...),
+    _: User = Depends(get_current_user),
+):
+    filename = file.filename or "roster.csv"
+    lowered = filename.lower()
+    if not lowered.endswith((".csv", ".txt", ".xlsx", ".xlsm")):
+        raise ApiHTTPException(
+            status_code=400,
+            detail="Upload a CSV or Excel (.xlsx) file.",
+        )
+    data = await file.read()
+    try:
+        parsed = parse_tabular_bytes(data, filename)
+    except ValueError as exc:
+        raise ApiHTTPException(status_code=400, detail=str(exc)) from exc
+    return ApiResponse(data=parsed, success=True)
 
 
 def _resolve_question_context(
@@ -59,12 +80,26 @@ def batch_analyze(
 
     results = []
     for item in payload.answers:
-        result_dict = run_rexa_pipeline(
-            question_text=question_text,
-            reference_answer=reference_answer,
-            student_answer=item.student_answer,
-            concepts=concepts,
-        )
+        try:
+            result_dict = run_rexa_pipeline(
+                question_text=question_text,
+                reference_answer=reference_answer,
+                student_answer=item.student_answer,
+                concepts=concepts,
+            )
+        except Exception as exc:  # noqa: BLE001 — isolate one student failure
+            results.append(
+                {
+                    "analysis_id": None,
+                    "submission_id": None,
+                    "question_id": question.id if question else None,
+                    "student_name": item.student_name,
+                    "student_id": item.student_id,
+                    "error": str(exc),
+                    "result": None,
+                }
+            )
+            continue
 
         analysis_id = None
         submission_id = None
@@ -73,6 +108,7 @@ def batch_analyze(
             submission = Submission(
                 question_id=question.id,
                 student_name=item.student_name,
+                student_id=getattr(item, "student_id", None),
                 answer_text=item.student_answer,
                 created_by=current_user.id,
             )
@@ -99,6 +135,7 @@ def batch_analyze(
                 "submission_id": submission_id,
                 "question_id": question.id if question else None,
                 "student_name": item.student_name,
+                "student_id": item.student_id,
                 "result": result_dict,
             }
         )

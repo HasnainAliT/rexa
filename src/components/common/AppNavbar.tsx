@@ -39,7 +39,8 @@ export function AppNavbar({
               <Menu className="h-5 w-5" />
             </Button>
           )}
-          <Logo />
+          {variant === 'marketing' && <Logo />}
+          {variant === 'app' && onMenuClick && <Logo />}
         </div>
 
         {variant === 'marketing' && (

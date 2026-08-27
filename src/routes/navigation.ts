@@ -1,10 +1,13 @@
 import {
   BookOpen,
   Brain,
+  ClipboardList,
+  FileSpreadsheet,
   GitCompare,
   LayoutDashboard,
   LineChart,
   PenLine,
+  Tags,
 } from 'lucide-react'
 import type { NavGroup } from '@/types'
 import { ROUTES } from './paths'
@@ -39,9 +42,19 @@ export const sidebarNavigation: NavGroup[] = [
         icon: PenLine,
       },
       {
+        title: 'Batch upload',
+        href: ROUTES.APP.BATCH,
+        icon: FileSpreadsheet,
+      },
+      {
         title: 'Compare',
         href: ROUTES.APP.COMPARE,
         icon: GitCompare,
+      },
+      {
+        title: 'Class report',
+        href: ROUTES.APP.REPORTS,
+        icon: ClipboardList,
       },
     ],
   },
@@ -52,6 +65,11 @@ export const sidebarNavigation: NavGroup[] = [
         title: 'Reasoning Engine',
         href: ROUTES.APP.REASONING,
         icon: Brain,
+      },
+      {
+        title: 'Annotation Lab',
+        href: ROUTES.APP.ANNOTATION,
+        icon: Tags,
       },
     ],
   },

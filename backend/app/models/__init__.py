@@ -41,7 +41,7 @@ class Question(Base):
     prompt: Mapped[str] = mapped_column(Text, nullable=False)
     reference_answer: Mapped[str] = mapped_column(Text, nullable=False)
     concepts: Mapped[list] = mapped_column(JSON, default=list)
-    course: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    difficulty: Mapped[str | None] = mapped_column(String(20), nullable=True, default="medium")
     created_by: Mapped[str | None] = mapped_column(String(36), ForeignKey("users.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
@@ -56,6 +56,7 @@ class Submission(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     question_id: Mapped[str] = mapped_column(String(36), ForeignKey("questions.id"), nullable=False)
     student_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    student_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     answer_text: Mapped[str] = mapped_column(Text, nullable=False)
     created_by: Mapped[str | None] = mapped_column(String(36), ForeignKey("users.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)

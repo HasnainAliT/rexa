@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { CheckCircle2, Loader2, Star, Tags } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { CheckCircle2, Inbox, Loader2, Star, Tags } from 'lucide-react'
 import type {
   AnalysisResult,
   ConceptCoverage,
@@ -7,7 +7,7 @@ import type {
   SentenceRoleLabel,
 } from '@/types'
 import { analysisService, annotationsService } from '@/services'
-import { EmptyState, PageHeader, ROLE_LABELS } from '@/components/common'
+import { EmptyState, HighlightedAnswer, PageHeader, ROLE_LABELS } from '@/components/common'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select } from '@/components/ui/select'
@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/utils'
+import { Badge } from '@/components/ui/badge'
 
 const ROLE_OPTIONS = Object.keys(ROLE_LABELS) as SentenceRoleLabel[]
 
@@ -55,6 +56,7 @@ function InteractiveStars({ value, onChange }: InteractiveStarsProps) {
 
 export function AnnotationPage() {
   const [analyses, setAnalyses] = useState<AnalysisResult[]>([])
+  const [annotatedIds, setAnnotatedIds] = useState<Set<string>>(new Set())
   const [selectedId, setSelectedId] = useState<string>('')
   const [isLoadingList, setIsLoadingList] = useState(true)
   const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false)
@@ -70,9 +72,22 @@ export function AnnotationPage() {
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
-    analysisService
-      .listAnalyses({ page: 1, pageSize: 50 })
-      .then((response) => setAnalyses(response.data))
+    Promise.all([
+      analysisService.listAnalyses({ page: 1, pageSize: 50 }),
+      annotationsService.listAnnotations({ page: 1, pageSize: 100 }).catch(() => ({
+        data: [],
+      })),
+    ])
+      .then(([analysisResponse, annotationResponse]) => {
+        setAnalyses(analysisResponse.data)
+        setAnnotatedIds(
+          new Set(
+            (annotationResponse.data ?? [])
+              .map((item) => item.analysisId)
+              .filter(Boolean),
+          ),
+        )
+      })
       .catch(() => setAnalyses([]))
       .finally(() => setIsLoadingList(false))
   }, [])
@@ -132,6 +147,7 @@ export function AnnotationPage() {
         notes: notes.trim() || undefined,
       })
       setSuccessMessage('Annotation saved successfully.')
+      setAnnotatedIds((prev) => new Set(prev).add(selectedId))
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to save annotation.',
@@ -141,45 +157,87 @@ export function AnnotationPage() {
     }
   }
 
+  const pending = useMemo(
+    () => analyses.filter((analysis) => !annotatedIds.has(analysis.id)),
+    [analyses, annotatedIds],
+  )
+
   return (
     <div>
       <PageHeader
         title="Annotation lab"
-        description="Review and correct REXA's automated labels to improve the model."
+        description="Review RExA labels, correct sentence roles, and save gold annotations."
       />
 
       <div className="space-y-6 p-4 sm:p-6 lg:p-8">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Select a submission</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base">Pending queue</CardTitle>
+            <Badge variant="secondary">{pending.length} pending</Badge>
           </CardHeader>
           <CardContent>
             {isLoadingList ? (
-              <p className="text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Loading submissions…
-              </p>
+              </div>
             ) : analyses.length === 0 ? (
               <EmptyState
-                icon={Tags}
-                title="No submissions to annotate"
-                description="Run an analysis first, then come back to annotate it."
+                icon={Inbox}
+                title="No submissions in the queue"
+                description="Run an analysis first. New results appear here so you can review sentence roles and concept coverage."
                 className="border-0"
               />
             ) : (
-              <div className="space-y-2">
-                <Label htmlFor="submission">Analysis</Label>
-                <Select
-                  id="submission"
-                  value={selectedId}
-                  onChange={(event) => setSelectedId(event.target.value)}
-                >
-                  <option value="">Select a submission…</option>
-                  {analyses.map((analysis) => (
-                    <option key={analysis.id} value={analysis.id}>
-                      {analysis.questionText} — {formatDate(analysis.createdAt)}
-                    </option>
-                  ))}
-                </Select>
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label htmlFor="submission">Or pick from all analyses</Label>
+                  <Select
+                    id="submission"
+                    value={selectedId}
+                    onChange={(event) => setSelectedId(event.target.value)}
+                  >
+                    <option value="">Select a submission…</option>
+                    {analyses.map((analysis) => (
+                      <option key={analysis.id} value={analysis.id}>
+                        {annotatedIds.has(analysis.id) ? 'Reviewed · ' : 'Pending · '}
+                        {analysis.questionText} — {formatDate(analysis.createdAt)}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <ul className="divide-y rounded-md border">
+                  {(pending.length ? pending : analyses).slice(0, 8).map((analysis) => {
+                    const reviewed = annotatedIds.has(analysis.id)
+                    return (
+                      <li key={analysis.id}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedId(analysis.id)}
+                          className={cn(
+                            'flex w-full items-start justify-between gap-3 p-3 text-left text-sm hover:bg-muted/50',
+                            selectedId === analysis.id && 'bg-primary/5',
+                          )}
+                        >
+                          <span className="min-w-0">
+                            <span className="line-clamp-2 font-medium">
+                              {analysis.questionText}
+                            </span>
+                            <span className="mt-1 block text-xs text-muted-foreground">
+                              {formatDate(analysis.createdAt)}
+                              {analysis.studentName
+                                ? ` · ${analysis.studentName}`
+                                : ''}
+                            </span>
+                          </span>
+                          <Badge variant={reviewed ? 'outline' : 'secondary'}>
+                            {reviewed ? 'Reviewed' : 'Pending'}
+                          </Badge>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
               </div>
             )}
           </CardContent>
@@ -203,8 +261,25 @@ export function AnnotationPage() {
           </div>
         )}
 
+        {!isLoadingAnalysis && !selectedId && analyses.length > 0 && (
+          <EmptyState
+            icon={Tags}
+            title="Select a submission to review"
+            description="Open an item from the pending queue. You can then correct sentence roles, mark concepts, and save a gold annotation."
+          />
+        )}
+
         {!isLoadingAnalysis && selectedId && sentenceRoles.length > 0 && (
           <>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Color-coded preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <HighlightedAnswer sentences={sentenceRoles} />
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Sentence roles</CardTitle>

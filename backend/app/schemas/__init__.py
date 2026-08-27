@@ -86,6 +86,7 @@ class QuestionBase(BaseModel):
     reference_answer: str
     concepts: List[str] = Field(default_factory=list)
     course: Optional[str] = None
+    difficulty: Optional[str] = None
 
 
 class QuestionCreate(QuestionBase):
@@ -98,6 +99,7 @@ class QuestionUpdate(BaseModel):
     reference_answer: Optional[str] = None
     concepts: Optional[List[str]] = None
     course: Optional[str] = None
+    difficulty: Optional[str] = None
 
 
 class QuestionOut(QuestionBase):
@@ -120,6 +122,7 @@ class AnalyzeRequest(BaseModel):
     concepts: Optional[List[str]] = None
     student_answer: str
     student_name: Optional[str] = None
+    student_id: Optional[str] = None
     save: bool = True
 
     @model_validator(mode="after")
@@ -189,6 +192,18 @@ class AnalyzeResponseData(BaseModel):
     result: RexaResult
 
 
+class PdfExamItem(BaseModel):
+    question_text: str
+    matched_from_bank: bool = False
+    note: Optional[str] = None
+    analysis: AnalyzeResponseData
+
+
+class PdfExamAnalyzeData(BaseModel):
+    filename: str
+    items: List[PdfExamItem]
+
+
 class AnalysisRunOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -200,6 +215,8 @@ class AnalysisRunOut(BaseModel):
     stars: float
     model_version: str
     created_at: datetime
+    student_name: Optional[str] = None
+    student_id: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------
@@ -284,6 +301,7 @@ class DashboardStats(BaseModel):
 
 class BatchAnswerItem(BaseModel):
     student_name: Optional[str] = None
+    student_id: Optional[str] = None
     student_answer: str
 
 
@@ -363,3 +381,9 @@ class BaselineEvaluationData(BaseModel):
     student_answer: str
     rexa_stars: float
     baselines: List[BaselineResult]
+
+
+class PdfExtractData(BaseModel):
+    filename: str
+    page_count: int
+    text: str

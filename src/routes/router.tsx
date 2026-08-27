@@ -15,6 +15,7 @@ import { SettingsPage } from '@/pages/app/SettingsPage'
 import { QuestionsPage } from '@/pages/app/QuestionsPage'
 import { AnnotationPage } from '@/pages/app/AnnotationPage'
 import { ComparePage } from '@/pages/app/ComparePage'
+import { BatchPage } from '@/pages/app/BatchPage'
 import { EvaluationPage } from '@/pages/app/EvaluationPage'
 
 export const router = createBrowserRouter([
@@ -84,6 +85,10 @@ export const router = createBrowserRouter([
           {
             path: 'reports',
             element: <ReportsPage />,
+          },
+          {
+            path: 'batch',
+            element: <BatchPage />,
           },
           {
             path: 'questions',

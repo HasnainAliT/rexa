@@ -34,7 +34,7 @@ class ApiClient {
 
       try {
         const body = await response.json()
-        error.message = body.message ?? error.message
+        error.message = body.message ?? body.detail ?? error.message
         error.code = body.code
       } catch {
         // Response body is not JSON
@@ -91,6 +91,36 @@ class ApiClient {
 
   delete<T>(endpoint: string, options?: RequestInit) {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' })
+  }
+
+  async postForm<T>(endpoint: string, formData: FormData): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`
+    const headers: HeadersInit = {}
+    const token = this.getToken()
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+
+    if (!response.ok) {
+      let message = response.statusText || 'Request failed'
+      try {
+        const body = await response.json()
+        message = body.message ?? body.detail ?? message
+      } catch {
+        // Response body is not JSON
+      }
+      const err = new Error(message) as Error & ApiError
+      err.status = response.status
+      throw err
+    }
+
+    return response.json() as Promise<T>
   }
 }
 

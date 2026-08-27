@@ -12,7 +12,7 @@ import {
 import { ROUTES } from '@/routes/paths'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import heroImage from '@/assets/hero.png'
+import heroImage from '@/assets/rexa-product-ui.png'
 
 const pillars = [
   {
@@ -115,7 +115,7 @@ export function LandingPage() {
               <div className="absolute -inset-8 -z-10 rounded-full bg-primary/10 blur-3xl" />
               <img
                 src={heroImage}
-                alt="RExA reasoning analysis illustration"
+                alt="RExA workspace showing a highlighted student answer, star score, and concept coverage"
                 className="w-full max-w-md rounded-2xl border bg-card shadow-xl"
               />
             </div>
@@ -166,7 +166,7 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="mx-auto mt-12 grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mx-auto mt-12 grid max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-5">
             {pillars.map((pillar, index) => (
               <motion.div
                 key={pillar.title}
@@ -192,17 +192,21 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="border-t bg-primary text-primary-foreground">
+      <section className="border-t bg-indigo-950 text-white">
         <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
-          <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
             Ready to see reasoning-based grading in action?
           </h3>
-          <p className="mx-auto mt-3 max-w-xl text-primary-foreground/80">
+          <p className="mx-auto mt-3 max-w-xl text-indigo-100">
             Sign in to run an analysis and inspect the explainable reasoning
             output.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button size="lg" variant="secondary" asChild>
+            <Button
+              size="lg"
+              className="bg-white text-indigo-900 hover:bg-indigo-50"
+              asChild
+            >
               <Link to={ROUTES.AUTH.LOGIN}>Sign in</Link>
             </Button>
           </div>

@@ -74,4 +74,56 @@ export const analysisService = {
       resultB: mapRexaResultToAnalysis(data.result_b, { id: 'compare-b' }),
     }
   },
+
+  async extractPdf(file: File): Promise<{ filename: string; page_count: number; text: string }> {
+    const form = new FormData()
+    form.append('file', file)
+    const response = await apiClient.postForm<
+      ApiResponse<{ filename: string; page_count: number; text: string }>
+    >('/extract-pdf', form)
+    if (!response.data?.text) {
+      throw new Error('No text was found in this PDF.')
+    }
+    return response.data
+  },
+
+  async analyzePdf(
+    file: File,
+    questionId?: string,
+  ): Promise<{
+    filename: string
+    items: Array<{
+      questionText: string
+      matchedFromBank: boolean
+      note?: string | null
+      result: AnalysisResult
+    }>
+  }> {
+    const form = new FormData()
+    form.append('file', file)
+    if (questionId) form.append('question_id', questionId)
+    const response = await apiClient.postForm<
+      ApiResponse<{
+        filename: string
+        items: Array<{
+          question_text: string
+          matched_from_bank: boolean
+          note?: string | null
+          analysis: unknown
+        }>
+      }>
+    >('/analyze-pdf', form)
+    if (!response.data?.items?.length) {
+      throw new Error('No answers were found in this PDF.')
+    }
+    return {
+      filename: response.data.filename,
+      items: response.data.items.map((item) => ({
+        questionText: item.question_text,
+        matchedFromBank: item.matched_from_bank,
+        note: item.note,
+        result: mapAnalyzeResponse(item.analysis),
+      })),
+    }
+  },
 }

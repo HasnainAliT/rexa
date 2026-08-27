@@ -4,16 +4,32 @@ import type { ModelVersion } from '@/types'
 import { modelsService } from '@/services'
 import { useAuth } from '@/hooks'
 import { getInitials } from '@/utils'
+import {
+  GRADING_STORAGE_KEY,
+  getGradingThresholds,
+} from '@/lib/grading'
 import { PageHeader } from '@/components/common'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/common'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 
 export function SettingsPage() {
   const { user } = useAuth()
   const [activeModel, setActiveModel] = useState<ModelVersion | null>(null)
   const [isLoadingModel, setIsLoadingModel] = useState(true)
+  const [thresholds, setThresholds] = useState(getGradingThresholds)
+
+  const saveThresholds = (next: typeof thresholds) => {
+    setThresholds(next)
+    try {
+      localStorage.setItem(GRADING_STORAGE_KEY, JSON.stringify(next))
+    } catch {
+      // ignore
+    }
+  }
 
   useEffect(() => {
     let mounted = true
@@ -82,6 +98,77 @@ export function SettingsPage() {
               </p>
             </div>
             <ThemeToggle />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Grading thresholds</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Pass requires role coverage, concept coverage, and a minimum star
+              score. These apply to the Reasoning Engine, Class report, and
+              Batch upload on this device.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="roleThreshold">Role coverage %</Label>
+                <Input
+                  id="roleThreshold"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={Math.round(thresholds.role * 100)}
+                  onChange={(event) =>
+                    saveThresholds({
+                      ...thresholds,
+                      role:
+                        Math.min(100, Math.max(0, Number(event.target.value) || 0)) /
+                        100,
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="conceptThreshold">Concept coverage %</Label>
+                <Input
+                  id="conceptThreshold"
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={Math.round(thresholds.concept * 100)}
+                  onChange={(event) =>
+                    saveThresholds({
+                      ...thresholds,
+                      concept:
+                        Math.min(100, Math.max(0, Number(event.target.value) || 0)) /
+                        100,
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="minStars">Minimum stars</Label>
+                <Input
+                  id="minStars"
+                  type="number"
+                  min={1}
+                  max={5}
+                  step={0.5}
+                  value={thresholds.minStars}
+                  onChange={(event) =>
+                    saveThresholds({
+                      ...thresholds,
+                      minStars: Math.min(
+                        5,
+                        Math.max(1, Number(event.target.value) || 1),
+                      ),
+                    })
+                  }
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
 

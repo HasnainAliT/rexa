@@ -12,6 +12,7 @@ export const ROUTES = {
     ANALYSIS: '/app/analysis',
     REASONING: '/app/reasoning',
     REPORTS: '/app/reports',
+    BATCH: '/app/batch',
     SETTINGS: '/app/settings',
     QUESTIONS: '/app/questions',
     ANNOTATION: '/app/annotation',

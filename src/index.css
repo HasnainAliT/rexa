@@ -120,7 +120,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
 
   body {
@@ -131,5 +131,22 @@
 
   #root {
     min-height: 100svh;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  @media (max-width: 425px) {
+    h1 {
+      font-size: 1.5rem;
+      line-height: 2rem;
+    }
+  }
+
+  @media (max-width: 375px) {
+    body {
+      font-size: 0.9375rem;
+    }
   }
 }

@@ -184,6 +184,8 @@ export function mapRexaResultToAnalysis(
     id?: string | null
     questionId?: string | null
     createdAt?: string
+    studentName?: string | null
+    studentId?: string | null
   } = {},
 ): AnalysisResult {
   const depthScore =
@@ -195,6 +197,8 @@ export function mapRexaResultToAnalysis(
     questionText: result.question_text ?? '',
     referenceAnswer: result.reference_answer,
     studentAnswer: result.student_answer ?? '',
+    studentName: meta.studentName ?? undefined,
+    studentId: meta.studentId ?? undefined,
     stars: result.stars ?? 0,
     dimensions: mapDimensions(result.dimension_scores),
     sentenceRoles: mapSentenceRoles(result.highlights ?? []),
@@ -211,6 +215,8 @@ export function mapAnalyzeResponse(raw: unknown): AnalysisResult {
   const data = raw as {
     analysis_id?: string | null
     question_id?: string | null
+    student_name?: string | null
+    student_id?: string | null
     result?: BackendRexaResult
     // already flat AnalysisResult?
     id?: string
@@ -221,6 +227,8 @@ export function mapAnalyzeResponse(raw: unknown): AnalysisResult {
     return mapRexaResultToAnalysis(data.result, {
       id: data.analysis_id,
       questionId: data.question_id,
+      studentName: data.student_name,
+      studentId: data.student_id,
     })
   }
 
@@ -236,6 +244,8 @@ export function mapAnalyzeResponse(raw: unknown): AnalysisResult {
     stars?: number
     model_version?: string
     created_at?: string
+    student_name?: string | null
+    student_id?: string | null
   }
 
   if (run.result_json) {
@@ -249,6 +259,8 @@ export function mapAnalyzeResponse(raw: unknown): AnalysisResult {
         id: run.id,
         questionId: run.question_id,
         createdAt: run.created_at,
+        studentName: run.student_name,
+        studentId: run.student_id,
       },
     )
   }
@@ -256,6 +268,8 @@ export function mapAnalyzeResponse(raw: unknown): AnalysisResult {
   return mapRexaResultToAnalysis(data as BackendRexaResult, {
     id: data.analysis_id ?? data.id,
     questionId: data.question_id,
+    studentName: data.student_name,
+    studentId: data.student_id,
   })
 }
 
@@ -296,6 +310,7 @@ export function toBackendQuestionPayload(input: QuestionInput): Record<string, u
     reference_answer: input.referenceAnswer,
     concepts: input.concepts,
     course: input.subject ?? null,
+    difficulty: input.difficulty ?? 'medium',
   }
 }
 
@@ -305,6 +320,8 @@ export function toBackendAnalyzePayload(payload: {
   referenceAnswer: string
   concepts?: string[]
   studentAnswer: string
+  studentName?: string
+  studentId?: string
 }): Record<string, unknown> {
   return {
     question_id: payload.questionId ?? null,
@@ -312,6 +329,8 @@ export function toBackendAnalyzePayload(payload: {
     reference_answer: payload.referenceAnswer,
     concepts: payload.concepts ?? [],
     student_answer: payload.studentAnswer,
+    student_name: payload.studentName ?? null,
+    student_id: payload.studentId ?? null,
     save: true,
   }
 }

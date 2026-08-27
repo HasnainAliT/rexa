@@ -58,6 +58,7 @@ def create_question(
         reference_answer=payload.reference_answer,
         concepts=payload.concepts,
         course=payload.course,
+        difficulty=payload.difficulty or "medium",
         created_by=current_user.id,
     )
     db.add(question)

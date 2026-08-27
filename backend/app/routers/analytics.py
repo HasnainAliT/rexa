@@ -59,7 +59,7 @@ def dashboard(db: Session = Depends(get_db), _: User = Depends(get_current_user)
             RecentAnalysisItem(
                 id=run.id,
                 question_title=question.title if question else "Unknown",
-                student_name=submission.student_name if submission else None,
+                student_name=getattr(submission, "student_name", None) if submission else None,
                 stars=run.stars,
                 created_at=run.created_at,
             )

@@ -56,6 +56,8 @@ export interface AnalysisResult {
   questionText: string
   referenceAnswer?: string
   studentAnswer: string
+  studentName?: string
+  studentId?: string
   stars: number
   dimensions: DimensionScore[]
   sentenceRoles: SentenceRole[]
@@ -94,6 +96,8 @@ export interface AnalyzeRequest {
   referenceAnswer: string
   concepts?: string[]
   studentAnswer: string
+  studentName?: string
+  studentId?: string
 }
 
 export interface BatchAnalyzeRequest {

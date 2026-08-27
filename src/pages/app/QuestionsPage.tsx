@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -16,6 +16,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -54,6 +55,11 @@ export function QuestionsPage() {
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
+  const [search, setSearch] = useState('')
+  const [difficultyFilter, setDifficultyFilter] = useState<'all' | 'easy' | 'medium' | 'hard'>('all')
+  const [sortBy, setSortBy] = useState<'newest' | 'az' | 'difficulty'>('newest')
+  const [page, setPage] = useState(1)
+  const pageSize = 8
   const [deletingQuestion, setDeletingQuestion] = useState<Question | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -86,6 +92,33 @@ export function QuestionsPage() {
       })
       .finally(() => setIsLoading(false))
   }
+
+  const filteredQuestions = useMemo(() => {
+    let rows = [...questions]
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      rows = rows.filter(
+        (item) =>
+          item.text.toLowerCase().includes(q) ||
+          (item.subject ?? '').toLowerCase().includes(q),
+      )
+    }
+    if (difficultyFilter !== 'all') {
+      rows = rows.filter((item) => (item.difficulty ?? 'medium') === difficultyFilter)
+    }
+    rows.sort((a, b) => {
+      if (sortBy === 'az') return a.text.localeCompare(b.text)
+      if (sortBy === 'difficulty') {
+        const order = { easy: 0, medium: 1, hard: 2 }
+        return (order[a.difficulty ?? 'medium'] ?? 1) - (order[b.difficulty ?? 'medium'] ?? 1)
+      }
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    })
+    return rows
+  }, [questions, search, difficultyFilter, sortBy])
+
+  const totalPages = Math.max(1, Math.ceil(filteredQuestions.length / pageSize))
+  const pagedQuestions = filteredQuestions.slice((page - 1) * pageSize, page * pageSize)
 
   useEffect(() => {
     loadQuestions()
@@ -183,13 +216,47 @@ export function QuestionsPage() {
           </Alert>
         )}
 
+        <div className="grid gap-2 sm:grid-cols-3">
+          <Input
+            placeholder="Search questions…"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value)
+              setPage(1)
+            }}
+            aria-label="Search questions"
+          />
+          <Select
+            value={difficultyFilter}
+            onChange={(event) => {
+              setDifficultyFilter(event.target.value as typeof difficultyFilter)
+              setPage(1)
+            }}
+            aria-label="Filter by difficulty"
+          >
+            <option value="all">All difficulties</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </Select>
+          <Select
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value as typeof sortBy)}
+            aria-label="Sort questions"
+          >
+            <option value="newest">Newest</option>
+            <option value="az">A–Z</option>
+            <option value="difficulty">Difficulty</option>
+          </Select>
+        </div>
+
         <Card>
           <CardContent className="p-0">
             {isLoading ? (
               <div className="flex justify-center py-16">
                 <LoadingSpinner size="lg" label="Loading questions…" />
               </div>
-            ) : questions.length === 0 ? (
+            ) : filteredQuestions.length === 0 ? (
               <EmptyState
                 icon={BookOpen}
                 title="No questions yet"
@@ -209,23 +276,28 @@ export function QuestionsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {questions.map((question) => (
+                  {pagedQuestions.map((question) => (
                     <TableRow key={question.id}>
-                      <TableCell className="max-w-sm truncate font-medium">
-                        {question.text}
+                      <TableCell className="max-w-sm font-medium">
+                        <span
+                          className="line-clamp-2"
+                          title={question.text}
+                        >
+                          {question.text}
+                        </span>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {question.subject ?? '—'}
                       </TableCell>
                       <TableCell>
-                        {question.difficulty && (
-                          <Badge
-                            variant={DIFFICULTY_VARIANT[question.difficulty]}
-                            className="capitalize"
-                          >
-                            {question.difficulty}
-                          </Badge>
-                        )}
+                        <Badge
+                          variant={
+                            DIFFICULTY_VARIANT[question.difficulty ?? 'medium']
+                          }
+                          className="capitalize"
+                        >
+                          {question.difficulty ?? 'medium'}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {question.concepts.length} concept
@@ -258,6 +330,33 @@ export function QuestionsPage() {
             )}
           </CardContent>
         </Card>
+
+        {!isLoading && filteredQuestions.length > 0 && (
+          <div className="flex items-center justify-between text-sm">
+            <p className="text-muted-foreground">
+              {filteredQuestions.length} question
+              {filteredQuestions.length === 1 ? '' : 's'} · page {page} of {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -374,11 +473,14 @@ export function QuestionsPage() {
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Delete question?</DialogTitle>
+            <DialogTitle>Delete this question?</DialogTitle>
+            <DialogDescription>
+              This permanently removes the question from the bank. Analyses
+              already saved are not deleted.
+            </DialogDescription>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            This will permanently remove &ldquo;{deletingQuestion?.text}
-            &rdquo; from the question bank. This action cannot be undone.
+            &ldquo;{deletingQuestion?.text}&rdquo;
           </p>
           <DialogFooter>
             <Button
