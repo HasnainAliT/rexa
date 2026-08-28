@@ -5,9 +5,43 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import ApiHTTPException, get_current_user
 from app.models import AnalysisRun, Question, Submission, User
+from app.schemas import ClassReportExport
+from app.services.class_export import generate_class_pdf, generate_class_xlsx
 from app.services.reports import generate_markdown_report, generate_pdf_report
 
 router = APIRouter(prefix="/reports", tags=["reports"])
+
+
+@router.post("/class/xlsx")
+def download_class_xlsx(
+    payload: ClassReportExport,
+    _: User = Depends(get_current_user),
+):
+    content = generate_class_xlsx(
+        [row.model_dump() for row in payload.rows],
+        title=payload.title,
+    )
+    return Response(
+        content=content,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": 'attachment; filename="rexa-class-report.xlsx"'},
+    )
+
+
+@router.post("/class/pdf")
+def download_class_pdf(
+    payload: ClassReportExport,
+    _: User = Depends(get_current_user),
+):
+    content = generate_class_pdf(
+        [row.model_dump() for row in payload.rows],
+        title=payload.title,
+    )
+    return Response(
+        content=content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="rexa-class-report.pdf"'},
+    )
 
 
 def _load_report_context(db: Session, analysis_id: str):

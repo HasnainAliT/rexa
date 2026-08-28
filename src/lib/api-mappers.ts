@@ -113,12 +113,14 @@ function mapSentenceRoles(highlights: unknown[]): SentenceRole[] {
       text?: string
       role?: string
       confidence?: number
+      reason?: string
     }
     return {
       index: h.index ?? index,
       text: h.text ?? '',
       role: mapRole(h.role ?? 'Other'),
       confidence: h.confidence ?? 0.8,
+      reason: h.reason,
     }
   })
 }

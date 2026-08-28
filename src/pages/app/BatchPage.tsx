@@ -5,14 +5,16 @@ import type { Question } from '@/types'
 import { analysisService, batchService, questionsService } from '@/services'
 import { ROUTES } from '@/routes/paths'
 import { overallStatus, toPercent } from '@/lib/grading'
-import { EmptyState, PageHeader, StarRating } from '@/components/common'
+import { EmptyState, LoadingSpinner, PageHeader, StarRating } from '@/components/common'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Table,
   TableBody,
@@ -33,17 +35,11 @@ const FIELD_OPTIONS = [
   { id: 'answer', label: 'Student answer' },
 ] as const
 
-function guessMapping(columns: string[]): Record<string, string> {
-  const map: Record<string, string> = {}
-  for (const col of columns) {
-    const n = col.toLowerCase()
-    if (/name/.test(n) && !/file|file/.test(n)) map[col] = 'student_name'
-    else if (/(student\s*id|sid|roll)/.test(n)) map[col] = 'student_id'
-    else if (/(question|assignment|prompt)/.test(n)) map[col] = 'question'
-    else if (/(answer|response|essay)/.test(n)) map[col] = 'answer'
-    else map[col] = 'ignore'
-  }
-  return map
+type DraftRow = {
+  studentName: string
+  studentId: string
+  question: string
+  answer: string
 }
 
 type ResultRow = {
@@ -58,97 +54,230 @@ type ResultRow = {
   error?: string
 }
 
+function guessMapping(columns: string[]): Record<string, string> {
+  const map: Record<string, string> = {}
+  for (const col of columns) {
+    const n = col.toLowerCase()
+    if (/name/.test(n) && !/file/.test(n)) map[col] = 'student_name'
+    else if (/(student\s*id|sid|roll)/.test(n)) map[col] = 'student_id'
+    else if (/(question|assignment|prompt)/.test(n)) map[col] = 'question'
+    else if (/(answer|response|essay)/.test(n)) map[col] = 'answer'
+    else map[col] = 'ignore'
+  }
+  return map
+}
+
+function matchQuestion(value: string, bank: Question[]): Question | undefined {
+  const needle = value.trim().toLowerCase()
+  if (!needle) return undefined
+  return (
+    bank.find((item) => item.id.toLowerCase() === needle) ||
+    bank.find((item) => item.text.toLowerCase() === needle) ||
+    bank.find(
+      (item) =>
+        item.text.toLowerCase().includes(needle) ||
+        needle.includes(item.text.toLowerCase().slice(0, 48)),
+    )
+  )
+}
+
+function stemName(filename: string) {
+  return filename.replace(/\.(pdf|txt|docx)$/i, '')
+}
+
 export function BatchPage() {
   const [step, setStep] = useState<Step>('upload')
   const [fileName, setFileName] = useState('')
   const [columns, setColumns] = useState<string[]>([])
   const [rows, setRows] = useState<Row[]>([])
   const [mapping, setMapping] = useState<Record<string, string>>({})
+  const [drafts, setDrafts] = useState<DraftRow[]>([])
   const [questions, setQuestions] = useState<Question[]>([])
   const [questionId, setQuestionId] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState({ done: 0, total: 0 })
   const [results, setResults] = useState<ResultRow[]>([])
   const [running, setRunning] = useState(false)
+  const [parsing, setParsing] = useState(false)
 
   const selectedQuestion = questions.find((q) => q.id === questionId)
+  const answerMapped = Object.values(mapping).includes('answer')
+  const questionMapped = Object.values(mapping).includes('question')
 
-  const mapped = useMemo(() => {
-    return rows
-      .map((row) => {
-        const get = (field: string) => {
-          const col = Object.entries(mapping).find(([, v]) => v === field)?.[0]
-          return col ? row[col] ?? '' : ''
-        }
-        return {
-          studentName: get('student_name'),
-          studentId: get('student_id'),
-          question: get('question'),
-          answer: get('answer'),
-        }
-      })
-      .filter((row) => row.answer.trim())
-  }, [rows, mapping])
+  const rebuildDrafts = (nextRows: Row[], nextMapping: Record<string, string>) => {
+    const next = nextRows.map((row) => {
+      const get = (field: string) => {
+        const col = Object.entries(nextMapping).find(([, v]) => v === field)?.[0]
+        return col ? row[col] ?? '' : ''
+      }
+      return {
+        studentName: get('student_name'),
+        studentId: get('student_id'),
+        question: get('question'),
+        answer: get('answer'),
+      }
+    })
+    setDrafts(next)
+  }
 
-  const onFile = async (file: File) => {
+  const validDrafts = useMemo(
+    () => drafts.filter((row) => row.answer.trim()),
+    [drafts],
+  )
+  const emptyAnswers = drafts.length - validDrafts.length
+  const missingIds = validDrafts.filter((row) => !row.studentId.trim()).length
+  const missingNames = validDrafts.filter((row) => !row.studentName.trim()).length
+  const duplicateIds = useMemo(() => {
+    const seen = new Map<string, number>()
+    for (const row of validDrafts) {
+      const id = row.studentId.trim().toLowerCase()
+      if (!id) continue
+      seen.set(id, (seen.get(id) ?? 0) + 1)
+    }
+    return [...seen.values()].filter((count) => count > 1).length
+  }, [validDrafts])
+  const unmatchedQuestions = useMemo(() => {
+    if (!questionMapped) return 0
+    return validDrafts.filter((row) => !matchQuestion(row.question, questions)).length
+  }, [questionMapped, validDrafts, questions])
+
+  const canStart =
+    validDrafts.length > 0 &&
+    answerMapped &&
+    (Boolean(selectedQuestion) ||
+      (questionMapped && unmatchedQuestions < validDrafts.length))
+
+  const resolveQuestion = (row: DraftRow): Question | undefined => {
+    return matchQuestion(row.question, questions) ?? selectedQuestion
+  }
+
+  const onFiles = async (fileList: FileList | File[]) => {
+    const files = Array.from(fileList)
+    if (!files.length) return
     setError(null)
+    setParsing(true)
     try {
-      const parsed = await batchService.parseUpload(file)
+      const documents = files.filter((file) =>
+        /\.(pdf|txt|docx)$/i.test(file.name),
+      )
+      const tables = files.filter((file) =>
+        /\.(csv|xlsx|xlsm)$/i.test(file.name),
+      )
+      if (!documents.length && !tables.length) {
+        setError('Upload CSV, Excel (.xlsx), PDF, Word (.docx), or TXT answer files.')
+        return
+      }
+      const bank = await questionsService.listQuestions({ pageSize: 100 })
+      setQuestions(bank.data)
+
+      if (documents.length) {
+        const nextRows: Row[] = []
+        for (const file of documents) {
+          if (file.name.toLowerCase().endsWith('.txt')) {
+            nextRows.push({
+              'Student name': stemName(file.name),
+              'Student ID': '',
+              Answer: await file.text(),
+            })
+          } else {
+            const extracted = await analysisService.extractDocument(file)
+            nextRows.push({
+              'Student name': stemName(file.name),
+              'Student ID': '',
+              Answer: extracted.text,
+            })
+          }
+        }
+        const nextColumns = ['Student name', 'Student ID', 'Answer']
+        const nextMapping = guessMapping(nextColumns)
+        setFileName(documents.map((file) => file.name).join(', '))
+        setColumns(nextColumns)
+        setRows(nextRows)
+        setMapping(nextMapping)
+        rebuildDrafts(nextRows, nextMapping)
+        setStep('map')
+        return
+      }
+
+      const parsed = await batchService.parseUpload(tables[0])
+      const nextMapping = guessMapping(parsed.columns)
       setFileName(parsed.filename)
       setColumns(parsed.columns)
       setRows(parsed.rows)
-      setMapping(guessMapping(parsed.columns))
-      questionsService.listQuestions({ pageSize: 100 }).then((res) => setQuestions(res.data))
+      setMapping(nextMapping)
+      rebuildDrafts(parsed.rows, nextMapping)
       setStep('map')
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : 'Could not read this file. Use CSV or Excel (.xlsx).',
+          : 'Could not read this file. Use CSV, Excel, PDF, Word, or TXT.',
       )
+    } finally {
+      setParsing(false)
+    }
+  }
+
+  const gradeRow = async (row: DraftRow, index: number): Promise<ResultRow> => {
+    const question = resolveQuestion(row)
+    if (!question) {
+      return {
+        studentName: row.studentName || `Student ${index + 1}`,
+        studentId: row.studentId,
+        question: row.question,
+        stars: 0,
+        coverage: 0,
+        depth: 0,
+        passed: false,
+        error: 'No matching question in the bank for this row.',
+      }
+    }
+    const analysis = await analysisService.analyze({
+      questionId: question.id,
+      questionText: question.text,
+      referenceAnswer: question.referenceAnswer,
+      concepts: question.concepts,
+      studentAnswer: row.answer,
+      studentName: row.studentName || undefined,
+      studentId: row.studentId || undefined,
+    })
+    const status = overallStatus(analysis)
+    return {
+      studentName: row.studentName || `Student ${index + 1}`,
+      studentId: row.studentId,
+      question: question.text,
+      stars: analysis.stars,
+      coverage: status.roles.percent,
+      depth: toPercent(
+        analysis.dimensions.find((d) => d.key === 'reasoning_depth')?.score ?? 0,
+      ),
+      passed: status.passed,
+      analysisId: analysis.id,
     }
   }
 
   const runBatch = async () => {
-    if (!selectedQuestion) {
-      setError('Pick a question from the bank so every student is graded against the same reference.')
+    if (!canStart) {
+      setError(
+        'Map the answer column and pick a fallback question, or map a question column that matches the bank.',
+      )
       return
     }
+    setError(null)
     setRunning(true)
     setStep('run')
     setResults([])
-    setProgress({ done: 0, total: mapped.length })
+    setProgress({ done: 0, total: validDrafts.length })
     const next: ResultRow[] = []
-    for (let i = 0; i < mapped.length; i += 1) {
-      const row = mapped[i]
+    for (let i = 0; i < validDrafts.length; i += 1) {
       try {
-        const analysis = await analysisService.analyze({
-          questionId: selectedQuestion.id,
-          questionText: selectedQuestion.text,
-          referenceAnswer: selectedQuestion.referenceAnswer,
-          concepts: selectedQuestion.concepts,
-          studentAnswer: row.answer,
-          studentName: row.studentName || undefined,
-          studentId: row.studentId || undefined,
-        })
-        const status = overallStatus(analysis)
-        next.push({
-          studentName: row.studentName || `Student ${i + 1}`,
-          studentId: row.studentId,
-          question: selectedQuestion.text,
-          stars: analysis.stars,
-          coverage: status.roles.percent,
-          depth: toPercent(
-            analysis.dimensions.find((d) => d.key === 'reasoning_depth')?.score ?? 0,
-          ),
-          passed: status.passed,
-          analysisId: analysis.id,
-        })
+        next.push(await gradeRow(validDrafts[i], i))
       } catch (err) {
+        const row = validDrafts[i]
         next.push({
           studentName: row.studentName || `Student ${i + 1}`,
           studentId: row.studentId,
-          question: selectedQuestion.text,
+          question: resolveQuestion(row)?.text || row.question,
           stars: 0,
           coverage: 0,
           depth: 0,
@@ -157,43 +286,22 @@ export function BatchPage() {
         })
       }
       setResults([...next])
-      setProgress({ done: i + 1, total: mapped.length })
+      setProgress({ done: i + 1, total: validDrafts.length })
     }
     setRunning(false)
     setStep('done')
   }
 
   const retryFailed = async () => {
-    const failed = results.filter((r) => r.error)
-    if (!failed.length || !selectedQuestion) return
+    if (!results.some((row) => row.error)) return
     setRunning(true)
     const updated = [...results]
     for (let i = 0; i < updated.length; i += 1) {
       if (!updated[i].error) continue
-      const source = mapped[i]
+      const source = validDrafts[i]
       if (!source) continue
       try {
-        const analysis = await analysisService.analyze({
-          questionId: selectedQuestion.id,
-          questionText: selectedQuestion.text,
-          referenceAnswer: selectedQuestion.referenceAnswer,
-          concepts: selectedQuestion.concepts,
-          studentAnswer: source.answer,
-          studentName: source.studentName || undefined,
-          studentId: source.studentId || undefined,
-        })
-        const status = overallStatus(analysis)
-        updated[i] = {
-          ...updated[i],
-          error: undefined,
-          stars: analysis.stars,
-          coverage: status.roles.percent,
-          depth: toPercent(
-            analysis.dimensions.find((d) => d.key === 'reasoning_depth')?.score ?? 0,
-          ),
-          passed: status.passed,
-          analysisId: analysis.id,
-        }
+        updated[i] = await gradeRow(source, i)
         setResults([...updated])
       } catch (err) {
         updated[i] = {
@@ -207,10 +315,18 @@ export function BatchPage() {
   }
 
   const exportCsv = () => {
-    const header = 'Student name,Student ID,Stars,Coverage %,Depth %,Status\n'
+    const header = 'Student name,Student ID,Question,Stars,Coverage %,Depth %,Status\n'
     const body = results
       .map((r) =>
-        [r.studentName, r.studentId, r.stars, r.coverage, r.depth, r.error ? 'Failed' : r.passed ? 'Pass' : 'Below threshold']
+        [
+          r.studentName,
+          r.studentId,
+          r.question,
+          r.stars,
+          r.coverage,
+          r.depth,
+          r.error ? 'Failed' : r.passed ? 'Pass' : 'Below threshold',
+        ]
           .map((v) => `"${String(v).replace(/"/g, '""')}"`)
           .join(','),
       )
@@ -231,11 +347,17 @@ export function BatchPage() {
     processing: running ? progress.total - progress.done : 0,
   }
 
+  const updateDraft = (index: number, field: keyof DraftRow, value: string) => {
+    setDrafts((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row)),
+    )
+  }
+
   return (
     <div>
       <PageHeader
         title="Batch upload"
-        description="Grade many student answers at once from CSV or Excel, map columns, then review the class report."
+        description="Grade many student answers at once from CSV, Excel, PDF, Word, or TXT. Map columns, edit rows, then review the class report."
       />
       <div className="space-y-4 p-4 sm:p-6 lg:p-8">
         {error && (
@@ -251,24 +373,30 @@ export function BatchPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                Upload CSV or Excel (.xlsx) with student name, student ID,
-                question/assignment, and student answer columns. Document PDFs
-                with question–answer pairs still use Analysis → Exam PDF.
+                Upload a CSV or Excel roster, or one or more PDF, Word, or TXT
+                student answers. Map and edit rows next, then grade against bank
+                questions.
               </p>
-              <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed p-8 text-sm hover:bg-muted/40">
-                <Upload className="h-6 w-6 text-primary" />
-                Choose CSV or Excel file
-                <input
-                  type="file"
-                  accept=".csv,text/csv,.txt,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                  className="sr-only"
-                  aria-label="Upload CSV or Excel roster"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0]
-                    if (file) void onFile(file)
-                  }}
-                />
-              </label>
+              {parsing ? (
+                <div className="flex justify-center py-10">
+                  <LoadingSpinner label="Reading files…" />
+                </div>
+              ) : (
+                <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed p-8 text-sm hover:bg-muted/40">
+                  <Upload className="h-6 w-6 text-primary" />
+                  Choose CSV, Excel, PDF, Word, or TXT
+                  <input
+                    type="file"
+                    multiple
+                    accept=".csv,text/csv,.txt,.xlsx,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    className="sr-only"
+                    aria-label="Upload CSV, Excel, PDF, Word, or TXT files"
+                    onChange={(event) => {
+                      if (event.target.files?.length) void onFiles(event.target.files)
+                    }}
+                  />
+                </label>
+              )}
             </CardContent>
           </Card>
         )}
@@ -287,9 +415,11 @@ export function BatchPage() {
                     <Label>{col}</Label>
                     <Select
                       value={mapping[col] ?? 'ignore'}
-                      onChange={(event) =>
-                        setMapping((prev) => ({ ...prev, [col]: event.target.value }))
-                      }
+                      onChange={(event) => {
+                        const next = { ...mapping, [col]: event.target.value }
+                        setMapping(next)
+                        rebuildDrafts(rows, next)
+                      }}
                     >
                       {FIELD_OPTIONS.map((opt) => (
                         <option key={opt.id} value={opt.id}>
@@ -301,7 +431,7 @@ export function BatchPage() {
                 ))}
               </div>
               <div className="space-y-2">
-                <Label>Question from bank</Label>
+                <Label>Fallback question from bank</Label>
                 <Select
                   value={questionId}
                   onChange={(event) => setQuestionId(event.target.value)}
@@ -313,15 +443,93 @@ export function BatchPage() {
                     </option>
                   ))}
                 </Select>
+                <p className="text-xs text-muted-foreground">
+                  Used when a row has no question column, or the mapped question
+                  does not match the bank.
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {mapped.length} valid answers after mapping.
-              </p>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <p>
+                  {validDrafts.length} valid answers after mapping
+                  {emptyAnswers ? ` · ${emptyAnswers} rows skipped (empty answer)` : ''}.
+                </p>
+                {missingNames > 0 && <p>{missingNames} rows are missing a student name.</p>}
+                {missingIds > 0 && <p>{missingIds} rows are missing a student ID.</p>}
+                {duplicateIds > 0 && (
+                  <p>{duplicateIds} student IDs appear more than once.</p>
+                )}
+                {questionMapped && unmatchedQuestions > 0 && (
+                  <p>
+                    {unmatchedQuestions} mapped questions do not match the bank
+                    {selectedQuestion ? ' and will use the fallback question.' : '.'}
+                  </p>
+                )}
+                {!answerMapped && (
+                  <p className="text-destructive">Map a column to Student answer before starting.</p>
+                )}
+              </div>
+              {drafts.length > 0 && (
+                <div className="overflow-x-auto rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Student name</TableHead>
+                        <TableHead>Student ID</TableHead>
+                        <TableHead>Question / assignment</TableHead>
+                        <TableHead>Student answer</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {drafts.map((row, index) => (
+                        <TableRow key={`${row.studentId}-${index}`}>
+                          <TableCell className="min-w-36">
+                            <Input
+                              value={row.studentName}
+                              aria-label={`Student name row ${index + 1}`}
+                              onChange={(event) =>
+                                updateDraft(index, 'studentName', event.target.value)
+                              }
+                            />
+                          </TableCell>
+                          <TableCell className="min-w-28">
+                            <Input
+                              value={row.studentId}
+                              aria-label={`Student ID row ${index + 1}`}
+                              onChange={(event) =>
+                                updateDraft(index, 'studentId', event.target.value)
+                              }
+                            />
+                          </TableCell>
+                          <TableCell className="min-w-48">
+                            <Input
+                              value={row.question}
+                              aria-label={`Question row ${index + 1}`}
+                              onChange={(event) =>
+                                updateDraft(index, 'question', event.target.value)
+                              }
+                            />
+                          </TableCell>
+                          <TableCell className="min-w-64">
+                            <Textarea
+                              value={row.answer}
+                              rows={2}
+                              aria-label={`Answer row ${index + 1}`}
+                              onChange={(event) =>
+                                updateDraft(index, 'answer', event.target.value)
+                              }
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setStep('upload')}>
                   Back
                 </Button>
-                <Button disabled={!mapped.length} onClick={() => void runBatch()}>
+                <Button disabled={!canStart} onClick={() => void runBatch()}>
                   Start analysis
                 </Button>
               </div>
@@ -335,7 +543,7 @@ export function BatchPage() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-xs text-muted-foreground">Total</p>
-                  <p className="text-2xl font-bold">{stats.total || mapped.length}</p>
+                  <p className="text-2xl font-bold">{stats.total || validDrafts.length}</p>
                 </CardContent>
               </Card>
               <Card>
@@ -365,7 +573,7 @@ export function BatchPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-base">Class results</CardTitle>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {stats.failed > 0 && (
                     <Button variant="outline" size="sm" disabled={running} onClick={() => void retryFailed()}>
                       Retry failed
@@ -393,6 +601,7 @@ export function BatchPage() {
                       <TableRow>
                         <TableHead>Student</TableHead>
                         <TableHead>ID</TableHead>
+                        <TableHead>Question</TableHead>
                         <TableHead>Stars</TableHead>
                         <TableHead>Coverage</TableHead>
                         <TableHead>Depth</TableHead>
@@ -408,6 +617,9 @@ export function BatchPage() {
                         >
                           <TableCell>{row.studentName}</TableCell>
                           <TableCell>{row.studentId || '—'}</TableCell>
+                          <TableCell className="max-w-xs truncate" title={row.question}>
+                            {row.question || '—'}
+                          </TableCell>
                           <TableCell>
                             <StarRating value={row.stars} size="sm" />
                           </TableCell>

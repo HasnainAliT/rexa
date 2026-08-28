@@ -29,7 +29,7 @@
       "recall": 1.0,
       "f1": 1.0,
       "metric_type": "macro",
-      "caveat": "Silver labels from heuristic teacher — disclose in viva",
+      "caveat": "Silver labels from the heuristic teacher, so high agreement is expected",
       "source": "data/baselines/large_results.json"
     }
   ],

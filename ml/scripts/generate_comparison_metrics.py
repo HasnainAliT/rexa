@@ -80,10 +80,10 @@ def main() -> None:
     x = np.arange(len(module_rows))
     w = 0.2
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.bar(x - 1.5 * w, [r["Accuracy"] for r in module_rows], w, label="Accuracy", color="#3b82f6")
-    ax.bar(x - 0.5 * w, [r["Precision"] for r in module_rows], w, label="Precision", color="#10b981")
-    ax.bar(x + 0.5 * w, [r["Recall"] for r in module_rows], w, label="Recall", color="#f59e0b")
-    ax.bar(x + 1.5 * w, [r["F1-score"] for r in module_rows], w, label="F1-score", color="#8b5cf6")
+    ax.bar(x - 1.5 * w, [r["Accuracy"] for r in module_rows], w, label="Accuracy", color="#4f46e5")
+    ax.bar(x - 0.5 * w, [r["Precision"] for r in module_rows], w, label="Precision", color="#7c3aed")
+    ax.bar(x + 0.5 * w, [r["Recall"] for r in module_rows], w, label="Recall", color="#6366f1")
+    ax.bar(x + 1.5 * w, [r["F1-score"] for r in module_rows], w, label="F1-score", color="#a78bfa")
     ax.set_xticks(x)
     ax.set_xticklabels(labels, rotation=15)
     ax.set_ylabel("Score (%)")
@@ -100,7 +100,7 @@ def main() -> None:
     labels = [x["model"].replace(" (ours)", "\n(ours)") for x in plot_items]
     metrics = ["accuracy", "precision", "recall", "f1"]
     metric_names = ["Accuracy", "Precision", "Recall", "F1"]
-    colors = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"]
+    colors = ["#4f46e5", "#7c3aed", "#6366f1", "#a78bfa"]
     x = np.arange(len(plot_items))
     w = 0.2
     fig, ax = plt.subplots(figsize=(11, 5.5))
@@ -125,13 +125,13 @@ def main() -> None:
     # Fig 11 — star scoring
     models = [r["Model"] for r in score_rows]
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
-    axes[0].bar(models, [r["MAE (↓)"] for r in score_rows], color=["#f87171", "#34d399", "#60a5fa"])
+    axes[0].bar(models, [r["MAE (↓)"] for r in score_rows], color=["#a78bfa", "#4f46e5", "#7c3aed"])
     axes[0].set_title("Star MAE (lower is better)")
     axes[0].tick_params(axis="x", rotation=20)
     axes[1].bar(
         models,
         [r["Within-1-star % (↑)"] for r in score_rows],
-        color=["#f87171", "#34d399", "#60a5fa"],
+        color=["#a78bfa", "#4f46e5", "#7c3aed"],
     )
     axes[1].set_title("Within-1-star accuracy % (higher is better)")
     axes[1].tick_params(axis="x", rotation=20)

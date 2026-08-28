@@ -142,11 +142,33 @@
       font-size: 1.5rem;
       line-height: 2rem;
     }
+
+    main {
+      overflow-x: hidden;
+    }
   }
 
-  @media (max-width: 375px) {
+  @media (max-width: 320px) {
     body {
-      font-size: 0.9375rem;
+      font-size: 0.875rem;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    table {
+      min-width: 36rem;
     }
   }
 }

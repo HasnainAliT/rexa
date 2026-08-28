@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Cpu, Mail, Shield } from 'lucide-react'
-import type { ModelVersion } from '@/types'
-import { modelsService } from '@/services'
+import type { ModelVersion, Question } from '@/types'
+import { modelsService, questionsService } from '@/services'
 import { useAuth } from '@/hooks'
 import { getInitials } from '@/utils'
 import {
-  GRADING_STORAGE_KEY,
   getGradingThresholds,
+  saveGradingThresholds,
 } from '@/lib/grading'
 import { PageHeader } from '@/components/common'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,20 +15,19 @@ import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/common'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
 
 export function SettingsPage() {
   const { user } = useAuth()
   const [activeModel, setActiveModel] = useState<ModelVersion | null>(null)
   const [isLoadingModel, setIsLoadingModel] = useState(true)
-  const [thresholds, setThresholds] = useState(getGradingThresholds)
+  const [thresholds, setThresholds] = useState(() => getGradingThresholds())
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [assignmentId, setAssignmentId] = useState('')
 
   const saveThresholds = (next: typeof thresholds) => {
     setThresholds(next)
-    try {
-      localStorage.setItem(GRADING_STORAGE_KEY, JSON.stringify(next))
-    } catch {
-      // ignore
-    }
+    saveGradingThresholds(next, assignmentId || undefined)
   }
 
   useEffect(() => {
@@ -44,6 +43,15 @@ export function SettingsPage() {
       })
       .finally(() => {
         if (mounted) setIsLoadingModel(false)
+      })
+
+    questionsService
+      .listQuestions({ pageSize: 100 })
+      .then((response) => {
+        if (mounted) setQuestions(response.data)
+      })
+      .catch(() => {
+        if (mounted) setQuestions([])
       })
 
     return () => {
@@ -108,9 +116,27 @@ export function SettingsPage() {
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
               Pass requires role coverage, concept coverage, and a minimum star
-              score. These apply to the Reasoning Engine, Class report, and
-              Batch upload on this device.
+              score. Set a default, or pick an assignment to override it.
             </p>
+            <div className="space-y-2">
+              <Label htmlFor="assignmentThreshold">Assignment</Label>
+              <Select
+                id="assignmentThreshold"
+                value={assignmentId}
+                onChange={(event) => {
+                  const id = event.target.value
+                  setAssignmentId(id)
+                  setThresholds(getGradingThresholds(id || undefined))
+                }}
+              >
+                <option value="">Default (all assignments)</option>
+                {questions.map((question) => (
+                  <option key={question.id} value={question.id}>
+                    {question.text}
+                  </option>
+                ))}
+              </Select>
+            </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="roleThreshold">Role coverage %</Label>

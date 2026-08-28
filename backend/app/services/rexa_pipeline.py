@@ -84,6 +84,8 @@ class Sentence:
     start: int
     end: int
     role: str = ROLE_OTHER
+    reason: str = ""
+    confidence: float = 0.0
 
 
 @dataclass
@@ -164,35 +166,111 @@ class KeywordRoleClassifier:
     using keyword and positional heuristics.
     """
 
+    _MARKERS = {
+        ROLE_EXPLANATION: EXPLANATION_MARKERS,
+        ROLE_EVIDENCE: EVIDENCE_MARKERS,
+        ROLE_CONCLUSION: CONCLUSION_MARKERS,
+        ROLE_CLAIM: CLAIM_MARKERS,
+    }
+
     def classify(self, sentences: list[Sentence]) -> None:
         total = len(sentences)
         for sentence in sentences:
-            lowered = sentence.text.lower()
-            role = self._classify_one(lowered, sentence.index, total)
+            role, reason, confidence = self.explain(
+                sentence.text, sentence.index, total
+            )
             sentence.role = role
+            sentence.reason = reason
+            sentence.confidence = confidence
 
-    def _classify_one(self, lowered: str, index: int, total: int) -> str:
-        scores = {
-            ROLE_EXPLANATION: self._count_markers(lowered, EXPLANATION_MARKERS),
-            ROLE_EVIDENCE: self._count_markers(lowered, EVIDENCE_MARKERS),
-            ROLE_CONCLUSION: self._count_markers(lowered, CONCLUSION_MARKERS),
-            ROLE_CLAIM: self._count_markers(lowered, CLAIM_MARKERS),
+    def explain(
+        self, text: str, index: int, total: int, assigned_role: str | None = None
+    ) -> tuple[str, str, float]:
+        lowered = text.lower()
+        hits = {
+            role: [marker for marker in markers if marker in lowered]
+            for role, markers in self._MARKERS.items()
         }
-
-        # Positional priors: last sentence is often a conclusion, first is often a claim.
-        if total > 1 and index == total - 1:
+        scores = {role: float(len(found)) for role, found in hits.items()}
+        opening = index == 0
+        closing = total > 1 and index == total - 1
+        if closing:
             scores[ROLE_CONCLUSION] += 0.5
-        if index == 0:
+        if opening:
             scores[ROLE_CLAIM] += 0.5
 
-        best_role = max(scores, key=lambda r: scores[r])
+        best_role = max(scores, key=lambda role: scores[role])
         if scores[best_role] <= 0:
-            return ROLE_OTHER
-        return best_role
+            best_role = ROLE_OTHER
+
+        role = assigned_role or best_role
+        reason, confidence = self._reason_for(
+            role, hits.get(role, []), opening, closing, index, total
+        )
+        return role, reason, confidence
+
+    @staticmethod
+    def _reason_for(
+        role: str,
+        matched: list[str],
+        opening: bool,
+        closing: bool,
+        index: int,
+        total: int,
+    ) -> tuple[str, float]:
+        quoted = ", ".join(f'"{cue}"' for cue in matched[:3])
+        position = f"sentence {index + 1} of {total}"
+        if role == ROLE_OTHER:
+            return (
+                f"Labeled Irrelevant because no claim, evidence, reasoning, or "
+                f"conclusion cues were found ({position}).",
+                0.45,
+            )
+        parts: list[str] = []
+        if quoted:
+            parts.append(f"it contains {quoted}")
+        if role == ROLE_CLAIM and opening:
+            parts.append("it is the opening sentence (typical claim position)")
+        if role == ROLE_CONCLUSION and closing:
+            parts.append("it is the closing sentence (typical conclusion position)")
+        if not parts:
+            parts.append(
+                f"the classifier assigned this role from surrounding structure ({position})"
+            )
+        return f"Labeled {role} because " + " and ".join(parts) + ".", min(
+            0.95, 0.55 + 0.12 * len(matched) + (0.08 if opening or closing else 0)
+        )
 
     @staticmethod
     def _count_markers(lowered: str, markers: tuple[str, ...]) -> float:
         return float(sum(1 for marker in markers if marker in lowered))
+
+
+def attach_sentence_reasons(sentences: list[Sentence]) -> None:
+    """Fill per-sentence why-text after any classifier (heuristic or trained)."""
+    total = len(sentences)
+    helper = KeywordRoleClassifier()
+    for sentence in sentences:
+        if sentence.reason:
+            continue
+        _role, reason, confidence = helper.explain(
+            sentence.text, sentence.index, total, assigned_role=sentence.role
+        )
+        sentence.reason = reason
+        if not sentence.confidence:
+            sentence.confidence = confidence
+
+
+def sentence_highlight(sentence: Sentence) -> dict:
+    return {
+        "index": sentence.index,
+        "text": sentence.text,
+        "role": sentence.role,
+        "start": sentence.start,
+        "end": sentence.end,
+        "reason": sentence.reason,
+        "confidence": round(sentence.confidence or 0.8, 3),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -422,6 +500,7 @@ class RexaPipeline:
 
         sentences = self.splitter.split(student_answer)
         self.role_classifier.classify(sentences)
+        attach_sentence_reasons(sentences)
 
         coverage = self.concept_matcher.match(student_answer, sentences, concepts)
         support_pairs = self.support_analyzer.analyze(sentences)
@@ -449,16 +528,7 @@ class RexaPipeline:
                 "coverage_pct": coverage.coverage_pct,
                 "matches": coverage.matches,
             },
-            "highlights": [
-                {
-                    "index": s.index,
-                    "text": s.text,
-                    "role": s.role,
-                    "start": s.start,
-                    "end": s.end,
-                }
-                for s in sentences
-            ],
+            "highlights": [sentence_highlight(s) for s in sentences],
             "support_pairs": [
                 {
                     "source_index": p.source_index,

@@ -9,16 +9,17 @@ function getToken(): string | null {
   }
 }
 
-async function downloadBlob(
+async function downloadResponse(
   path: string,
   filename: string,
-  method: 'GET' | 'POST' = 'GET',
+  init: RequestInit,
 ): Promise<void> {
   const token = getToken()
-  const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {}
+  const headers = new Headers(init.headers)
+  if (token) headers.set('Authorization', `Bearer ${token}`)
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    method,
+    ...init,
     headers,
   })
 
@@ -26,7 +27,7 @@ async function downloadBlob(
     let message = 'Failed to download report'
     try {
       const body = await response.json()
-      message = body.message ?? message
+      message = body.message ?? body.detail ?? message
     } catch {
       // ignore
     }
@@ -44,9 +45,38 @@ async function downloadBlob(
   URL.revokeObjectURL(url)
 }
 
+export type ClassReportExportRow = {
+  student_name: string
+  student_id: string
+  class_name: string
+  question: string
+  role_coverage: number
+  concept_coverage: number
+  depth: number
+  stars: number
+  overall: number
+  status: string
+}
+
 export const reportsService = {
   downloadMarkdown: (id: string) =>
-    downloadBlob(`/reports/${id}/markdown`, `earas-report-${id}.md`),
+    downloadResponse(`/reports/${id}/markdown`, `earas-report-${id}.md`, {
+      method: 'GET',
+    }),
   downloadPdf: (id: string) =>
-    downloadBlob(`/reports/${id}/pdf`, `earas-report-${id}.pdf`, 'POST'),
+    downloadResponse(`/reports/${id}/pdf`, `earas-report-${id}.pdf`, {
+      method: 'POST',
+    }),
+  downloadClassXlsx: (rows: ClassReportExportRow[]) =>
+    downloadResponse('/reports/class/xlsx', 'rexa-class-report.xlsx', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: 'RExA class report', rows }),
+    }),
+  downloadClassPdf: (rows: ClassReportExportRow[]) =>
+    downloadResponse('/reports/class/pdf', 'rexa-class-report.pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: 'RExA class report', rows }),
+    }),
 }

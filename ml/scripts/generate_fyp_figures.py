@@ -56,7 +56,7 @@ def fig_dataset_composition(manifest: dict, results: dict) -> None:
     }
     labels = ["ASAP 2.0\n(AES essays)", "ASAP-SAS\n(via AERA)", "Total"]
     values = [sources.get("asap2", 0), sources.get("aera-asap-sas", 0), manifest.get("total", sum(sources.values()))]
-    colors = ["#3b82f6", "#10b981", "#6366f1"]
+    colors = ["#4f46e5", "#7c3aed", "#8b5cf6"]
 
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
 
@@ -73,7 +73,7 @@ def fig_dataset_composition(manifest: dict, results: dict) -> None:
         split_vals,
         labels=[f"{a}\n{b:,}" for a, b in zip(split_labels, split_vals)],
         autopct="%1.1f%%",
-        colors=["#60a5fa", "#34d399", "#fbbf24"],
+        colors=["#6366f1", "#8b5cf6", "#a78bfa"],
         startangle=90,
     )
     axes[1].set_title("Train / validation / test split")
@@ -143,9 +143,9 @@ def fig_role_metrics(results: dict) -> None:
     x = np.arange(len(roles))
     width = 0.25
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.bar(x - width, precision, width, label="Precision", color="#3b82f6")
-    ax.bar(x, recall, width, label="Recall", color="#10b981")
-    ax.bar(x + width, f1, width, label="F1-score", color="#8b5cf6")
+    ax.bar(x - width, precision, width, label="Precision", color="#4f46e5")
+    ax.bar(x, recall, width, label="Recall", color="#7c3aed")
+    ax.bar(x + width, f1, width, label="F1-score", color="#a78bfa")
     ax.set_xticks(x)
     ax.set_xticklabels(roles)
     ax.set_ylim(0, 110)
@@ -173,13 +173,13 @@ def fig_depth_progression(results: dict) -> None:
     dist = [18, 27, 33, 22]
 
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.8))
-    axes[0].bar(bands, dist, color=["#fca5a5", "#fdba74", "#86efac", "#67e8f9"], edgecolor="#111827")
+    axes[0].bar(bands, dist, color=["#c7d2fe", "#a5b4fc", "#818cf8", "#4f46e5"], edgecolor="#1e1b4b")
     axes[0].set_ylabel("% of answers (illustrative bands)")
     axes[0].set_title("Objective 2 — Reasoning depth progression bands")
 
     metrics = ["MAE\n(↓ better)", "RMSE\n(↓ better)", "R²\n(↑ better)", "Spearman ρ\n(↑ better)"]
     values = [depth["mae"], depth["rmse"], depth["r2"], depth["spearman_rho"]]
-    colors = ["#ef4444", "#f97316", "#22c55e", "#3b82f6"]
+    colors = ["#6366f1", "#7c3aed", "#4f46e5", "#8b5cf6"]
     bars = axes[1].bar(metrics, values, color=colors, edgecolor="#111827")
     axes[1].set_title("Reasoning-depth model test metrics")
     for b, v in zip(bars, values):
@@ -204,8 +204,8 @@ def fig_before_after_stars(results: dict) -> None:
     # Error metrics (before vs after)
     x = np.arange(2)
     w = 0.35
-    axes[0].bar(x - w / 2, [base["mae"], base["rmse"]], w, label="Before (Keyword baseline)", color="#f87171")
-    axes[0].bar(x + w / 2, [rexa["mae"], rexa["rmse"]], w, label="After (Trained RExA)", color="#34d399")
+    axes[0].bar(x - w / 2, [base["mae"], base["rmse"]], w, label="Before (Keyword baseline)", color="#a78bfa")
+    axes[0].bar(x + w / 2, [rexa["mae"], rexa["rmse"]], w, label="After (Trained RExA)", color="#4f46e5")
     axes[0].set_xticks(x)
     axes[0].set_xticklabels(["MAE", "RMSE"])
     axes[0].set_ylabel("Error (stars)")
@@ -213,8 +213,8 @@ def fig_before_after_stars(results: dict) -> None:
     axes[0].legend()
 
     x2 = np.arange(2)
-    axes[1].bar(x2 - w / 2, [base["within_one_star_accuracy"] * 100, max(base["spearman_rho"], 0) * 100], w, label="Before (Keyword)", color="#f87171")
-    axes[1].bar(x2 + w / 2, [rexa["within_one_star_accuracy"] * 100, rexa["spearman_rho"] * 100], w, label="After (RExA)", color="#34d399")
+    axes[1].bar(x2 - w / 2, [base["within_one_star_accuracy"] * 100, max(base["spearman_rho"], 0) * 100], w, label="Before (Keyword)", color="#a78bfa")
+    axes[1].bar(x2 + w / 2, [rexa["within_one_star_accuracy"] * 100, rexa["spearman_rho"] * 100], w, label="After (RExA)", color="#4f46e5")
     axes[1].set_xticks(x2)
     axes[1].set_xticklabels(["Within-1-star (%)", "Spearman ρ ×100"])
     axes[1].set_ylabel("Score")
@@ -235,7 +235,7 @@ def fig_module_accuracy_overview(results: dict) -> None:
         mods["star_prediction"]["rexa"]["within_one_star_accuracy"] * 100,
         mods["reasoning_depth"]["spearman_rho"] * 100,
     ]
-    colors = ["#3b82f6", "#06b6d4", "#a78bfa", "#22c55e", "#f59e0b"]
+    colors = ["#4f46e5", "#7c3aed", "#8b5cf6", "#6366f1", "#a78bfa"]
     fig, ax = plt.subplots(figsize=(10, 5))
     bars = ax.bar(names, values, color=colors, edgecolor="#111827")
     ax.set_ylim(0, 115)
@@ -246,7 +246,7 @@ def fig_module_accuracy_overview(results: dict) -> None:
     ax.text(
         0.5,
         -0.18,
-        "* Support 100% is vs silver labels (heuristic teacher) — disclose in viva",
+        "* Support 100% is vs silver labels from the heuristic teacher, so high agreement is expected.",
         ha="center",
         transform=ax.transAxes,
         fontsize=8,
@@ -269,9 +269,9 @@ def fig_training_curves() -> None:
     baseline = np.full_like(train_sizes, 1.39, dtype=float)
 
     fig, ax = plt.subplots(figsize=(9, 5))
-    ax.plot(train_sizes, train_mae, "o-", color="#3b82f6", linewidth=2, label="RExA train MAE")
-    ax.plot(train_sizes, val_mae, "s-", color="#10b981", linewidth=2, label="RExA validation MAE")
-    ax.plot(train_sizes, baseline, "--", color="#ef4444", linewidth=2, label="Keyword baseline MAE (1.39)")
+    ax.plot(train_sizes, train_mae, "o-", color="#4f46e5", linewidth=2, label="RExA train MAE")
+    ax.plot(train_sizes, val_mae, "s-", color="#7c3aed", linewidth=2, label="RExA validation MAE")
+    ax.plot(train_sizes, baseline, "--", color="#a78bfa", linewidth=2, label="Keyword baseline MAE (1.39)")
     ax.set_xlabel("Training set size (# answers)")
     ax.set_ylabel("MAE (stars)")
     ax.set_title("Training curves — scoring error decreases as data grows")
@@ -281,44 +281,23 @@ def fig_training_curves() -> None:
         "Final test MAE ≈ 0.60",
         xy=(18014, 0.60),
         xytext=(11000, 0.85),
-        arrowprops=dict(arrowstyle="->", color="#065f46"),
+        arrowprops=dict(arrowstyle="->", color="#4f46e5"),
         fontsize=9,
-        color="#065f46",
+        color="#4f46e5",
     )
     save(fig, "07_training_curves_mae.png")
 
 
 def fig_explainable_visual_concept() -> None:
-    """Objective 3 — schematic of explainable visual output."""
-    fig, ax = plt.subplots(figsize=(10, 4.5))
-    ax.axis("off")
-    ax.set_title("Objective 3 — Explainable visual output (Reasoning Engine UI)", fontweight="bold", pad=8)
-
-    boxes = [
-        (0.05, 0.55, 0.25, 0.3, "Student answer\nsplit into sentences", "#dbeafe"),
-        (0.38, 0.55, 0.25, 0.3, "Color-coded roles\nClaim / Evidence /\nExplanation / Conclusion", "#dcfce7"),
-        (0.71, 0.55, 0.24, 0.3, "Support links &\ncontradiction cues", "#fef3c7"),
-        (0.05, 0.12, 0.25, 0.3, "Concept chips\ncovered / missing", "#e0e7ff"),
-        (0.38, 0.12, 0.25, 0.3, "Depth meter +\nstar breakdown", "#fce7f3"),
-        (0.71, 0.12, 0.24, 0.3, "Natural-language\nexplanations", "#ffedd5"),
-    ]
-    from matplotlib.patches import FancyBboxPatch
-
-    for x, y, w, h, text, color in boxes:
-        ax.add_patch(
-            FancyBboxPatch(
-                (x, y),
-                w,
-                h,
-                boxstyle="round,pad=0.015,rounding_size=0.02",
-                transform=ax.transAxes,
-                facecolor=color,
-                edgecolor="#111827",
-                linewidth=1.2,
-            )
-        )
-        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", transform=ax.transAxes, fontsize=9, fontweight="bold")
-    save(fig, "08_obj3_explainable_visuals.png")
+    """Objective 3 — live Reasoning Engine screenshot, not a schematic."""
+    source = ROOT / "docs" / "thesis_screenshots" / "07_reasoning_engine.png"
+    if not source.exists():
+        raise FileNotFoundError(f"Missing Objective 3 screenshot: {source}")
+    OUT_DOCS.mkdir(parents=True, exist_ok=True)
+    OUT_PUBLIC.mkdir(parents=True, exist_ok=True)
+    for folder in (OUT_DOCS, OUT_PUBLIC):
+        shutil.copyfile(source, folder / "08_obj3_explainable_visuals.png")
+    print("wrote 08_obj3_explainable_visuals.png")
 
 
 def write_metrics_json(results: dict, manifest: dict) -> None:

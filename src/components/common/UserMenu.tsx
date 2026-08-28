@@ -22,7 +22,7 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+        <Button variant="ghost" className="relative h-9 w-9 rounded-full" aria-label="Account menu">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user.avatarUrl} alt={user.name} />
             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>

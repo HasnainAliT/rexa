@@ -62,6 +62,7 @@ export function QuestionsPage() {
   const pageSize = 8
   const [deletingQuestion, setDeletingQuestion] = useState<Question | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [previewQuestion, setPreviewQuestion] = useState<Question | null>(null)
 
   const {
     control,
@@ -279,12 +280,14 @@ export function QuestionsPage() {
                   {pagedQuestions.map((question) => (
                     <TableRow key={question.id}>
                       <TableCell className="max-w-sm font-medium">
-                        <span
-                          className="line-clamp-2"
+                        <button
+                          type="button"
+                          className="line-clamp-2 text-left hover:underline"
                           title={question.text}
+                          onClick={() => setPreviewQuestion(question)}
                         >
                           {question.text}
-                        </span>
+                        </button>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {question.subject ?? '—'}
@@ -464,6 +467,32 @@ export function QuestionsPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(previewQuestion)}
+        onOpenChange={(open) => !open && setPreviewQuestion(null)}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Question</DialogTitle>
+            <DialogDescription>
+              {previewQuestion?.subject ?? 'Bank question'} ·{' '}
+              {previewQuestion?.difficulty ?? 'medium'}
+            </DialogDescription>
+          </DialogHeader>
+          <p className="text-sm">{previewQuestion?.text}</p>
+          {previewQuestion?.concepts.length ? (
+            <p className="text-xs text-muted-foreground">
+              Concepts: {previewQuestion.concepts.join(', ')}
+            </p>
+          ) : null}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreviewQuestion(null)}>
+              Close
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

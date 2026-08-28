@@ -25,6 +25,8 @@ from app.services.rexa_pipeline import (
     ConceptCoverageResult,
     Sentence,
     SupportPair,
+    attach_sentence_reasons,
+    sentence_highlight,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -285,6 +287,7 @@ class TrainedRexaPipeline:
         concepts = concepts or []
         sentences = self.splitter.split(student_answer)
         self._classify_roles(sentences)
+        attach_sentence_reasons(sentences)
         coverage = self._match_concepts(student_answer, sentences, concepts)
         support_pairs = self._analyze_support(sentences)
         depth_score = self._score_depth(student_answer, sentences, support_pairs)
@@ -316,16 +319,7 @@ class TrainedRexaPipeline:
                 "coverage_pct": coverage.coverage_pct,
                 "matches": coverage.matches,
             },
-            "highlights": [
-                {
-                    "index": s.index,
-                    "text": s.text,
-                    "role": s.role,
-                    "start": s.start,
-                    "end": s.end,
-                }
-                for s in sentences
-            ],
+            "highlights": [sentence_highlight(s) for s in sentences],
             "support_pairs": [
                 {
                     "source_index": p.source_index,

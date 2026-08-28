@@ -6,6 +6,7 @@ import {
   overallStatus,
   toPercent,
 } from '@/lib/grading'
+import { ROLE_LABELS } from './RoleBadge'
 import { MissingRolesList } from './HighlightedAnswer'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -18,7 +19,7 @@ interface ThresholdPanelProps {
 
 export function ThresholdPanel({ analysis, className }: ThresholdPanelProps) {
   const { roles, concepts, passed, minStars } = overallStatus(analysis)
-  const thresholds = getGradingThresholds()
+  const thresholds = getGradingThresholds(analysis.questionId)
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -78,6 +79,14 @@ export function ThresholdPanel({ analysis, className }: ThresholdPanelProps) {
             }
           />
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        {roles.covered.map((role) => (
+          <Badge key={role} variant="secondary" className="capitalize">
+            {ROLE_LABELS[role]} contributed
+          </Badge>
+        ))}
       </div>
 
       <MissingRolesList missing={roles.missing} />

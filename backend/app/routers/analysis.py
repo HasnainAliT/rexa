@@ -17,7 +17,7 @@ from app.schemas import (
 )
 from app.schemas import AnalysisRunOut
 from app.services.pdf_exam_parser import fallback_single_answer, match_bank_question, parse_exam_text
-from app.services.pdf_extract import extract_pdf_text
+from app.services.pdf_extract import extract_docx_text, extract_pdf_text
 from app.services.rexa_pipeline import run_rexa_pipeline
 
 router = APIRouter(tags=["analysis"])
@@ -44,6 +44,35 @@ async def extract_pdf(
     data = await file.read()
     try:
         text, page_count = extract_pdf_text(data, filename)
+    except ValueError as exc:
+        raise ApiHTTPException(status_code=400, detail=str(exc)) from exc
+
+    return ApiResponse(
+        data=PdfExtractData(filename=filename, page_count=page_count, text=text),
+        success=True,
+    )
+
+
+@router.post("/extract-document", response_model=ApiResponse[PdfExtractData])
+async def extract_document(
+    file: UploadFile = File(...),
+    _: User = Depends(get_current_user),
+):
+    filename = file.filename or "answer.bin"
+    lowered = filename.lower()
+    data = await file.read()
+    try:
+        if lowered.endswith(".pdf"):
+            text, page_count = extract_pdf_text(data, filename)
+        elif lowered.endswith(".docx"):
+            text, page_count = extract_docx_text(data, filename), 1
+        elif lowered.endswith(".txt"):
+            text = data.decode("utf-8-sig", errors="replace").strip()
+            if not text:
+                raise ValueError("This text file is empty.")
+            page_count = 1
+        else:
+            raise ValueError("Upload a PDF, Word (.docx), or TXT file.")
     except ValueError as exc:
         raise ApiHTTPException(status_code=400, detail=str(exc)) from exc
 

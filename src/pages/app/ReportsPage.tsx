@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Bar,
   BarChart,
   CartesianGrid,
+  Legend,
   Tooltip,
   XAxis,
   YAxis,
@@ -15,16 +16,17 @@ import {
   FileSpreadsheet,
   FileText,
 } from 'lucide-react'
-import type { AnalysisResult } from '@/types'
-import { analysisService, reportsService } from '@/services'
+import type { AnalysisResult, Question } from '@/types'
+import { analysisService, questionsService, reportsService } from '@/services'
 import { ROUTES } from '@/routes/paths'
-import { overallStatus, toPercent } from '@/lib/grading'
+import { CORE_ROLES, overallStatus, toPercent } from '@/lib/grading'
 import { CHART_COLORS } from '@/lib/chart-theme'
 import {
   ChartContainer,
   EmptyState,
   LoadingSpinner,
   PageHeader,
+  ROLE_LABELS,
   StarRating,
 } from '@/components/common'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -62,10 +64,6 @@ function rowMetrics(analysis: AnalysisResult) {
   }
 }
 
-function csvEscape(value: string | number) {
-  return `"${String(value).replace(/"/g, '""')}"`
-}
-
 export function ReportsPage() {
   const [analyses, setAnalyses] = useState<AnalysisResult[]>([])
   const [page, setPage] = useState(1)
@@ -75,17 +73,24 @@ export function ReportsPage() {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [sortKey, setSortKey] = useState<SortKey>('date')
+  const [assignmentFilter, setAssignmentFilter] = useState('all')
+  const [classFilter, setClassFilter] = useState('all')
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [exporting, setExporting] = useState<'xlsx' | 'pdf' | null>(null)
 
   useEffect(() => {
     let mounted = true
     setIsLoading(true)
     setError(null)
 
-    analysisService
-      .listAnalyses({ page: 1, pageSize: 100 })
-      .then((response) => {
+    Promise.all([
+      analysisService.listAnalyses({ page: 1, pageSize: 100 }),
+      questionsService.listQuestions({ pageSize: 100 }).catch(() => ({ data: [] })),
+    ])
+      .then(([response, questionResponse]) => {
         if (!mounted) return
         setAnalyses(response.data)
+        setQuestions(questionResponse.data ?? [])
       })
       .catch((err) => {
         if (mounted) {
@@ -122,7 +127,22 @@ export function ReportsPage() {
     }
     if (statusFilter === 'pass') rows = rows.filter((row) => row.status.passed)
     if (statusFilter === 'below') rows = rows.filter((row) => !row.status.passed)
+    if (assignmentFilter !== 'all') {
+      rows = rows.filter((row) => {
+        const key = row.analysis.questionId || row.analysis.questionText
+        return key === assignmentFilter
+      })
+    }
+    const classOf = (analysis: AnalysisResult) => {
+      const question = questions.find((item) => item.id === analysis.questionId)
+      return question?.subject || 'Unassigned class'
+    }
+    if (classFilter !== 'all') {
+      rows = rows.filter((row) => classOf(row.analysis) === classFilter)
+    }
     rows.sort((a, b) => {
+      const classCmp = classOf(a.analysis).localeCompare(classOf(b.analysis))
+      if (classCmp !== 0) return classCmp
       if (sortKey === 'student') {
         return (a.analysis.studentName ?? '').localeCompare(
           b.analysis.studentName ?? '',
@@ -137,14 +157,14 @@ export function ReportsPage() {
       )
     })
     return rows
-  }, [analyses, query, sortKey, statusFilter])
+  }, [analyses, query, sortKey, statusFilter, assignmentFilter, classFilter, questions])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   useEffect(() => {
     setPage(1)
-  }, [query, statusFilter, sortKey])
+  }, [query, statusFilter, sortKey, assignmentFilter, classFilter])
 
   const summary = useMemo(() => {
     if (!filtered.length) {
@@ -164,9 +184,43 @@ export function ReportsPage() {
     }
   }, [filtered])
 
-  const comparison = filtered.slice(0, 12).map((row, index) => ({
+  const assignmentOptions = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const question of questions) {
+      map.set(question.id, question.text)
+    }
+    for (const analysis of analyses) {
+      const key = analysis.questionId || analysis.questionText
+      if (key && !map.has(key)) map.set(key, analysis.questionText)
+    }
+    return [...map.entries()]
+  }, [analyses, questions])
+
+  const classLabel = (analysis: AnalysisResult) => {
+    const question = questions.find((item) => item.id === analysis.questionId)
+    return question?.subject || 'Unassigned class'
+  }
+
+  const classOptions = useMemo(() => {
+    const names = new Set(analyses.map((analysis) => classLabel(analysis)))
+    return [...names].sort()
+  }, [analyses, questions])
+
+  const rolePattern = filtered.slice(0, 20).map((row, index) => {
+    const point: Record<string, string | number> = {
+      name: row.analysis.studentName || `S${index + 1}`,
+    }
+    for (const role of CORE_ROLES) {
+      point[ROLE_LABELS[role]] = row.analysis.sentenceRoles.filter(
+        (sentence) => sentence.role === role,
+      ).length
+    }
+    return point
+  })
+
+  const comparison = filtered.slice(0, 20).map((row, index) => ({
     name: row.analysis.studentName || `S${index + 1}`,
-    stars: Number(row.analysis.stars.toFixed(1)),
+    starsPct: Number((row.analysis.stars * 20).toFixed(1)),
     coverage: row.coverage,
   }))
 
@@ -185,65 +239,42 @@ export function ReportsPage() {
     }
   }
 
-  const exportCsv = () => {
-    const header = [
-      'Student name',
-      'Student ID',
-      'Question',
-      'Role coverage %',
-      'Concept coverage %',
-      'Depth %',
-      'Stars',
-      'Overall',
-      'Status',
-    ].join(',')
-    const body = filtered
-      .map((row) =>
-        [
-          row.analysis.studentName ?? '',
-          row.analysis.studentId ?? '',
-          row.analysis.questionText,
-          row.coverage,
-          row.concepts,
-          row.depth,
-          row.analysis.stars.toFixed(1),
-          row.overall,
-          row.status.passed ? 'Pass' : 'Below threshold',
-        ]
-          .map(csvEscape)
-          .join(','),
-      )
-      .join('\n')
-    const blob = new Blob([`${header}\n${body}`], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'rexa-class-report.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+  const exportRows = () =>
+    filtered.map((row) => ({
+      student_name: row.analysis.studentName ?? '',
+      student_id: row.analysis.studentId ?? '',
+      class_name: classLabel(row.analysis),
+      question: row.analysis.questionText,
+      role_coverage: row.coverage,
+      concept_coverage: row.concepts,
+      depth: row.depth,
+      stars: Number(row.analysis.stars.toFixed(1)),
+      overall: row.overall,
+      status: row.status.passed ? 'Pass' : 'Below threshold',
+    }))
+
+  const exportXlsx = async () => {
+    setExporting('xlsx')
+    setError(null)
+    try {
+      await reportsService.downloadClassXlsx(exportRows())
+    } catch {
+      setError('Failed to export Excel. Please try again.')
+    } finally {
+      setExporting(null)
+    }
   }
 
-  const exportPdf = () => {
-    const html = `<!doctype html><html><head><title>RExA class report</title>
-      <style>body{font-family:Inter,system-ui,sans-serif;padding:24px;color:#1e1b4b}
-      table{border-collapse:collapse;width:100%;font-size:12px}
-      th,td{border:1px solid #c7d2fe;padding:6px 8px;text-align:left}
-      th{background:#eef2ff} .fail{background:#fff7ed}</style></head><body>
-      <h1>RExA class report</h1>
-      <p>Pass requires ≥50% role coverage, ≥50% concept coverage, and at least 3 stars.</p>
-      <table><thead><tr><th>Student</th><th>ID</th><th>Question</th><th>Roles</th><th>Stars</th><th>Status</th></tr></thead>
-      <tbody>${filtered
-        .map(
-          (row) =>
-            `<tr class="${row.status.passed ? '' : 'fail'}"><td>${row.analysis.studentName ?? '—'}</td><td>${row.analysis.studentId ?? '—'}</td><td>${row.analysis.questionText}</td><td>${row.coverage}%</td><td>${row.analysis.stars.toFixed(1)}</td><td>${row.status.passed ? 'Pass' : 'Below threshold'}</td></tr>`,
-        )
-        .join('')}</tbody></table></body></html>`
-    const win = window.open('', '_blank')
-    if (!win) return
-    win.document.write(html)
-    win.document.close()
-    win.focus()
-    win.print()
+  const exportPdf = async () => {
+    setExporting('pdf')
+    setError(null)
+    try {
+      await reportsService.downloadClassPdf(exportRows())
+    } catch {
+      setError('Failed to export PDF. Please try again.')
+    } finally {
+      setExporting(null)
+    }
   }
 
   return (
@@ -254,13 +285,23 @@ export function ReportsPage() {
         actions={
           !isLoading && analyses.length > 0 ? (
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={exportCsv}>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={exporting !== null}
+                onClick={() => void exportXlsx()}
+              >
                 <FileSpreadsheet />
-                Excel / CSV
+                {exporting === 'xlsx' ? 'Exporting…' : 'Excel'}
               </Button>
-              <Button variant="outline" size="sm" onClick={exportPdf}>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={exporting !== null}
+                onClick={() => void exportPdf()}
+              >
                 <Download />
-                PDF
+                {exporting === 'pdf' ? 'Exporting…' : 'PDF'}
               </Button>
             </div>
           ) : undefined
@@ -328,6 +369,31 @@ export function ReportsPage() {
               </Card>
             </div>
 
+            {rolePattern.length > 1 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    Reasoning pattern comparison
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer className="h-64 w-full">
+                    <BarChart data={rolePattern}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                      <YAxis allowDecimals={false} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="Claim" stackId="roles" fill={CHART_COLORS.indigo} />
+                      <Bar dataKey="Evidence" stackId="roles" fill={CHART_COLORS.sky} />
+                      <Bar dataKey="Reasoning" stackId="roles" fill={CHART_COLORS.violet} />
+                      <Bar dataKey="Conclusion" stackId="roles" fill={CHART_COLORS.lavender} />
+                    </BarChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+            )}
+
             {comparison.length > 1 && (
               <Card>
                 <CardHeader>
@@ -341,20 +407,44 @@ export function ReportsPage() {
                       <YAxis domain={[0, 100]} />
                       <Tooltip />
                       <Bar dataKey="coverage" fill={CHART_COLORS.indigo} name="Role coverage %" />
-                      <Bar dataKey="stars" fill={CHART_COLORS.violet} name="Stars (×1)" />
+                      <Bar dataKey="starsPct" fill={CHART_COLORS.violet} name="Stars (×20)" />
                     </BarChart>
                   </ChartContainer>
                 </CardContent>
               </Card>
             )}
 
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
               <Input
                 placeholder="Search student, ID, or question…"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 aria-label="Search class report"
               />
+              <Select
+                value={classFilter}
+                onChange={(event) => setClassFilter(event.target.value)}
+                aria-label="Filter by class"
+              >
+                <option value="all">All classes</option>
+                {classOptions.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </Select>
+              <Select
+                value={assignmentFilter}
+                onChange={(event) => setAssignmentFilter(event.target.value)}
+                aria-label="Filter by assignment"
+              >
+                <option value="all">All assignments</option>
+                {assignmentOptions.map(([id, text]) => (
+                  <option key={id} value={id}>
+                    {text}
+                  </option>
+                ))}
+              </Select>
               <Select
                 value={statusFilter}
                 onChange={(event) =>
@@ -394,6 +484,7 @@ export function ReportsPage() {
                       <TableRow>
                         <TableHead>Student</TableHead>
                         <TableHead>ID</TableHead>
+                        <TableHead>Class</TableHead>
                         <TableHead>Question / assignment</TableHead>
                         <TableHead>Role coverage</TableHead>
                         <TableHead>Stars</TableHead>
@@ -404,52 +495,72 @@ export function ReportsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {paged.map(({ analysis, status, coverage, depth, overall }) => (
-                        <TableRow
-                          key={analysis.id}
-                          className={
-                            status.passed
-                              ? undefined
-                              : 'bg-orange-50 dark:bg-orange-500/10'
-                          }
-                        >
-                          <TableCell className="font-medium">
-                            {analysis.studentName || '—'}
-                          </TableCell>
-                          <TableCell>{analysis.studentId || '—'}</TableCell>
-                          <TableCell className="max-w-xs truncate" title={analysis.questionText}>
-                            {analysis.questionText}
-                          </TableCell>
-                          <TableCell>{coverage}%</TableCell>
-                          <TableCell>
-                            <StarRating value={analysis.stars} size="sm" />
-                          </TableCell>
-                          <TableCell>{depth}%</TableCell>
-                          <TableCell>{overall}</TableCell>
-                          <TableCell>
-                            <Badge variant={status.passed ? 'default' : 'outline'}>
-                              {status.passed ? 'Pass' : 'Below 50%'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button variant="ghost" size="sm" asChild>
-                                <Link to={`${ROUTES.APP.REASONING}?id=${analysis.id}`}>
-                                  Open
-                                </Link>
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={downloadingId === `${analysis.id}-pdf`}
-                                onClick={() => handleDownload(analysis.id, 'pdf')}
-                              >
-                                PDF
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {paged.map(({ analysis, status, coverage, depth, overall }, index) => {
+                        const currentClass = classLabel(analysis)
+                        const previousClass =
+                          index === 0
+                            ? undefined
+                            : classLabel(paged[index - 1].analysis)
+                        const showGroup = currentClass !== previousClass
+                        return (
+                          <Fragment key={analysis.id}>
+                            {showGroup && (
+                              <TableRow>
+                                <TableCell
+                                  colSpan={10}
+                                  className="bg-indigo-50 text-sm font-semibold text-indigo-950 dark:bg-indigo-500/15 dark:text-indigo-100"
+                                >
+                                  {currentClass}
+                                </TableCell>
+                              </TableRow>
+                            )}
+                            <TableRow
+                              className={
+                                status.passed
+                                  ? undefined
+                                  : 'bg-orange-50 dark:bg-orange-500/10'
+                              }
+                            >
+                              <TableCell className="font-medium">
+                                {analysis.studentName || '—'}
+                              </TableCell>
+                              <TableCell>{analysis.studentId || '—'}</TableCell>
+                              <TableCell>{currentClass}</TableCell>
+                              <TableCell className="max-w-xs truncate" title={analysis.questionText}>
+                                {analysis.questionText}
+                              </TableCell>
+                              <TableCell>{coverage}%</TableCell>
+                              <TableCell>
+                                <StarRating value={analysis.stars} size="sm" />
+                              </TableCell>
+                              <TableCell>{depth}%</TableCell>
+                              <TableCell>{overall}</TableCell>
+                              <TableCell>
+                                <Badge variant={status.passed ? 'default' : 'outline'}>
+                                  {status.passed ? 'Pass' : 'Below 50%'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Button variant="ghost" size="sm" asChild>
+                                    <Link to={`${ROUTES.APP.REASONING}?id=${analysis.id}`}>
+                                      Open
+                                    </Link>
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={downloadingId === `${analysis.id}-pdf`}
+                                    onClick={() => handleDownload(analysis.id, 'pdf')}
+                                  >
+                                    PDF
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          </Fragment>
+                        )
+                      })}
                     </TableBody>
                   </Table>
                 )}

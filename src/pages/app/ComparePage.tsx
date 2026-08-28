@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { AlertCircle, GitCompare, Loader2 } from 'lucide-react'
 import type { CompareResult, Question } from '@/types'
 import { analysisService, questionsService } from '@/services'
-import { DimensionBars, EmptyState, PageHeader, StarRating } from '@/components/common'
+import { DimensionBars, EmptyState, HighlightedAnswer, PageHeader, StarRating, ThresholdPanel } from '@/components/common'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -162,13 +162,21 @@ export function ComparePage() {
           />
         )}
 
-        {result && (
+        {isComparing && (
+          <EmptyState
+            icon={Loader2}
+            title="Comparing…"
+            description="Scoring both answers sentence by sentence."
+          />
+        )}
+
+        {result && !isComparing && (
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               { label: 'Answer A', data: result.resultA },
               { label: 'Answer B', data: result.resultB },
             ].map(({ label, data }) => (
-              <Card key={label}>
+              <Card key={label} className="flex h-full flex-col">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between text-base">
                     {label}
@@ -177,7 +185,7 @@ export function ComparePage() {
                     </span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-5">
+                <CardContent className="flex flex-1 flex-col space-y-5">
                   <div className="flex items-center gap-3">
                     <StarRating value={data.stars} />
                     <span className="text-xl font-bold">
@@ -185,6 +193,8 @@ export function ComparePage() {
                     </span>
                   </div>
                   <DimensionBars dimensions={data.dimensions} />
+                  <HighlightedAnswer sentences={data.sentenceRoles} />
+                  <ThresholdPanel analysis={data} />
                 </CardContent>
               </Card>
             ))}

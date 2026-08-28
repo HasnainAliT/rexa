@@ -119,10 +119,10 @@ interface ComparisonTables {
 }
 
 const STATIC_FIGURES = [
+  '01_dataset_preprocessing.png',
+  '02_preprocessing_pipeline.png',
+  '04_obj2_reasoning_depth.png',
   '08_obj3_explainable_visuals.png',
-  '09_rexa_module_clf_metrics.png',
-  '10_literature_model_comparison.png',
-  '11_star_scoring_comparison.png',
 ]
 
 function pct(v: number) {
@@ -625,6 +625,10 @@ export function EvaluationPage() {
               <h2 className="text-lg font-semibold tracking-tight">
                 Static figures (slides / report)
               </h2>
+              <p className="text-sm text-muted-foreground">
+                Interactive metric charts live in the Charts tab. This tab keeps
+                the dataset, pipeline, depth-band, and Objective 3 screenshots.
+              </p>
               <div className="grid gap-4 md:grid-cols-2">
                 {STATIC_FIGURES.map((name) => (
                   <Card key={name}>

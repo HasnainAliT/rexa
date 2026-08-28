@@ -1,5 +1,5 @@
 import type { SentenceRole, SentenceRoleLabel } from '@/types'
-import { ROLE_REASONS } from '@/lib/grading'
+import { sentenceWhy } from '@/lib/grading'
 import { ALL_ROLES, RoleBadge, ROLE_LABELS, getRoleHighlightStyles } from './RoleBadge'
 import {
   Tooltip,
@@ -49,7 +49,7 @@ export function HighlightedAnswer({
               </TooltipTrigger>
               <TooltipContent className="max-w-xs bg-foreground text-background">
                 <p className="font-medium">{ROLE_LABELS[sentence.role]}</p>
-                <p className="mt-1 opacity-90">{ROLE_REASONS[sentence.role]}</p>
+                <p className="mt-1 opacity-90">{sentenceWhy(sentence)}</p>
                 {typeof sentence.confidence === 'number' &&
                   sentence.confidence > 0 && (
                     <p className="mt-1 text-[11px] opacity-80">

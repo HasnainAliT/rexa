@@ -76,13 +76,19 @@ export const analysisService = {
   },
 
   async extractPdf(file: File): Promise<{ filename: string; page_count: number; text: string }> {
+    return analysisService.extractDocument(file)
+  },
+
+  async extractDocument(
+    file: File,
+  ): Promise<{ filename: string; page_count: number; text: string }> {
     const form = new FormData()
     form.append('file', file)
     const response = await apiClient.postForm<
       ApiResponse<{ filename: string; page_count: number; text: string }>
-    >('/extract-pdf', form)
+    >('/extract-document', form)
     if (!response.data?.text) {
-      throw new Error('No text was found in this PDF.')
+      throw new Error('No text was found in this file.')
     }
     return response.data
   },

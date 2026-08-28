@@ -13,7 +13,7 @@ const ROLE_STYLES: Record<SentenceRoleLabel, string> = {
   counterargument:
     'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-500/20 dark:text-rose-200 dark:border-rose-400/40',
   conclusion:
-    'bg-indigo-100 text-indigo-950 border-indigo-300 dark:bg-indigo-500/20 dark:text-indigo-200 dark:border-indigo-400/40',
+    'bg-fuchsia-100 text-fuchsia-950 border-fuchsia-300 dark:bg-fuchsia-500/20 dark:text-fuchsia-100 dark:border-fuchsia-400/40',
   irrelevant:
     'bg-orange-100 text-orange-950 border-orange-400 border-dashed dark:bg-orange-500/15 dark:text-orange-200 dark:border-orange-400/50',
 }
@@ -28,7 +28,7 @@ const ROLE_HIGHLIGHT: Record<SentenceRoleLabel, string> = {
   counterargument:
     'bg-rose-100 text-rose-950 dark:bg-rose-500/25 dark:text-rose-100',
   conclusion:
-    'bg-indigo-100 text-indigo-950 dark:bg-indigo-500/25 dark:text-indigo-100',
+    'bg-fuchsia-100 text-fuchsia-950 dark:bg-fuchsia-500/25 dark:text-fuchsia-100',
   irrelevant:
     'bg-orange-100 text-orange-950 line-through decoration-orange-400/80 dark:bg-orange-500/20 dark:text-orange-100',
 }

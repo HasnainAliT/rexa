@@ -12,6 +12,7 @@ export interface SentenceRole {
   text: string
   role: SentenceRoleLabel
   confidence: number
+  reason?: string
 }
 
 export interface ConceptCoverage {

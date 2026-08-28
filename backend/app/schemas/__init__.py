@@ -140,6 +140,8 @@ class SentenceHighlight(BaseModel):
     role: str
     start: int
     end: int
+    reason: Optional[str] = None
+    confidence: Optional[float] = None
 
 
 class SupportPair(BaseModel):
@@ -387,3 +389,21 @@ class PdfExtractData(BaseModel):
     filename: str
     page_count: int
     text: str
+
+
+class ClassReportRow(BaseModel):
+    student_name: str = ""
+    student_id: str = ""
+    class_name: str = ""
+    question: str = ""
+    role_coverage: float = 0
+    concept_coverage: float = 0
+    depth: float = 0
+    stars: float = 0
+    overall: float = 0
+    status: str = ""
+
+
+class ClassReportExport(BaseModel):
+    rows: List[ClassReportRow]
+    title: str = "RExA class report"
