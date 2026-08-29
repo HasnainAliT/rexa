@@ -6,6 +6,7 @@ Run from the `backend/` directory with:
 from __future__ import annotations
 
 import json
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -28,6 +29,9 @@ from app.routers import (
     reports,
 )
 from app.security import hash_password
+from app.services.rexa_pipeline import describe_pipeline
+
+logger = logging.getLogger("rexa")
 
 SEED_USERS = [
     {"email": "admin@earas.edu", "password": "Admin1234", "name": "RExA Admin", "role": "admin"},
@@ -184,6 +188,15 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     ensure_schema()
     seed_database()
+    status = describe_pipeline()
+    logger.info(
+        "RExA pipeline ready: serving=%s version=%s configured=%s checkpoints=%s fallback=%s",
+        status["serving"],
+        status["pipeline_version"],
+        status["configured_mode"],
+        status["checkpoints_available"],
+        status["fallback_to_heuristic"],
+    )
     yield
 
 
@@ -252,7 +265,16 @@ app.include_router(batch.router, prefix=api_prefix)
 
 @app.get(f"{api_prefix}/health", tags=["health"])
 def health_check():
-    return {"status": "ok", "service": settings.PROJECT_NAME, "model_mode": settings.MODEL_MODE}
+    status = describe_pipeline()
+    return {
+        "status": "ok",
+        "service": settings.PROJECT_NAME,
+        "model_mode": status["serving"],
+        "configured_mode": status["configured_mode"],
+        "pipeline_version": status["pipeline_version"],
+        "checkpoints_available": status["checkpoints_available"],
+        "fallback_to_heuristic": status["fallback_to_heuristic"],
+    }
 
 
 @app.get("/", tags=["health"])

@@ -15,9 +15,12 @@ backed stages.
 from __future__ import annotations
 
 import difflib
+import logging
 import re
 from dataclasses import dataclass, field
 from typing import Protocol
+
+logger = logging.getLogger("rexa.pipeline")
 
 # ---------------------------------------------------------------------------
 # Constants / keyword banks
@@ -555,8 +558,9 @@ _pipeline_instance = None
 def get_pipeline():
     """Returns the singleton pipeline for the configured MODEL_MODE.
 
-    `heuristic` uses rule-based stages. `trained` loads sklearn checkpoints
-    from `ml/checkpoints` when available, otherwise falls back to heuristic.
+    `trained` loads sklearn checkpoints from `ml/checkpoints` (the proposed
+    Core RExA system). `heuristic` uses rule-based stages. If trained is
+    requested but checkpoints are missing, falls back to heuristic.
     """
     global _pipeline_instance
     if _pipeline_instance is None:
@@ -571,13 +575,49 @@ def get_pipeline():
 
                 if checkpoints_available():
                     _pipeline_instance = build_trained_pipeline()
+                    logger.info(
+                        "Serving Core RExA %s",
+                        getattr(_pipeline_instance, "MODEL_VERSION", "trained"),
+                    )
                 else:
+                    logger.warning(
+                        "MODEL_MODE=trained but checkpoints are missing; "
+                        "falling back to heuristic-v1"
+                    )
                     _pipeline_instance = RexaPipeline()
             except Exception:
+                logger.exception(
+                    "Failed to load trained Core RExA; falling back to heuristic-v1"
+                )
                 _pipeline_instance = RexaPipeline()
         else:
             _pipeline_instance = RexaPipeline()
+            logger.info("Serving heuristic-v1 (MODEL_MODE=%s)", settings.MODEL_MODE)
     return _pipeline_instance
+
+
+def describe_pipeline() -> dict:
+    """Runtime status for health checks and startup logs."""
+    from app.config import settings
+
+    pipe = get_pipeline()
+    version = getattr(pipe, "MODEL_VERSION", "unknown")
+    checkpoints = False
+    try:
+        from app.services.trained_models import checkpoints_available
+
+        checkpoints = checkpoints_available()
+    except Exception:
+        checkpoints = False
+    serving_trained = str(version).startswith("trained")
+    configured = settings.MODEL_MODE
+    return {
+        "configured_mode": configured,
+        "pipeline_version": version,
+        "checkpoints_available": checkpoints,
+        "serving": "trained" if serving_trained else "heuristic",
+        "fallback_to_heuristic": configured.lower() == "trained" and not serving_trained,
+    }
 
 
 def reset_pipeline() -> None:

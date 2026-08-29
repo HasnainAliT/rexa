@@ -1,12 +1,21 @@
 """Application settings, loaded from environment variables / .env file."""
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Always load backend/.env, even if uvicorn is started from the repo root.
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+_ENV_FILE = _BACKEND_DIR / ".env"
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=str(_ENV_FILE),
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     PROJECT_NAME: str = "RExA API"
     API_PREFIX: str = "/api"
@@ -22,8 +31,9 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
-    # RExA
-    MODEL_MODE: str = "heuristic"
+    # RExA — trained Core RExA is the proposed / demo pipeline.
+    # Heuristic is a fallback if sklearn checkpoints are missing.
+    MODEL_MODE: str = "trained"
     # DistilBERT is a comparative scoring experiment — off by default so Core RExA serves demos
     USE_DISTILBERT_STARS: bool = False
 
