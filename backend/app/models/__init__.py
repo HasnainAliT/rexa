@@ -41,6 +41,7 @@ class Question(Base):
     prompt: Mapped[str] = mapped_column(Text, nullable=False)
     reference_answer: Mapped[str] = mapped_column(Text, nullable=False)
     concepts: Mapped[list] = mapped_column(JSON, default=list)
+    course: Mapped[str | None] = mapped_column(String(255), nullable=True)
     difficulty: Mapped[str | None] = mapped_column(String(20), nullable=True, default="medium")
     created_by: Mapped[str | None] = mapped_column(String(36), ForeignKey("users.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)

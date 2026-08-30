@@ -23,6 +23,8 @@ def ensure_schema() -> None:
     statements: list[str] = []
     if "questions" in tables:
         cols = {c["name"] for c in inspector.get_columns("questions")}
+        if "course" not in cols:
+            statements.append("ALTER TABLE questions ADD COLUMN course VARCHAR(255)")
         if "difficulty" not in cols:
             statements.append("ALTER TABLE questions ADD COLUMN difficulty VARCHAR(20) DEFAULT 'medium'")
     if "submissions" in tables:
