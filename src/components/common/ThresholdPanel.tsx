@@ -2,7 +2,7 @@ import { CheckCircle2, XCircle } from 'lucide-react'
 import type { AnalysisResult } from '@/types'
 import {
   STAR_WEIGHTS,
-  getGradingThresholds,
+  getReviewThresholds,
   overallStatus,
   toPercent,
 } from '@/lib/grading'
@@ -19,7 +19,7 @@ interface ThresholdPanelProps {
 
 export function ThresholdPanel({ analysis, className }: ThresholdPanelProps) {
   const { roles, concepts, passed, minStars } = overallStatus(analysis)
-  const thresholds = getGradingThresholds(analysis.questionId)
+  const thresholds = getReviewThresholds(analysis.questionId)
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -37,12 +37,13 @@ export function ThresholdPanel({ analysis, className }: ThresholdPanelProps) {
           ) : (
             <XCircle className="mr-1 h-3.5 w-3.5" />
           )}
-          {passed ? 'Meets grading threshold' : 'Below grading threshold'}
+          {passed ? 'Meets review thresholds' : 'Flagged for review'}
         </Badge>
         <span className="text-xs text-muted-foreground">
-          Pass needs ≥{Math.round(thresholds.role * 100)}% role coverage,
-          ≥{Math.round(thresholds.concept * 100)}% concept coverage, and
-          at least {minStars} stars.
+          Flags for a closer look when below ≥{Math.round(thresholds.role * 100)}%
+          role coverage, ≥{Math.round(thresholds.concept * 100)}% concept
+          coverage, or {minStars} stars on the diagnostic indicator — this is a
+          triage aid, not an automatic grade.
         </span>
       </div>
 
@@ -92,7 +93,7 @@ export function ThresholdPanel({ analysis, className }: ThresholdPanelProps) {
       <MissingRolesList missing={roles.missing} />
 
       <div className="rounded-md border bg-muted/40 p-3 text-sm">
-        <p className="mb-2 font-medium">How the star score is calculated</p>
+        <p className="mb-2 font-medium">How the diagnostic indicator is calculated</p>
         <ul className="space-y-1 text-muted-foreground">
           {STAR_WEIGHTS.map((item) => {
             const dim = analysis.dimensions.find((d) => d.key === item.key)

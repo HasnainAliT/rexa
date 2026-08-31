@@ -5,8 +5,8 @@ import { modelsService, questionsService } from '@/services'
 import { useAuth } from '@/hooks'
 import { getInitials } from '@/utils'
 import {
-  getGradingThresholds,
-  saveGradingThresholds,
+  getReviewThresholds,
+  saveReviewThresholds,
 } from '@/lib/grading'
 import { PageHeader } from '@/components/common'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,13 +21,13 @@ export function SettingsPage() {
   const { user } = useAuth()
   const [activeModel, setActiveModel] = useState<ModelVersion | null>(null)
   const [isLoadingModel, setIsLoadingModel] = useState(true)
-  const [thresholds, setThresholds] = useState(() => getGradingThresholds())
+  const [thresholds, setThresholds] = useState(() => getReviewThresholds())
   const [questions, setQuestions] = useState<Question[]>([])
   const [assignmentId, setAssignmentId] = useState('')
 
   const saveThresholds = (next: typeof thresholds) => {
     setThresholds(next)
-    saveGradingThresholds(next, assignmentId || undefined)
+    saveReviewThresholds(next, assignmentId || undefined)
   }
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Grading thresholds</CardTitle>
+            <CardTitle className="text-base">Review thresholds</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
@@ -126,7 +126,7 @@ export function SettingsPage() {
                 onChange={(event) => {
                   const id = event.target.value
                   setAssignmentId(id)
-                  setThresholds(getGradingThresholds(id || undefined))
+                  setThresholds(getReviewThresholds(id || undefined))
                 }}
               >
                 <option value="">Default (all assignments)</option>

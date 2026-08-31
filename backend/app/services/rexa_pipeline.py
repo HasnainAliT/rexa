@@ -159,6 +159,58 @@ class RegexSentenceSplitter:
         return sentences
 
 
+class SpacySentenceSplitter:
+    """Sentence splitter backed by spaCy's statistical sentence-boundary
+    detector (en_core_web_sm), matching the "spaCy for sentence splitting"
+    stage described in the FYP-1 PPT tech stack.
+
+    Opt-in via USE_SPACY_SPLITTER=true (see app/config.py). Falls back to
+    RegexSentenceSplitter — silently but with a logged warning — if spaCy or
+    the en_core_web_sm model are not installed, or if loading/parsing fails
+    for any other reason. This stage must never break the pipeline just
+    because the optional dependency is missing.
+    """
+
+    _nlp = None  # class-level cache: load the model once per process
+
+    @classmethod
+    def _get_nlp(cls):
+        if cls._nlp is None:
+            import spacy
+
+            cls._nlp = spacy.load("en_core_web_sm", disable=["ner", "lemmatizer"])
+        return cls._nlp
+
+    def split(self, text: str) -> list[Sentence]:
+        text = (text or "").strip()
+        if not text:
+            return []
+        try:
+            nlp = self._get_nlp()
+            doc = nlp(text)
+            sentences: list[Sentence] = []
+            for sent in doc.sents:
+                part = sent.text.strip()
+                if not part:
+                    continue
+                sentences.append(
+                    Sentence(
+                        index=len(sentences),
+                        text=part,
+                        start=sent.start_char,
+                        end=sent.end_char,
+                    )
+                )
+            if sentences:
+                return sentences
+            logger.warning("spaCy produced no sentences; falling back to regex splitter")
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "spaCy sentence splitting failed (%s); falling back to regex splitter", exc
+            )
+        return RegexSentenceSplitter().split(text)
+
+
 # ---------------------------------------------------------------------------
 # Stage 2: Sentence role classification
 # ---------------------------------------------------------------------------
@@ -334,6 +386,63 @@ class TokenOverlapConceptMatcher:
 
         result.coverage_pct = round(100.0 * len(result.covered) / len(concepts), 2) if concepts else 100.0
         return result
+
+
+class SBERTConceptMatcher:
+    """Matches concepts against the student's answer using Sentence-BERT
+    (all-MiniLM-L6-v2) cosine similarity between concept and sentence
+    embeddings, matching the "SBERT for semantic concept matching" stage
+    described in the FYP-1 PPT tech stack — a semantic alternative to
+    TokenOverlapConceptMatcher's lexical overlap.
+
+    Opt-in via USE_SBERT_CONCEPTS=true (see app/config.py). Falls back to
+    TokenOverlapConceptMatcher — silently but with a logged warning — if
+    sentence-transformers is not installed, or if loading/inference fails
+    for any other reason.
+    """
+
+    _model = None  # class-level cache: load the model once per process
+    SIMILARITY_THRESHOLD = 0.55
+
+    @classmethod
+    def _get_model(cls):
+        if cls._model is None:
+            from sentence_transformers import SentenceTransformer
+
+            cls._model = SentenceTransformer("all-MiniLM-L6-v2")
+        return cls._model
+
+    def match(
+        self, student_answer: str, sentences: list[Sentence], concepts: list[str]
+    ) -> ConceptCoverageResult:
+        if not concepts:
+            return ConceptCoverageResult(covered=[], missing=[], coverage_pct=100.0, matches={})
+        try:
+            from sentence_transformers import util
+
+            model = self._get_model()
+            sentence_texts = [s.text for s in sentences] or [student_answer]
+            concept_embeddings = model.encode(concepts, convert_to_tensor=True)
+            sentence_embeddings = model.encode(sentence_texts, convert_to_tensor=True)
+            sims = util.cos_sim(concept_embeddings, sentence_embeddings)
+
+            result = ConceptCoverageResult()
+            for i, concept in enumerate(concepts):
+                row = sims[i]
+                best_idx = int(row.argmax())
+                best_score = float(row[best_idx])
+                if best_score >= self.SIMILARITY_THRESHOLD:
+                    result.covered.append(concept)
+                    result.matches[concept] = [sentence_texts[best_idx]]
+                else:
+                    result.missing.append(concept)
+            result.coverage_pct = round(100.0 * len(result.covered) / len(concepts), 2)
+            return result
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "SBERT concept matching failed (%s); falling back to token overlap", exc
+            )
+            return TokenOverlapConceptMatcher().match(student_answer, sentences, concepts)
 
 
 # ---------------------------------------------------------------------------

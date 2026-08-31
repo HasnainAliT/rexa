@@ -13,8 +13,6 @@ const PASSWORD = 'Admin1234'
 
 const STRONG_ANSWER = `Mitosis is when a cell divides into two identical daughter cells. Before this happens, the cell copies its DNA so both new cells get the same chromosomes. This is important because it lets the body grow and repair damaged tissue by replacing dead cells. In summary, mitosis keeps genetic information consistent while allowing organisms to grow and heal.`
 
-const WEAK_ANSWER = `Mitosis is a type of cell division. It happens in the body.`
-
 async function shot(page, name) {
   const path = join(OUT, `${name}.png`)
   await page.screenshot({ path, fullPage: true })
@@ -72,21 +70,6 @@ async function main() {
     await page.waitForTimeout(1200)
   }
   await shot(page, '07_reasoning_engine')
-
-  await page.goto(`${BASE}/app/compare`, { waitUntil: 'domcontentloaded' })
-  await page.waitForTimeout(800)
-  const areas = page.locator('textarea')
-  const areaCount = await areas.count()
-  if (areaCount >= 2) {
-    await areas.nth(areaCount - 2).fill(STRONG_ANSWER)
-    await areas.nth(areaCount - 1).fill(WEAK_ANSWER)
-  }
-  const compareBtn = page.getByRole('button', { name: /compare/i })
-  if (await compareBtn.count()) {
-    await compareBtn.first().click()
-    await page.waitForTimeout(8000)
-  }
-  await shot(page, '08_compare')
 
   await page.goto(`${BASE}/app/evaluation`, { waitUntil: 'domcontentloaded' })
   await page.waitForTimeout(1500)

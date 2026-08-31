@@ -1,8 +1,8 @@
-# Supervisor walkthrough screenshots
+# Thesis screenshots
 
 Live walkthrough of RExA using the bank question **Explain encapsulation in object-oriented programming and why it is important.** and the student answer already in the analysis draft (142 words).
 
-Folder: `docs/supervisor_walkthrough/`
+Folder: `docs/thesis_screenshots/`
 
 ## Encapsulation run (what the system returned)
 

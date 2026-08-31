@@ -1,6 +1,12 @@
 import type { AnalysisResult, SentenceRole, SentenceRoleLabel } from '@/types'
 
-/** Core roles used for the role-coverage pass line (50%). */
+// NOTE (scope): the approved FYP-1 proposal excludes "Automatic grading or
+// scoring of answers" from scope. Nothing in this module assigns a grade —
+// it computes a diagnostic 1-5 star indicator and role/concept coverage
+// ratios used to flag answers for a human reviewer's closer look. See
+// docs/SRS.md "Deviations from the Approved Proposal" for the full note.
+
+/** Core roles used for the role-coverage review line (50%). */
 export const CORE_ROLES: SentenceRoleLabel[] = [
   'claim',
   'evidence',
@@ -11,36 +17,36 @@ export const CORE_ROLES: SentenceRoleLabel[] = [
 export const ROLE_COVERAGE_THRESHOLD = 0.5
 export const CONCEPT_COVERAGE_THRESHOLD = 0.5
 export const MIN_STARS_THRESHOLD = 3
-export const GRADING_STORAGE_KEY = 'rexa-grading-thresholds'
+export const REVIEW_THRESHOLD_STORAGE_KEY = 'rexa-grading-thresholds'
 
-export type GradingThresholds = {
+export type ReviewThresholds = {
   role: number
   concept: number
   minStars: number
 }
 
-function readStoredThresholds(key: string): Partial<GradingThresholds> | null {
+function readStoredThresholds(key: string): Partial<ReviewThresholds> | null {
   if (typeof window === 'undefined') return null
   try {
     const raw = localStorage.getItem(key)
     if (!raw) return null
-    return JSON.parse(raw) as Partial<GradingThresholds>
+    return JSON.parse(raw) as Partial<ReviewThresholds>
   } catch {
     return null
   }
 }
 
 export function assignmentThresholdKey(questionId: string) {
-  return `${GRADING_STORAGE_KEY}:${questionId}`
+  return `${REVIEW_THRESHOLD_STORAGE_KEY}:${questionId}`
 }
 
-export function getGradingThresholds(questionId?: string): GradingThresholds {
-  const defaults: GradingThresholds = {
+export function getReviewThresholds(questionId?: string): ReviewThresholds {
+  const defaults: ReviewThresholds = {
     role: ROLE_COVERAGE_THRESHOLD,
     concept: CONCEPT_COVERAGE_THRESHOLD,
     minStars: MIN_STARS_THRESHOLD,
   }
-  const global = readStoredThresholds(GRADING_STORAGE_KEY)
+  const global = readStoredThresholds(REVIEW_THRESHOLD_STORAGE_KEY)
   const assignment = questionId
     ? readStoredThresholds(assignmentThresholdKey(questionId))
     : null
@@ -52,12 +58,12 @@ export function getGradingThresholds(questionId?: string): GradingThresholds {
   }
 }
 
-export function saveGradingThresholds(
-  values: GradingThresholds,
+export function saveReviewThresholds(
+  values: ReviewThresholds,
   questionId?: string,
 ) {
   if (typeof window === 'undefined') return
-  const key = questionId ? assignmentThresholdKey(questionId) : GRADING_STORAGE_KEY
+  const key = questionId ? assignmentThresholdKey(questionId) : REVIEW_THRESHOLD_STORAGE_KEY
   localStorage.setItem(key, JSON.stringify(values))
 }
 
@@ -111,7 +117,7 @@ export function roleCoverage(sentences: SentenceRole[], questionId?: string) {
   const covered = CORE_ROLES.filter((role) => present.has(role))
   const missing = CORE_ROLES.filter((role) => !present.has(role))
   const ratio = CORE_ROLES.length ? covered.length / CORE_ROLES.length : 0
-  const threshold = getGradingThresholds(questionId).role
+  const threshold = getReviewThresholds(questionId).role
   return {
     covered,
     missing,
@@ -125,7 +131,7 @@ export function conceptCoverageStats(analysis: AnalysisResult) {
   const total = analysis.conceptCoverage.length
   const covered = analysis.conceptCoverage.filter((c) => c.covered).length
   const ratio = total ? covered / total : 1
-  const threshold = getGradingThresholds(analysis.questionId).concept
+  const threshold = getReviewThresholds(analysis.questionId).concept
   return {
     covered,
     total,
@@ -138,7 +144,14 @@ export function conceptCoverageStats(analysis: AnalysisResult) {
 export function overallStatus(analysis: AnalysisResult) {
   const roles = roleCoverage(analysis.sentenceRoles, analysis.questionId)
   const concepts = conceptCoverageStats(analysis)
-  const minStars = getGradingThresholds(analysis.questionId).minStars
+  const minStars = getReviewThresholds(analysis.questionId).minStars
   const passed = roles.passed && concepts.passed && analysis.stars >= minStars
   return { roles, concepts, passed, minStars }
 }
+
+/**
+ * `passed` here means "clears the review thresholds" — i.e. flagged/not
+ * flagged for a closer human look. It is a triage aid, not a grade; the
+ * educator still decides the actual mark. See the scope note at the top of
+ * this file.
+ */

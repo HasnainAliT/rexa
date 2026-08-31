@@ -37,6 +37,14 @@ class Settings(BaseSettings):
     # DistilBERT is a comparative scoring experiment — off by default so Core RExA serves demos
     USE_DISTILBERT_STARS: bool = False
 
+    # Real spaCy sentence splitting + SBERT semantic concept matching, as
+    # described in the FYP-1 progress PPT tech stack. Off by default; needs:
+    #   pip install spacy sentence-transformers
+    #   python -m spacy download en_core_web_sm
+    # See docs/SRS.md "Pipeline Evolution" for what these replace and why.
+    USE_SPACY_SPLITTER: bool = False
+    USE_SBERT_CONCEPTS: bool = False
+
     @property
     def cors_origins_list(self) -> List[str]:
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]

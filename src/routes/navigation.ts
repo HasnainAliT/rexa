@@ -3,7 +3,6 @@ import {
   Brain,
   ClipboardList,
   FileSpreadsheet,
-  GitCompare,
   LayoutDashboard,
   LineChart,
   PenLine,
@@ -45,11 +44,6 @@ export const sidebarNavigation: NavGroup[] = [
         title: 'Batch upload',
         href: ROUTES.APP.BATCH,
         icon: FileSpreadsheet,
-      },
-      {
-        title: 'Compare',
-        href: ROUTES.APP.COMPARE,
-        icon: GitCompare,
       },
       {
         title: 'Class report',

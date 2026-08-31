@@ -281,7 +281,7 @@ export function ReportsPage() {
     <div>
       <PageHeader
         title="Class report"
-        description="Compare graded submissions. Students below the 50% role/concept threshold are highlighted."
+        description="Compare analyzed submissions. Students below the 50% role/concept threshold are flagged for review."
         actions={
           !isLoading && analyses.length > 0 ? (
             <div className="flex gap-2">

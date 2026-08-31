@@ -14,7 +14,6 @@ import { ReportsPage } from '@/pages/app/ReportsPage'
 import { SettingsPage } from '@/pages/app/SettingsPage'
 import { QuestionsPage } from '@/pages/app/QuestionsPage'
 import { AnnotationPage } from '@/pages/app/AnnotationPage'
-import { ComparePage } from '@/pages/app/ComparePage'
 import { BatchPage } from '@/pages/app/BatchPage'
 import { EvaluationPage } from '@/pages/app/EvaluationPage'
 
@@ -97,10 +96,6 @@ export const router = createBrowserRouter([
           {
             path: 'annotation',
             element: <AnnotationPage />,
-          },
-          {
-            path: 'compare',
-            element: <ComparePage />,
           },
           {
             path: 'evaluation',

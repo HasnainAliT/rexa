@@ -290,7 +290,7 @@ def fig_training_curves() -> None:
 
 def fig_explainable_visual_concept() -> None:
     """Objective 3 — live Reasoning Engine screenshot, not a schematic."""
-    source = ROOT / "docs" / "thesis_screenshots" / "07_reasoning_engine.png"
+    source = ROOT / "docs" / "thesis_screenshots" / "10_reasoning_engine_encapsulation.png"
     if not source.exists():
         raise FileNotFoundError(f"Missing Objective 3 screenshot: {source}")
     OUT_DOCS.mkdir(parents=True, exist_ok=True)

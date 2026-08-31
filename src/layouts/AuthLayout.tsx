@@ -23,7 +23,7 @@ export function AuthLayout() {
           >
             <p className="text-xl font-medium leading-relaxed">
               See claims, evidence, and gaps in every descriptive answer —
-              then grade with a transparent 1–5 star score.
+              surfaced through a transparent 1–5 star diagnostic indicator.
             </p>
             <footer className="text-sm text-white/80">{APP_FULL_NAME}</footer>
           </motion.blockquote>

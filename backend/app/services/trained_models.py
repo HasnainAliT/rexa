@@ -19,6 +19,8 @@ from app.services.rexa_pipeline import (
     CueBasedSupportAnalyzer,
     KeywordRoleClassifier,
     RegexSentenceSplitter,
+    SBERTConceptMatcher,
+    SpacySentenceSplitter,
     TokenOverlapConceptMatcher,
     WeightedStarPredictor,
     ChainReasoningDepthScorer,
@@ -123,7 +125,12 @@ class TrainedRexaPipeline:
     def __init__(self) -> None:
         from app.config import settings
 
-        self.splitter = RegexSentenceSplitter()
+        # Real spaCy sentence splitting — opt-in via USE_SPACY_SPLITTER=true
+        self.splitter = (
+            SpacySentenceSplitter() if settings.USE_SPACY_SPLITTER else RegexSentenceSplitter()
+        )
+        # Real SBERT semantic concept matching — opt-in via USE_SBERT_CONCEPTS=true
+        self.use_sbert_concepts = bool(settings.USE_SBERT_CONCEPTS)
         self.role_model = _load_joblib(_resolve_checkpoint("sentence_roles"))
         self.concept_model = _load_joblib(_resolve_checkpoint("concept_coverage"))
         self.support_model = _load_joblib(_resolve_checkpoint("support_contradiction"))
@@ -167,9 +174,19 @@ class TrainedRexaPipeline:
         if not concepts:
             return ConceptCoverageResult()
 
-        heuristic = TokenOverlapConceptMatcher().match(student_answer, sentences, concepts)
+        best = TokenOverlapConceptMatcher().match(student_answer, sentences, concepts)
+
+        # Optional semantic candidate — enabled via USE_SBERT_CONCEPTS=true
+        if self.use_sbert_concepts:
+            try:
+                sbert = SBERTConceptMatcher().match(student_answer, sentences, concepts)
+                if sbert.coverage_pct >= best.coverage_pct:
+                    best = sbert
+            except Exception:
+                pass
+
         if self.concept_model is None:
-            return heuristic
+            return best
 
         try:
             answers = [student_answer] * len(concepts)
@@ -191,11 +208,11 @@ class TrainedRexaPipeline:
                 matches=matches,
             )
             # Prefer richer coverage when the trained model under-detects
-            if trained.coverage_pct >= heuristic.coverage_pct:
+            if trained.coverage_pct >= best.coverage_pct:
                 return trained
-            return heuristic
+            return best
         except Exception:
-            return heuristic
+            return best
 
     def _analyze_support(self, sentences: list[Sentence]) -> list[SupportPair]:
         if len(sentences) < 2:

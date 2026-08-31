@@ -16,7 +16,6 @@ export const ROUTES = {
     SETTINGS: '/app/settings',
     QUESTIONS: '/app/questions',
     ANNOTATION: '/app/annotation',
-    COMPARE: '/app/compare',
     EVALUATION: '/app/evaluation',
   },
 } as const

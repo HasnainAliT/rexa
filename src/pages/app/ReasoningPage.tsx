@@ -197,7 +197,7 @@ export function ReasoningPage() {
               <Card className="flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-base">
-                    Thresholds &amp; grading logic
+                    Thresholds &amp; review logic
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="flex-1">

@@ -218,7 +218,7 @@ export function BatchPage() {
     }
   }
 
-  const gradeRow = async (row: DraftRow, index: number): Promise<ResultRow> => {
+  const analyzeRow = async (row: DraftRow, index: number): Promise<ResultRow> => {
     const question = resolveQuestion(row)
     if (!question) {
       return {
@@ -271,7 +271,7 @@ export function BatchPage() {
     const next: ResultRow[] = []
     for (let i = 0; i < validDrafts.length; i += 1) {
       try {
-        next.push(await gradeRow(validDrafts[i], i))
+        next.push(await analyzeRow(validDrafts[i], i))
       } catch (err) {
         const row = validDrafts[i]
         next.push({
@@ -301,7 +301,7 @@ export function BatchPage() {
       const source = validDrafts[i]
       if (!source) continue
       try {
-        updated[i] = await gradeRow(source, i)
+        updated[i] = await analyzeRow(source, i)
         setResults([...updated])
       } catch (err) {
         updated[i] = {
@@ -357,7 +357,7 @@ export function BatchPage() {
     <div>
       <PageHeader
         title="Batch upload"
-        description="Grade many student answers at once from CSV, Excel, PDF, Word, or TXT. Map columns, edit rows, then review the class report."
+        description="Analyze many student answers at once from CSV, Excel, PDF, Word, or TXT. Map columns, edit rows, then review the class report."
       />
       <div className="space-y-4 p-4 sm:p-6 lg:p-8">
         {error && (
@@ -374,8 +374,8 @@ export function BatchPage() {
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">
                 Upload a CSV or Excel roster, or one or more PDF, Word, or TXT
-                student answers. Map and edit rows next, then grade against bank
-                questions.
+                student answers. Map and edit rows next, then analyze against
+                bank questions.
               </p>
               {parsing ? (
                 <div className="flex justify-center py-10">
@@ -592,7 +592,7 @@ export function BatchPage() {
                 {results.length === 0 ? (
                   <EmptyState
                     icon={Loader2}
-                    title={running ? 'Grading…' : 'No results'}
+                    title={running ? 'Analyzing…' : 'No results'}
                     className="border-0"
                   />
                 ) : (

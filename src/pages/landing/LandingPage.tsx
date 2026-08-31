@@ -90,7 +90,7 @@ export function LandingPage() {
             </h2>
 
             <p className="max-w-xl text-base text-muted-foreground sm:text-lg">
-              RExA grades free-text answers the way a thoughtful examiner
+              RExA analyzes free-text answers the way a thoughtful examiner
               would — tracing claims, evidence, and reasoning depth instead of
               matching keywords.
             </p>
@@ -195,7 +195,7 @@ export function LandingPage() {
       <section className="border-t bg-indigo-950 text-white">
         <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
           <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Ready to see reasoning-based grading in action?
+            Ready to see reasoning-based analysis in action?
           </h3>
           <p className="mx-auto mt-3 max-w-xl text-indigo-100">
             Sign in to run an analysis and inspect the explainable reasoning

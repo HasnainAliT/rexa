@@ -16,3 +16,11 @@ numpy>=2.1
 joblib>=1.4
 httpx>=0.28
 openpyxl>=3.1
+
+# Optional real-NLP upgrades (USE_SPACY_SPLITTER / USE_SBERT_CONCEPTS in
+# .env — off by default). Install these, then:
+#   python -m spacy download en_core_web_sm
+# See docs/SRS.md "Pipeline Evolution" for what these replace and why they
+# were added.
+spacy>=3.7
+sentence-transformers>=3.0
