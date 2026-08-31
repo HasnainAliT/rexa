@@ -2,6 +2,8 @@
 
 Live walkthrough of RExA using the bank question **Explain encapsulation in object-oriented programming and why it is important.** and the student answer already in the analysis draft (142 words).
 
+Core analysis, Reasoning Engine, and Evaluation screens were recaptured in **light theme** for the thesis.
+
 Folder: `docs/thesis_screenshots/`
 
 ## Encapsulation run (what the system returned)
