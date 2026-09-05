@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.deps import ApiHTTPException, get_current_user
+from app.deps import ApiHTTPException, require_teacher
 from app.models import AnalysisRun, Question, Submission, User
 from app.schemas import (
     ApiResponse,
@@ -24,14 +24,14 @@ router = APIRouter(tags=["batch"])
 @router.post("/batch/parse-upload")
 async def parse_batch_upload(
     file: UploadFile = File(...),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_teacher),
 ):
     filename = file.filename or "roster.csv"
     lowered = filename.lower()
-    if not lowered.endswith((".csv", ".txt", ".xlsx", ".xlsm")):
+    if not lowered.endswith((".csv", ".txt", ".xlsx", ".xlsm", ".xls")):
         raise ApiHTTPException(
             status_code=400,
-            detail="Upload a CSV or Excel (.xlsx) file.",
+            detail="Upload a CSV or Excel (.xlsx) file exported from your online test.",
         )
     data = await file.read()
     try:
@@ -61,17 +61,17 @@ def _resolve_question_context(
 def batch_analyze(
     payload: BatchAnalyzeRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_teacher),
 ):
     question, question_text, reference_answer, concepts = _resolve_question_context(
         db, payload.question_id, payload.question_text, payload.reference_answer, payload.concepts
     )
 
-    if payload.save and question is None and question_text and reference_answer:
+    if payload.save and question is None and question_text:
         question = Question(
             title=question_text[:120],
             prompt=question_text,
-            reference_answer=reference_answer,
+            reference_answer=reference_answer or "",
             concepts=concepts,
             created_by=current_user.id,
         )
@@ -150,7 +150,7 @@ def batch_analyze(
 def compare_answers(
     payload: CompareRequest,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_teacher),
 ):
     question, question_text, reference_answer, concepts = _resolve_question_context(
         db, payload.question_id, payload.question_text, payload.reference_answer, payload.concepts
@@ -194,7 +194,7 @@ def compare_answers(
 def evaluate_baselines(
     question_id: str | None = None,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_teacher),
 ):
     """Runs classical baseline scoring methods against a sample question and
     the reference answer of the most recent submission (or the reference
@@ -220,21 +220,26 @@ def evaluate_baselines(
         .order_by(Submission.created_at.desc())
         .first()
     )
-    student_answer = submission.answer_text if submission else question.reference_answer
+    student_answer = submission.answer_text if submission else (question.reference_answer or "")
 
     rexa_result = run_rexa_pipeline(
         question_text=question.prompt,
-        reference_answer=question.reference_answer,
-        student_answer=student_answer,
+        reference_answer=question.reference_answer or "",
+        student_answer=student_answer or "",
         concepts=question.concepts or [],
     )
 
-    baseline_dicts = run_all_baselines(question.reference_answer, student_answer)
+    reference = (question.reference_answer or "").strip()
+    baseline_dicts = (
+        run_all_baselines(question.reference_answer, student_answer)
+        if reference
+        else []
+    )
 
     return ApiResponse(
         data=BaselineEvaluationData(
             question_text=question.prompt,
-            reference_answer=question.reference_answer,
+            reference_answer=question.reference_answer or "",
             student_answer=student_answer,
             rexa_stars=rexa_result["stars"],
             baselines=[BaselineResult(**b) for b in baseline_dicts],

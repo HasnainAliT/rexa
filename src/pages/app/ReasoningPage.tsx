@@ -9,6 +9,8 @@ import {
 } from 'lucide-react'
 import type { AnalysisResult, SupportRelation } from '@/types'
 import { analysisService } from '@/services'
+import { useAuth } from '@/hooks'
+import { isStudentRole, isTeacherRole } from '@/lib/roles'
 import { ROUTES } from '@/routes/paths'
 import { overallStatus } from '@/lib/grading'
 import {
@@ -16,6 +18,7 @@ import {
   DimensionBars,
   EmptyState,
   HighlightedAnswer,
+  ImprovementBriefCard,
   LoadingSpinner,
   PageHeader,
   StarRating,
@@ -50,7 +53,16 @@ const RELATION_META: Record<
   },
 }
 
+function withoutStarMentions(explanations: AnalysisResult['explanations']) {
+  return explanations.filter(
+    (item) => !/\b(stars?|overall rating)\b/i.test(item.message),
+  )
+}
+
 export function ReasoningPage() {
+  const { user } = useAuth()
+  const isTeacher = isTeacherRole(user?.role)
+  const isStudent = isStudentRole(user?.role)
   const [searchParams] = useSearchParams()
   const id = searchParams.get('id')
 
@@ -94,11 +106,13 @@ export function ReasoningPage() {
   return (
     <div>
       <PageHeader
-        title="Reasoning engine"
+        title={isTeacher ? 'Reasoning engine' : 'My feedback'}
         description={
           analysis
             ? `Deep dive into "${analysis.questionText}"`
-            : 'Deep dive into how REXA reasons about a submitted answer.'
+            : isTeacher
+              ? 'Deep dive into how REXA reasons about a submitted answer.'
+              : 'See how RExA scored your latest answer.'
         }
         actions={
           analysis && (
@@ -126,10 +140,16 @@ export function ReasoningPage() {
           <EmptyState
             icon={Brain}
             title="No analysis found"
-            description="Run an analysis first to explore its reasoning breakdown."
+            description={
+              isTeacher
+                ? 'Run an analysis first to explore its reasoning breakdown.'
+                : 'Submit an answer first to see your explainable feedback.'
+            }
             action={
               <Button asChild>
-                <Link to={ROUTES.APP.ANALYSIS}>Run analysis</Link>
+                <Link to={ROUTES.APP.ANALYSIS}>
+                  {isTeacher ? 'Run analysis' : 'Submit answer'}
+                </Link>
               </Button>
             }
           />
@@ -144,15 +164,33 @@ export function ReasoningPage() {
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col gap-5">
                   <div className="flex items-center gap-3">
-                    <StarRating value={analysis.stars} size="lg" />
-                    <span className="text-2xl font-bold">
-                      {analysis.stars.toFixed(1)}
-                    </span>
-                    <Badge variant={status.passed ? 'default' : 'outline'}>
-                      {status.passed ? 'Pass' : 'Needs work'}
-                    </Badge>
+                    {isTeacher ? (
+                      <>
+                        <StarRating value={analysis.stars} size="lg" />
+                        <span className="text-2xl font-bold">
+                          {analysis.stars.toFixed(1)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-2xl font-bold">
+                        {analysis.reasoningDepth.label}
+                      </span>
+                    )}
+                    {isTeacher && (
+                      <Badge variant={status.passed ? 'default' : 'outline'}>
+                        {status.passed ? 'Pass' : 'Needs work'}
+                      </Badge>
+                    )}
                   </div>
-                  <DimensionBars dimensions={analysis.dimensions} />
+                  <DimensionBars
+                    dimensions={
+                      isStudent
+                        ? analysis.dimensions.filter(
+                            (item) => !/star/i.test(`${item.key} ${item.label}`),
+                          )
+                        : analysis.dimensions
+                    }
+                  />
                 </CardContent>
               </Card>
 
@@ -194,6 +232,7 @@ export function ReasoningPage() {
             </Card>
 
             <div className="grid items-stretch gap-4 lg:grid-cols-2">
+              {isTeacher && (
               <Card className="flex flex-col">
                 <CardHeader>
                   <CardTitle className="text-base">
@@ -204,8 +243,9 @@ export function ReasoningPage() {
                   <ThresholdPanel analysis={analysis} />
                 </CardContent>
               </Card>
+              )}
 
-              <Card className="flex flex-col">
+              <Card className={cn('flex flex-col', !isTeacher && 'lg:col-span-2')}>
                 <CardHeader>
                   <CardTitle className="text-base">Concept coverage</CardTitle>
                 </CardHeader>
@@ -250,10 +290,12 @@ export function ReasoningPage() {
                             {meta.label}
                           </div>
                           <p>{pair.studentText}</p>
+                          {isTeacher && (
                           <div className="flex items-start gap-1.5 text-muted-foreground">
                             <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                             <p>{pair.referenceText}</p>
                           </div>
+                          )}
                         </li>
                       )
                     })}
@@ -262,14 +304,20 @@ export function ReasoningPage() {
               </CardContent>
             </Card>
 
-            {analysis.explanations.length > 0 && (
+            {(isStudent
+              ? withoutStarMentions(analysis.explanations)
+              : analysis.explanations
+            ).length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base">Explanations</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    {analysis.explanations.map((explanation) => (
+                    {(isStudent
+                      ? withoutStarMentions(analysis.explanations)
+                      : analysis.explanations
+                    ).map((explanation) => (
                       <li key={explanation.id} className="flex gap-2">
                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                         {explanation.message}
@@ -279,6 +327,8 @@ export function ReasoningPage() {
                 </CardContent>
               </Card>
             )}
+
+            <ImprovementBriefCard analysis={analysis} omitStars={isStudent} />
           </>
         )}
       </div>

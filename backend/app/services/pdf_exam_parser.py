@@ -71,6 +71,7 @@ def _pairs_from_headings(raw: str) -> list[ExamPair]:
             else:
                 current.student_answer = body
         elif kind == "reference":
+            # Optional: exams may omit a model answer.
             current.reference_answer = body
         elif kind == "concepts":
             current.concepts = [c.strip() for c in re.split(r"[,;\n]+", body) if c.strip()]

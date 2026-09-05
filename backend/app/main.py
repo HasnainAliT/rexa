@@ -27,6 +27,7 @@ from app.routers import (
     models_admin,
     questions,
     reports,
+    users,
 )
 from app.security import hash_password
 from app.services.rexa_pipeline import describe_pipeline
@@ -35,7 +36,8 @@ logger = logging.getLogger("rexa")
 
 SEED_USERS = [
     {"email": "admin@earas.edu", "password": "Admin1234", "name": "RExA Admin", "role": "admin"},
-    {"email": "analyst@earas.edu", "password": "Analyst1234", "name": "RExA Analyst", "role": "analyst"},
+    {"email": "teacher@earas.edu", "password": "Teacher1234", "name": "RExA Teacher", "role": "teacher"},
+    {"email": "student@earas.edu", "password": "Student1234", "name": "RExA Student", "role": "student", "roll_number": "STU-001"},
 ]
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -51,12 +53,15 @@ def seed_database() -> None:
             if existing:
                 if seed["role"] == "admin":
                     admin_id = existing.id
+                if seed.get("roll_number") and not getattr(existing, "roll_number", None):
+                    existing.roll_number = seed["roll_number"]
                 continue
             user = User(
                 email=seed["email"],
                 name=seed["name"],
                 hashed_password=hash_password(seed["password"]),
                 role=seed["role"],
+                roll_number=seed.get("roll_number"),
             )
             db.add(user)
             db.flush()
@@ -254,6 +259,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 api_prefix = settings.API_PREFIX
 
 app.include_router(auth.router, prefix=api_prefix)
+app.include_router(users.router, prefix=api_prefix)
 app.include_router(questions.router, prefix=api_prefix)
 app.include_router(analysis.router, prefix=api_prefix)
 app.include_router(reports.router, prefix=api_prefix)

@@ -3,19 +3,22 @@ import { GlobalLayout } from '@/layouts/GlobalLayout'
 import { AuthLayout } from '@/layouts/AuthLayout'
 import { SidebarLayout } from '@/layouts/SidebarLayout'
 import { NavbarLayout } from '@/layouts/NavbarLayout'
-import { GuestRoute, ProtectedRoute } from './guards'
+import { GuestRoute, HomeRedirect, ProtectedRoute, RoleRoute, TeacherRoute } from './guards'
 import { ROUTES } from './paths'
 import { LandingPage } from '@/pages/landing/LandingPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
+import { RegisterPage } from '@/pages/auth/RegisterPage'
 import { DashboardPage } from '@/pages/app/DashboardPage'
 import { AnalysisPage } from '@/pages/app/AnalysisPage'
 import { ReasoningPage } from '@/pages/app/ReasoningPage'
 import { ReportsPage } from '@/pages/app/ReportsPage'
+import { ComparePage } from '@/pages/app/ComparePage'
 import { SettingsPage } from '@/pages/app/SettingsPage'
 import { QuestionsPage } from '@/pages/app/QuestionsPage'
 import { AnnotationPage } from '@/pages/app/AnnotationPage'
 import { BatchPage } from '@/pages/app/BatchPage'
 import { EvaluationPage } from '@/pages/app/EvaluationPage'
+import { UsersPage } from '@/pages/app/UsersPage'
 
 export const router = createBrowserRouter([
   {
@@ -49,7 +52,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'register',
-            element: <Navigate to={ROUTES.AUTH.LOGIN} replace />,
+            element: <RegisterPage />,
           },
           {
             path: 'forgot-password',
@@ -67,11 +70,15 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to={ROUTES.APP.DASHBOARD} replace />,
+            element: <HomeRedirect />,
           },
           {
             path: 'dashboard',
-            element: <DashboardPage />,
+            element: (
+              <RoleRoute roles={['student', 'teacher', 'admin']}>
+                <DashboardPage />
+              </RoleRoute>
+            ),
           },
           {
             path: 'analysis',
@@ -83,23 +90,59 @@ export const router = createBrowserRouter([
           },
           {
             path: 'reports',
-            element: <ReportsPage />,
+            element: (
+              <TeacherRoute>
+                <ReportsPage />
+              </TeacherRoute>
+            ),
+          },
+          {
+            path: 'compare',
+            element: (
+              <TeacherRoute>
+                <ComparePage />
+              </TeacherRoute>
+            ),
           },
           {
             path: 'batch',
-            element: <BatchPage />,
+            element: (
+              <TeacherRoute>
+                <BatchPage />
+              </TeacherRoute>
+            ),
           },
           {
             path: 'questions',
-            element: <QuestionsPage />,
+            element: (
+              <TeacherRoute>
+                <QuestionsPage />
+              </TeacherRoute>
+            ),
           },
           {
             path: 'annotation',
-            element: <AnnotationPage />,
+            element: (
+              <TeacherRoute>
+                <AnnotationPage />
+              </TeacherRoute>
+            ),
           },
           {
             path: 'evaluation',
-            element: <EvaluationPage />,
+            element: (
+              <TeacherRoute>
+                <EvaluationPage />
+              </TeacherRoute>
+            ),
+          },
+          {
+            path: 'users',
+            element: (
+              <RoleRoute roles={['admin']}>
+                <UsersPage />
+              </RoleRoute>
+            ),
           },
           {
             path: 'settings',

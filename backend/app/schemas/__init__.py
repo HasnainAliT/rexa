@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import Any, Generic, List, Optional, TypeVar
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
 # ---------------------------------------------------------------------------
 # Generic envelope - MUST match frontend's ApiResponse<T>
@@ -29,7 +29,7 @@ class PaginatedData(BaseModel, Generic[T]):
 # Auth / User
 # ---------------------------------------------------------------------------
 
-UserRole = str  # "admin" | "analyst" | "viewer"
+UserRole = str  # "admin" | "teacher" | "student"
 
 
 class UserOut(BaseModel):
@@ -40,6 +40,7 @@ class UserOut(BaseModel):
     name: str
     avatarUrl: Optional[str] = Field(default=None, validation_alias="avatar_url")
     role: str
+    rollNumber: Optional[str] = Field(default=None, validation_alias="roll_number")
 
     @classmethod
     def from_orm_user(cls, user: Any) -> "UserOut":
@@ -49,23 +50,60 @@ class UserOut(BaseModel):
             name=user.name,
             avatarUrl=user.avatar_url,
             role=user.role,
+            rollNumber=getattr(user, "roll_number", None),
         )
+
+
+class UserListItem(BaseModel):
+    id: str
+    name: str
+    email: str
+    role: str
+    rollNumber: Optional[str] = None
+    createdAt: datetime
+
+    @classmethod
+    def from_user(cls, user: Any) -> "UserListItem":
+        return cls(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            role=user.role,
+            rollNumber=getattr(user, "roll_number", None),
+            createdAt=user.created_at,
+        )
+
+
+class UserRoleUpdate(BaseModel):
+    role: str
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+    role: str = "student"
+
+    @model_validator(mode="after")
+    def role_is_allowed(self) -> "LoginRequest":
+        role = (self.role or "student").strip().lower()
+        if role not in {"teacher", "student"}:
+            raise ValueError("Role must be teacher or student")
+        self.role = role
+        return self
 
 
 class RegisterRequest(BaseModel):
     name: str
     email: EmailStr
     password: str = Field(min_length=6)
-    confirmPassword: str
+    confirmPassword: Optional[str] = None
+    role: str = "student"
+    roll_number: Optional[str] = None
+    institution_code: Optional[str] = None
 
     @model_validator(mode="after")
     def passwords_match(self) -> "RegisterRequest":
-        if self.password != self.confirmPassword:
+        if self.confirmPassword is not None and self.password != self.confirmPassword:
             raise ValueError("Passwords do not match")
         return self
 
@@ -83,10 +121,15 @@ class AuthData(BaseModel):
 class QuestionBase(BaseModel):
     title: str
     prompt: str
-    reference_answer: str
+    reference_answer: Optional[str] = Field(default="")
     concepts: List[str] = Field(default_factory=list)
     course: Optional[str] = None
     difficulty: Optional[str] = None
+
+    @field_validator("reference_answer", mode="before")
+    @classmethod
+    def coerce_reference_answer(cls, value: Any) -> str:
+        return value or ""
 
 
 class QuestionCreate(QuestionBase):
@@ -110,6 +153,20 @@ class QuestionOut(QuestionBase):
     created_at: datetime
 
 
+class QuestionStudentOut(BaseModel):
+    """Question payload for students — no answer key, no concept list."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    title: str
+    prompt: str
+    course: Optional[str] = None
+    difficulty: Optional[str] = None
+    created_by: Optional[str] = None
+    created_at: datetime
+
+
 # ---------------------------------------------------------------------------
 # REXA analysis
 # ---------------------------------------------------------------------------
@@ -127,9 +184,9 @@ class AnalyzeRequest(BaseModel):
 
     @model_validator(mode="after")
     def check_question_source(self) -> "AnalyzeRequest":
-        if not self.question_id and not (self.question_text and self.reference_answer):
+        if not self.question_id and not self.question_text:
             raise ValueError(
-                "Either question_id or (question_text and reference_answer) must be provided"
+                "Either question_id or question_text must be provided"
             )
         return self
 
@@ -183,7 +240,7 @@ class RexaResult(BaseModel):
     explanations: List[Explanation]
     model_version: str
     question_text: str
-    reference_answer: str
+    reference_answer: Optional[str] = None
     student_answer: str
 
 
@@ -271,14 +328,18 @@ class RecentAnalysisItem(BaseModel):
     id: str
     question_title: str
     student_name: Optional[str] = None
-    stars: float
+    stars: Optional[float] = None
+    coverage: Optional[float] = None
+    depth: Optional[float] = None
     created_at: datetime
 
 
 class CoverageTrendPoint(BaseModel):
     date: str
     avg_coverage: float
-    avg_stars: float
+    avg_stars: Optional[float] = None
+    avg_depth: Optional[float] = None
+    count: int = 0
 
 
 class RoleDistributionItem(BaseModel):
@@ -286,14 +347,37 @@ class RoleDistributionItem(BaseModel):
     count: int
 
 
+class RoleSentenceItem(BaseModel):
+    analysisId: str
+    questionTitle: str
+    studentName: Optional[str] = None
+    text: str
+    role: str
+    confidence: Optional[float] = None
+    reason: Optional[str] = None
+
+
+class DashboardBand(BaseModel):
+    label: str
+    count: int
+    percent: float
+
+
 class DashboardStats(BaseModel):
     totalAnalyses: int
-    avgStars: float
+    avgStars: Optional[float] = None
+    avgCoverage: float = 0
+    avgDepth: Optional[float] = None
     totalQuestions: int
     totalSubmissions: int
+    analysesThisWeek: int = 0
+    starBands: Optional[List[DashboardBand]] = None
+    coverageBands: Optional[List[DashboardBand]] = None
     recentAnalyses: List[RecentAnalysisItem]
     coverageTrend: List[CoverageTrendPoint]
     roleDistribution: List[RoleDistributionItem]
+    roleSentences: List[RoleSentenceItem] = Field(default_factory=list)
+    empty: bool = False
 
 
 # ---------------------------------------------------------------------------
@@ -317,9 +401,9 @@ class BatchAnalyzeRequest(BaseModel):
 
     @model_validator(mode="after")
     def check_question_source(self) -> "BatchAnalyzeRequest":
-        if not self.question_id and not (self.question_text and self.reference_answer):
+        if not self.question_id and not self.question_text:
             raise ValueError(
-                "Either question_id or (question_text and reference_answer) must be provided"
+                "Either question_id or question_text must be provided"
             )
         return self
 
@@ -379,7 +463,7 @@ class BaselineResult(BaseModel):
 
 class BaselineEvaluationData(BaseModel):
     question_text: str
-    reference_answer: str
+    reference_answer: Optional[str] = None
     student_answer: str
     rexa_stars: float
     baselines: List[BaselineResult]

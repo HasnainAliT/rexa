@@ -33,10 +33,16 @@ def ensure_schema() -> None:
             statements.append("ALTER TABLE submissions ADD COLUMN student_id VARCHAR(64)")
         if "student_name" not in cols:
             statements.append("ALTER TABLE submissions ADD COLUMN student_name VARCHAR(255)")
-    if statements:
-        with engine.begin() as conn:
-            for sql in statements:
-                conn.execute(text(sql))
+    if "users" in tables:
+        cols = {c["name"] for c in inspector.get_columns("users")}
+        if "roll_number" not in cols:
+            statements.append("ALTER TABLE users ADD COLUMN roll_number VARCHAR(64)")
+    with engine.begin() as conn:
+        for sql in statements:
+            conn.execute(text(sql))
+        if "users" in tables:
+            conn.execute(text("UPDATE users SET role = 'student' WHERE role = 'viewer'"))
+            conn.execute(text("UPDATE users SET role = 'teacher' WHERE role = 'analyst'"))
 
 
 def get_db():

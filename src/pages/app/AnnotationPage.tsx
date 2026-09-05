@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CheckCircle2, Inbox, Loader2, Star, Tags } from 'lucide-react'
+import { CheckCircle2, Inbox, Loader2, Tags } from 'lucide-react'
 import type {
   AnalysisResult,
   ConceptCoverage,
@@ -7,7 +7,7 @@ import type {
   SentenceRoleLabel,
 } from '@/types'
 import { analysisService, annotationsService } from '@/services'
-import { EmptyState, HighlightedAnswer, PageHeader, ROLE_LABELS } from '@/components/common'
+import { EmptyState, HighlightedAnswer, PageHeader, ROLE_LABELS, StarRating } from '@/components/common'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select } from '@/components/ui/select'
@@ -20,39 +20,6 @@ import { formatDate } from '@/utils'
 import { Badge } from '@/components/ui/badge'
 
 const ROLE_OPTIONS = Object.keys(ROLE_LABELS) as SentenceRoleLabel[]
-
-interface InteractiveStarsProps {
-  value: number
-  onChange: (value: number) => void
-}
-
-function InteractiveStars({ value, onChange }: InteractiveStarsProps) {
-  return (
-    <div className="flex items-center gap-1">
-      {Array.from({ length: 5 }, (_, index) => {
-        const starValue = index + 1
-        const filled = starValue <= value
-        return (
-          <button
-            key={starValue}
-            type="button"
-            onClick={() => onChange(starValue)}
-            aria-label={`${starValue} star${starValue === 1 ? '' : 's'}`}
-          >
-            <Star
-              className={cn(
-                'h-6 w-6 transition-colors',
-                filled
-                  ? 'fill-amber-400 text-amber-400'
-                  : 'fill-transparent text-muted-foreground/30 hover:text-amber-300',
-              )}
-            />
-          </button>
-        )
-      })}
-    </div>
-  )
-}
 
 export function AnnotationPage() {
   const [analyses, setAnalyses] = useState<AnalysisResult[]>([])
@@ -104,7 +71,7 @@ export function AnnotationPage() {
         setSentenceRoles(analysis.sentenceRoles)
         setConceptCoverage(analysis.conceptCoverage)
         setDepthLevel(analysis.reasoningDepth.level)
-        setStars(Math.round(analysis.stars))
+        setStars(analysis.stars)
         setNotes('')
       })
       .catch((err) => {
@@ -173,7 +140,7 @@ export function AnnotationPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Pending queue</CardTitle>
-            <Badge variant="secondary">{pending.length} pending</Badge>
+            <Badge variant="secondary">{pending.length}</Badge>
           </CardHeader>
           <CardContent>
             {isLoadingList ? (
@@ -206,16 +173,15 @@ export function AnnotationPage() {
                     ))}
                   </Select>
                 </div>
-                <ul className="divide-y rounded-md border">
-                  {(pending.length ? pending : analyses).slice(0, 8).map((analysis) => {
-                    const reviewed = annotatedIds.has(analysis.id)
-                    return (
+                {pending.length > 0 ? (
+                  <ul className="divide-y rounded-md border">
+                    {pending.slice(0, 8).map((analysis) => (
                       <li key={analysis.id}>
                         <button
                           type="button"
                           onClick={() => setSelectedId(analysis.id)}
                           className={cn(
-                            'flex w-full items-start justify-between gap-3 p-3 text-left text-sm hover:bg-muted/50',
+                            'flex w-full items-start gap-3 p-3 text-left text-sm hover:bg-muted/50',
                             selectedId === analysis.id && 'bg-primary/5',
                           )}
                         >
@@ -230,14 +196,16 @@ export function AnnotationPage() {
                                 : ''}
                             </span>
                           </span>
-                          <Badge variant={reviewed ? 'outline' : 'secondary'}>
-                            {reviewed ? 'Reviewed' : 'Pending'}
-                          </Badge>
                         </button>
                       </li>
-                    )
-                  })}
-                </ul>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Queue is clear. Use the dropdown if you want to reopen a
+                    reviewed submission.
+                  </p>
+                )}
               </div>
             )}
           </CardContent>
@@ -361,8 +329,12 @@ export function AnnotationPage() {
                 <CardHeader>
                   <CardTitle className="text-base">Overall stars</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <InteractiveStars value={stars} onChange={setStars} />
+                <CardContent className="space-y-2">
+                  <StarRating value={stars} size="lg" />
+                  <p className="text-sm font-medium">{stars.toFixed(1)} / 5</p>
+                  <p className="text-xs text-muted-foreground">
+                    Assigned by RExA from this answer. Stars cannot be edited.
+                  </p>
                 </CardContent>
               </Card>
             </div>

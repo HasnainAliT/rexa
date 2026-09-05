@@ -21,7 +21,15 @@ export const authService = {
   async register(credentials: RegisterCredentials): Promise<User> {
     const response = await apiClient.post<ApiResponse<{ user: User; token: string }>>(
       '/auth/register',
-      credentials,
+      {
+        name: credentials.name,
+        email: credentials.email,
+        password: credentials.password,
+        confirmPassword: credentials.confirmPassword,
+        role: credentials.role,
+        roll_number: credentials.rollNumber,
+        institution_code: credentials.institutionCode,
+      },
     )
     localStorage.setItem(AUTH_TOKEN_KEY, response.data.token)
     return response.data.user

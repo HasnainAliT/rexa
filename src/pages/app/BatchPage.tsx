@@ -57,12 +57,37 @@ type ResultRow = {
 function guessMapping(columns: string[]): Record<string, string> {
   const map: Record<string, string> = {}
   for (const col of columns) {
-    const n = col.toLowerCase()
-    if (/name/.test(n) && !/file/.test(n)) map[col] = 'student_name'
-    else if (/(student\s*id|sid|roll)/.test(n)) map[col] = 'student_id'
-    else if (/(question|assignment|prompt)/.test(n)) map[col] = 'question'
-    else if (/(answer|response|essay)/.test(n)) map[col] = 'answer'
-    else map[col] = 'ignore'
+    const n = col.toLowerCase().trim()
+    if (
+      /(timestamp|start time|completion|duration|score|points|quiz feedback|feedback to respondent)/.test(
+        n,
+      )
+    ) {
+      map[col] = 'ignore'
+    } else if (
+      /(full\s*name|student\s*name|^name$|first name|last name)/.test(n) &&
+      !/file|user name/.test(n)
+    ) {
+      map[col] = 'student_name'
+    } else if (
+      /(student\s*id|\bsid\b|roll|registration|reg\.?\s*no|email)/.test(n)
+    ) {
+      map[col] = 'student_id'
+    } else if (
+      /^(question|assignment|prompt)$/.test(n) ||
+      n === 'question text'
+    ) {
+      map[col] = 'question'
+    } else if (
+      /(^answer$|student answer|response|essay|descriptive)/.test(n)
+    ) {
+      map[col] = 'answer'
+    } else if (n.includes('?') || n.length >= 40) {
+      // Online-test exports (Google / Microsoft Forms) use the question as the column header.
+      map[col] = 'answer'
+    } else {
+      map[col] = 'ignore'
+    }
   }
   return map
 }
@@ -103,20 +128,41 @@ export function BatchPage() {
   const selectedQuestion = questions.find((q) => q.id === questionId)
   const answerMapped = Object.values(mapping).includes('answer')
   const questionMapped = Object.values(mapping).includes('question')
+  const answerColumnCount = Object.values(mapping).filter(
+    (value) => value === 'answer',
+  ).length
 
   const rebuildDrafts = (nextRows: Row[], nextMapping: Record<string, string>) => {
-    const next = nextRows.map((row) => {
-      const get = (field: string) => {
-        const col = Object.entries(nextMapping).find(([, v]) => v === field)?.[0]
-        return col ? row[col] ?? '' : ''
+    const colsFor = (field: string) =>
+      Object.entries(nextMapping)
+        .filter(([, value]) => value === field)
+        .map(([col]) => col)
+    const answerCols = colsFor('answer')
+    const nameCols = colsFor('student_name')
+    const idCols = colsFor('student_id')
+    const questionCols = colsFor('question')
+
+    const next: DraftRow[] = []
+    for (const row of nextRows) {
+      const studentName = nameCols
+        .map((col) => row[col] ?? '')
+        .filter(Boolean)
+        .join(' ')
+      const studentId = idCols.map((col) => row[col] ?? '').find(Boolean) ?? ''
+      const mappedQuestion =
+        questionCols.map((col) => row[col] ?? '').find(Boolean) ?? ''
+      const targets = answerCols.length ? answerCols : []
+      if (!targets.length) continue
+      for (const answerCol of targets) {
+        const answer = row[answerCol] ?? ''
+        next.push({
+          studentName,
+          studentId,
+          question: mappedQuestion || (targets.length > 1 ? answerCol : ''),
+          answer,
+        })
       }
-      return {
-        studentName: get('student_name'),
-        studentId: get('student_id'),
-        question: get('question'),
-        answer: get('answer'),
-      }
-    })
+    }
     setDrafts(next)
   }
 
@@ -164,7 +210,7 @@ export function BatchPage() {
         /\.(csv|xlsx|xlsm)$/i.test(file.name),
       )
       if (!documents.length && !tables.length) {
-        setError('Upload CSV, Excel (.xlsx), PDF, Word (.docx), or TXT answer files.')
+        setError('Upload an Excel (.xlsx) or CSV file from your online test, or PDF / Word / TXT answers.')
         return
       }
       const bank = await questionsService.listQuestions({ pageSize: 100 })
@@ -211,7 +257,7 @@ export function BatchPage() {
       setError(
         err instanceof Error
           ? err.message
-          : 'Could not read this file. Use CSV, Excel, PDF, Word, or TXT.',
+          : 'Could not read this file. Export the online test as .xlsx or CSV and try again.',
       )
     } finally {
       setParsing(false)
@@ -235,7 +281,7 @@ export function BatchPage() {
     const analysis = await analysisService.analyze({
       questionId: question.id,
       questionText: question.text,
-      referenceAnswer: question.referenceAnswer,
+      referenceAnswer: question.referenceAnswer ?? '',
       concepts: question.concepts,
       studentAnswer: row.answer,
       studentName: row.studentName || undefined,
@@ -247,7 +293,7 @@ export function BatchPage() {
       studentId: row.studentId,
       question: question.text,
       stars: analysis.stars,
-      coverage: status.roles.percent,
+      coverage: status.concepts.percent,
       depth: toPercent(
         analysis.dimensions.find((d) => d.key === 'reasoning_depth')?.score ?? 0,
       ),
@@ -356,8 +402,8 @@ export function BatchPage() {
   return (
     <div>
       <PageHeader
-        title="Batch upload"
-        description="Analyze many student answers at once from CSV, Excel, PDF, Word, or TXT. Map columns, edit rows, then review the class report."
+        title="Class Excel upload"
+        description="Upload the Excel or CSV file from an online test. RExA analyses every student answer in that file and opens reasoning for each one."
       />
       <div className="space-y-4 p-4 sm:p-6 lg:p-8">
         {error && (
@@ -369,28 +415,47 @@ export function BatchPage() {
         {step === 'upload' && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Upload roster</CardTitle>
+              <CardTitle className="text-base">
+                Upload answers from an online test
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                Upload a CSV or Excel roster, or one or more PDF, Word, or TXT
-                student answers. Map and edit rows next, then analyze against
-                bank questions.
+                After a Google Form, Microsoft Form, Moodle, or Canvas test,
+                download the responses as Excel or CSV and drop that file here.
+                One row per student is enough — if each question is its own
+                column, RExA will analyse every question separately.
               </p>
+              <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                <li>Student name and ID or email (optional but recommended)</li>
+                <li>Each descriptive answer in its own column, or one Answer column</li>
+              </ul>
               {parsing ? (
                 <div className="flex justify-center py-10">
                   <LoadingSpinner label="Reading files…" />
                 </div>
               ) : (
-                <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed p-8 text-sm hover:bg-muted/40">
+                <label
+                  className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed p-8 text-sm hover:bg-muted/40"
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => {
+                    event.preventDefault()
+                    if (event.dataTransfer.files.length) {
+                      void onFiles(event.dataTransfer.files)
+                    }
+                  }}
+                >
                   <Upload className="h-6 w-6 text-primary" />
-                  Choose CSV, Excel, PDF, Word, or TXT
+                  Drop Excel here, or choose a file
+                  <span className="text-xs text-muted-foreground">
+                    .xlsx, .csv, PDF, Word, or TXT
+                  </span>
                   <input
                     type="file"
                     multiple
-                    accept=".csv,text/csv,.txt,.xlsx,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    accept=".csv,text/csv,.txt,.xlsx,.xls,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     className="sr-only"
-                    aria-label="Upload CSV, Excel, PDF, Word, or TXT files"
+                    aria-label="Upload Excel, CSV, PDF, Word, or TXT files"
                     onChange={(event) => {
                       if (event.target.files?.length) void onFiles(event.target.files)
                     }}
@@ -409,6 +474,13 @@ export function BatchPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Match each spreadsheet column. For an online test, map every
+                question column to <span className="font-medium">Student answer</span>
+                {answerColumnCount > 1
+                  ? ` — ${answerColumnCount} question columns will become ${answerColumnCount} analyses per student.`
+                  : '.'}
+              </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {columns.map((col) => (
                   <div key={col} className="space-y-1">
@@ -450,8 +522,12 @@ export function BatchPage() {
               </div>
               <div className="space-y-1 text-sm text-muted-foreground">
                 <p>
-                  {validDrafts.length} valid answers after mapping
-                  {emptyAnswers ? ` · ${emptyAnswers} rows skipped (empty answer)` : ''}.
+                  {validDrafts.length} answers ready to analyse
+                  {emptyAnswers ? ` · ${emptyAnswers} empty cells skipped` : ''}
+                  {answerColumnCount > 1
+                    ? ` · ${answerColumnCount} questions from this file`
+                    : ''}
+                  .
                 </p>
                 {missingNames > 0 && <p>{missingNames} rows are missing a student name.</p>}
                 {missingIds > 0 && <p>{missingIds} rows are missing a student ID.</p>}
@@ -465,7 +541,10 @@ export function BatchPage() {
                   </p>
                 )}
                 {!answerMapped && (
-                  <p className="text-destructive">Map a column to Student answer before starting.</p>
+                  <p className="text-destructive">
+                    Map at least one column to Student answer. That is the text
+                    RExA will evaluate.
+                  </p>
                 )}
               </div>
               {drafts.length > 0 && (
@@ -638,7 +717,7 @@ export function BatchPage() {
                             {row.analysisId && (
                               <Button variant="ghost" size="sm" asChild>
                                 <Link to={`${ROUTES.APP.REASONING}?id=${row.analysisId}`}>
-                                  Open
+                                  View reasoning
                                 </Link>
                               </Button>
                             )}

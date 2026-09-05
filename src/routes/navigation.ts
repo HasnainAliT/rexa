@@ -3,12 +3,16 @@ import {
   Brain,
   ClipboardList,
   FileSpreadsheet,
+  GitCompare,
   LayoutDashboard,
   LineChart,
   PenLine,
+  Settings,
   Tags,
+  Users,
 } from 'lucide-react'
 import type { NavGroup } from '@/types'
+import { isAdminRole, isTeacherRole } from '@/lib/roles'
 import { ROUTES } from './paths'
 
 export const sidebarNavigation: NavGroup[] = [
@@ -41,7 +45,7 @@ export const sidebarNavigation: NavGroup[] = [
         icon: PenLine,
       },
       {
-        title: 'Batch upload',
+        title: 'Class Excel',
         href: ROUTES.APP.BATCH,
         icon: FileSpreadsheet,
       },
@@ -49,6 +53,11 @@ export const sidebarNavigation: NavGroup[] = [
         title: 'Class report',
         href: ROUTES.APP.REPORTS,
         icon: ClipboardList,
+      },
+      {
+        title: 'Compare',
+        href: ROUTES.APP.COMPARE,
+        icon: GitCompare,
       },
     ],
   },
@@ -68,6 +77,59 @@ export const sidebarNavigation: NavGroup[] = [
     ],
   },
 ]
+
+const adminNavigation: NavGroup[] = [
+  ...sidebarNavigation,
+  {
+    label: 'Admin',
+    items: [
+      {
+        title: 'Users',
+        href: ROUTES.APP.USERS,
+        icon: Users,
+      },
+    ],
+  },
+]
+
+export const studentNavigation: NavGroup[] = [
+  {
+    label: 'Overview',
+    items: [
+      {
+        title: 'Dashboard',
+        href: ROUTES.APP.DASHBOARD,
+        icon: LayoutDashboard,
+      },
+    ],
+  },
+  {
+    label: 'Workspace',
+    items: [
+      {
+        title: 'Reasoning console',
+        href: ROUTES.APP.ANALYSIS,
+        icon: PenLine,
+      },
+      {
+        title: 'My feedback',
+        href: ROUTES.APP.REASONING,
+        icon: Brain,
+      },
+      {
+        title: 'Settings',
+        href: ROUTES.APP.SETTINGS,
+        icon: Settings,
+      },
+    ],
+  },
+]
+
+export function getSidebarNavigation(role?: string | null): NavGroup[] {
+  if (isAdminRole(role)) return adminNavigation
+  if (isTeacherRole(role)) return sidebarNavigation
+  return studentNavigation
+}
 
 export const navbarLinks = [
   { title: 'Features', href: '#pillars' },

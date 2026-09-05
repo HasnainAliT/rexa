@@ -271,28 +271,27 @@ class TrainedRexaPipeline:
             coverage_pct, depth_score, sentences, support_pairs
         )
 
-        # Optional comparative DistilBERT head (USE_DISTILBERT_STARS=true)
-        if self.distilbert_stars is not None:
+        # Displayed stars follow the same mix shown in the dimension bars
+        # (coverage, depth, roles, support). The ASAP regressor is kept only as
+        # a comparative number — it under-scores short course answers and must
+        # not replace the diagnostic rating.
+        trained_stars = None
+        if self.star_model is not None:
             try:
-                stars = float(self.distilbert_stars.predict([student_answer])[0])
-                stars = min(max(round(stars, 2), 1.0), 5.0)
-                if abs(stars - heuristic_stars) > 1.75:
-                    stars = round((stars + heuristic_stars) / 2, 2)
-                return stars, dimension_scores
+                trained_stars = float(
+                    self.star_model.predict([student_answer], [reference_answer])[0]
+                )
+                trained_stars = min(max(round(trained_stars, 2), 1.0), 5.0)
             except Exception:
-                pass
+                trained_stars = None
 
-        if self.star_model is None:
-            return heuristic_stars, dimension_scores
-        try:
-            stars = float(self.star_model.predict([student_answer], [reference_answer])[0])
-            stars = min(max(round(stars, 2), 1.0), 5.0)
-            # Blend toward heuristic if trained score is extreme vs dimensions
-            if abs(stars - heuristic_stars) > 1.5:
-                stars = round((stars + heuristic_stars) / 2, 2)
-            return stars, dimension_scores
-        except Exception:
-            return heuristic_stars, dimension_scores
+        stars = heuristic_stars
+        if trained_stars is not None:
+            dimension_scores = {
+                **dimension_scores,
+                "trained_star_score": trained_stars,
+            }
+        return stars, dimension_scores
 
     def run(
         self,
@@ -317,9 +316,16 @@ class TrainedRexaPipeline:
             support_pairs,
         )
 
-        from app.services.explainability import generate_explanations
+        from app.services.explainability import generate_explanations, generate_improvement_brief
 
         explanations = generate_explanations(
+            coverage=coverage,
+            sentences=sentences,
+            support_pairs=support_pairs,
+            depth_score=depth_score,
+            stars=stars,
+        )
+        improvement_brief = generate_improvement_brief(
             coverage=coverage,
             sentences=sentences,
             support_pairs=support_pairs,
@@ -350,6 +356,7 @@ class TrainedRexaPipeline:
             ],
             "reasoning_depth": depth_score,
             "explanations": explanations,
+            "improvement_brief": improvement_brief,
             "model_version": self.MODEL_VERSION,
             "question_text": question_text,
             "reference_answer": reference_answer,

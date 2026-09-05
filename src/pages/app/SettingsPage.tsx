@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Cpu, Mail, Shield } from 'lucide-react'
+import { Cpu, Hash, Mail, Shield } from 'lucide-react'
 import type { ModelVersion, Question } from '@/types'
 import { modelsService, questionsService } from '@/services'
 import { useAuth } from '@/hooks'
 import { getInitials } from '@/utils'
+import { isTeacherRole, roleLabel } from '@/lib/roles'
 import {
   getReviewThresholds,
   saveReviewThresholds,
@@ -19,6 +20,7 @@ import { Select } from '@/components/ui/select'
 
 export function SettingsPage() {
   const { user } = useAuth()
+  const isTeacher = isTeacherRole(user?.role)
   const [activeModel, setActiveModel] = useState<ModelVersion | null>(null)
   const [isLoadingModel, setIsLoadingModel] = useState(true)
   const [thresholds, setThresholds] = useState(() => getReviewThresholds())
@@ -86,9 +88,15 @@ export function SettingsPage() {
                 <Mail className="h-3.5 w-3.5" />
                 {user.email}
               </p>
+              {user.rollNumber && (
+                <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <Hash className="h-3.5 w-3.5" />
+                  Roll {user.rollNumber}
+                </p>
+              )}
               <Badge variant="secondary" className="capitalize">
                 <Shield className="mr-1 h-3 w-3" />
-                {user.role}
+                {roleLabel(user.role)}
               </Badge>
             </div>
           </CardContent>
@@ -109,14 +117,16 @@ export function SettingsPage() {
           </CardContent>
         </Card>
 
+        {isTeacher && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Review thresholds</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Pass requires role coverage, concept coverage, and a minimum star
-              score. Set a default, or pick an assignment to override it.
+              These flags decide when an answer is marked for a closer look.
+              They do not change the star score — stars come from the answer
+              itself (concept coverage, reasoning depth, roles, and support).
             </p>
             <div className="space-y-2">
               <Label htmlFor="assignmentThreshold">Assignment</Label>
@@ -137,7 +147,7 @@ export function SettingsPage() {
                 ))}
               </Select>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="roleThreshold">Role coverage %</Label>
                 <Input
@@ -174,29 +184,10 @@ export function SettingsPage() {
                   }
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="minStars">Minimum stars</Label>
-                <Input
-                  id="minStars"
-                  type="number"
-                  min={1}
-                  max={5}
-                  step={0.5}
-                  value={thresholds.minStars}
-                  onChange={(event) =>
-                    saveThresholds({
-                      ...thresholds,
-                      minStars: Math.min(
-                        5,
-                        Math.max(1, Number(event.target.value) || 1),
-                      ),
-                    })
-                  }
-                />
-              </div>
             </div>
           </CardContent>
         </Card>
+        )}
 
         <Card>
           <CardHeader>

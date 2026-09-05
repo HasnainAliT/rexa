@@ -61,7 +61,7 @@ export const analysisService = {
     >('/compare', {
       question_id: payload.questionId ?? null,
       question_text: payload.questionText,
-      reference_answer: payload.referenceAnswer,
+      reference_answer: payload.referenceAnswer ?? '',
       concepts: payload.concepts ?? [],
       answer_a: payload.answerA,
       answer_b: payload.answerB,
@@ -72,6 +72,7 @@ export const analysisService = {
       questionText: payload.questionText,
       resultA: mapRexaResultToAnalysis(data.result_a, { id: 'compare-a' }),
       resultB: mapRexaResultToAnalysis(data.result_b, { id: 'compare-b' }),
+      summary: data.diff_summary ?? [],
     }
   },
 

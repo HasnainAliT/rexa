@@ -11,9 +11,26 @@
 
 | # | Objective | How RExA covers it | Key evidence |
 |---|-----------|--------------------|--------------|
-| 1 | Classify sentences of descriptive answers into different reasoning levels | Sentence Roles model (Claim / Evidence / Explanation / Conclusion / Other) + color-coded Reasoning Engine | Test accuracy **95.9%**, Macro-F1 **0.945** · Fig `03_obj1_…` |
-| 2 | Analyze how an answer progresses from basic explanation to deeper reasoning | Reasoning Depth regressor + support/contradiction links between sentences | Depth MAE **0.072**, Spearman **0.84** · Fig `04_obj2_…` |
-| 3 | Present explainable visual output to show reasoning patterns | Reasoning Engine UI: role colors, concept chips, depth meter, star dimensions, NL explanations | Live UI + Fig `08_obj3_…`; star within-1 **83%** |
+| 1 | To classify sentences in descriptive answers into predefined reasoning roles using Natural Language Processing | Sentence Roles model (Claim / Evidence / Explanation / Conclusion / Other) + color-coded Reasoning Engine | Test accuracy **95.9%**, Macro-F1 **0.945** · Fig `03_obj1_…` |
+| 2 | To analyze reasoning depth based on the distribution and progression of reasoning roles within an answer | Reasoning Depth regressor + support/contradiction links between sentences | Depth MAE **0.072**, Spearman **0.84** · Fig `04_obj2_…` |
+| 3 | To present explainable visual representations that assist educators in understanding answer quality | Reasoning Engine UI: role colors, concept chips, depth meter, star dimensions, NL explanations | Live UI + Fig `08_obj3_…` — **built and demonstrated; the "assist educators" claim is not yet validated** (see note below) |
+
+> **Objective wording.** The three objectives above are quoted verbatim from the approved
+> FYP proposal (§G, Aim & Objectives). Do not paraphrase them in slides or the thesis —
+> an earlier version of this table shortened Objective 3 to "show reasoning patterns,"
+> which drops the "assist educators in understanding answer quality" claim the proposal
+> actually makes.
+>
+> **Objective 3 status — read before presenting.** The visual representations are built
+> and demonstrable, so the "present explainable visual representations" half is met. The
+> "assist educators" half has **no supporting evidence**: no educator has used the
+> interface under measurement. Note that `docs/annotation_protocol.md` §6 instructs
+> annotators to rate answers *without looking at REXA's output*, so the n=60 pilot in
+> `docs/evaluation_report.md` cannot be cited as evidence here either — and both of its
+> annotators were project authors. Closing this needs a small educator study (4–6 markers,
+> with and without the RExA view). Until then, report Objective 3 as implemented and
+> demonstrated, not as validated. Star within-1 accuracy is **not** evidence for this
+> objective and has been removed from its evidence column.
 
 ## Graphs generated
 

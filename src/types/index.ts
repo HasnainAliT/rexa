@@ -6,6 +6,7 @@ export type {
   LoginCredentials,
   RegisterCredentials,
   AuthContextValue,
+  ManagedUser,
 } from './auth.types'
 export type { NavItem, NavGroup, BreadcrumbItem } from './navigation.types'
 export type {
@@ -38,7 +39,9 @@ export type {
   ModelMode,
   ModelVersion,
   DashboardStats,
+  DashboardBand,
   CoverageTrendPoint,
   RoleDistributionPoint,
+  RoleSentenceExample,
   DashboardData,
 } from './rexa.types'

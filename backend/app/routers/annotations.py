@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.deps import ApiHTTPException, get_current_user, require_admin_or_analyst
+from app.deps import ApiHTTPException, require_teacher_or_admin
 from app.models import AnalysisRun, Annotation, Submission, User
 from app.schemas import AnnotationCreate, AnnotationOut, AnnotationUpdate, ApiResponse, PaginatedData
 
@@ -16,7 +16,7 @@ def list_annotations(
     pageSize: int = 20,
     submission_id: str | None = None,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_teacher_or_admin),
 ):
     query = db.query(Annotation)
     if submission_id:
@@ -49,7 +49,7 @@ def list_annotations(
 def create_annotation(
     payload: AnnotationCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_admin_or_analyst),
+    current_user: User = Depends(require_teacher_or_admin),
 ):
     submission_id = payload.submission_id
     if not submission_id and payload.analysis_id:
@@ -79,7 +79,11 @@ def create_annotation(
 
 
 @router.get("/{annotation_id}", response_model=ApiResponse[AnnotationOut])
-def get_annotation(annotation_id: str, db: Session = Depends(get_db), _: User = Depends(get_current_user)):
+def get_annotation(
+    annotation_id: str,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_teacher_or_admin),
+):
     annotation = db.query(Annotation).filter(Annotation.id == annotation_id).first()
     if not annotation:
         raise ApiHTTPException(status_code=404, detail="Annotation not found")
@@ -91,7 +95,7 @@ def update_annotation(
     annotation_id: str,
     payload: AnnotationUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_admin_or_analyst),
+    _: User = Depends(require_teacher_or_admin),
 ):
     annotation = db.query(Annotation).filter(Annotation.id == annotation_id).first()
     if not annotation:
@@ -110,7 +114,7 @@ def update_annotation(
 def delete_annotation(
     annotation_id: str,
     db: Session = Depends(get_db),
-    _: User = Depends(require_admin_or_analyst),
+    _: User = Depends(require_teacher_or_admin),
 ):
     annotation = db.query(Annotation).filter(Annotation.id == annotation_id).first()
     if not annotation:

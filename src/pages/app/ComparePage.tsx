@@ -30,11 +30,16 @@ export function ComparePage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<CompareFormValues>({
     resolver: zodResolver(compareSchema),
     defaultValues: { questionId: '', answerA: '', answerB: '' },
   })
+
+  const questionId = watch('questionId')
+  const selectedQuestion = questions.find((question) => question.id === questionId)
+  const hasReference = Boolean(selectedQuestion?.referenceAnswer?.trim())
 
   useEffect(() => {
     questionsService
@@ -52,13 +57,19 @@ export function ComparePage() {
       setError('Please select a valid question.')
       return
     }
+    if (!question.referenceAnswer?.trim()) {
+      setError(
+        'This question has no reference answer. Add one in the question bank to compare answers.',
+      )
+      return
+    }
 
     setIsComparing(true)
     try {
       const compareResult = await analysisService.compare({
         questionId: question.id,
         questionText: question.text,
-        referenceAnswer: question.referenceAnswer,
+        referenceAnswer: question.referenceAnswer ?? '',
         concepts: question.concepts,
         answerA: values.answerA,
         answerB: values.answerB,
@@ -142,7 +153,7 @@ export function ComparePage() {
                 </Alert>
               )}
 
-              <Button type="submit" disabled={isComparing}>
+              <Button type="submit" disabled={isComparing || Boolean(questionId && !hasReference)}>
                 {isComparing ? (
                   <Loader2 className="animate-spin" />
                 ) : (
@@ -154,7 +165,15 @@ export function ComparePage() {
           </CardContent>
         </Card>
 
-        {!result && !isComparing && (
+        {questionId && !hasReference && !isComparing && (
+          <EmptyState
+            icon={GitCompare}
+            title="No reference answer"
+            description="This question has no model answer. Compare is available when a reference answer exists for baseline comparison."
+          />
+        )}
+
+        {!result && !isComparing && !(questionId && !hasReference) && (
           <EmptyState
             icon={GitCompare}
             title="No comparison yet"
@@ -171,15 +190,47 @@ export function ComparePage() {
         )}
 
         {result && !isComparing && (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Which answer is stronger</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm font-medium">
+                  {result.resultA.stars === result.resultB.stars
+                    ? 'The two answers scored the same overall.'
+                    : result.resultA.stars > result.resultB.stars
+                      ? `Answer A is stronger (${result.resultA.stars.toFixed(1)} vs ${result.resultB.stars.toFixed(1)} stars).`
+                      : `Answer B is stronger (${result.resultB.stars.toFixed(1)} vs ${result.resultA.stars.toFixed(1)} stars).`}
+                </p>
+                {result.summary.length > 0 && (
+                  <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                    {result.summary.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               { label: 'Answer A', data: result.resultA },
               { label: 'Answer B', data: result.resultB },
-            ].map(({ label, data }) => (
-              <Card key={label} className="flex h-full flex-col">
+            ].map(({ label, data }) => {
+              const isWinner =
+                result.resultA.stars !== result.resultB.stars &&
+                data.stars === Math.max(result.resultA.stars, result.resultB.stars)
+              return (
+              <Card
+                key={label}
+                className={`flex h-full flex-col ${isWinner ? 'border-indigo-500 ring-2 ring-indigo-500/20' : ''}`}
+              >
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between text-base">
-                    {label}
+                    <span>
+                      {label}
+                      {isWinner ? ' · stronger' : ''}
+                    </span>
                     <span className="text-sm font-normal text-muted-foreground">
                       {data.reasoningDepth.label}
                     </span>
@@ -197,8 +248,10 @@ export function ComparePage() {
                   <ThresholdPanel analysis={data} />
                 </CardContent>
               </Card>
-            ))}
+              )
+            })}
           </div>
+          </>
         )}
       </div>
     </div>

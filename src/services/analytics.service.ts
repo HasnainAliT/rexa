@@ -7,6 +7,6 @@ export const analyticsService = {
     const response = await apiClient.get<ApiResponse<unknown>>(
       '/analytics/dashboard',
     )
-    return mapDashboard(response.data)
+    return mapDashboard(response.data ?? response)
   },
 }

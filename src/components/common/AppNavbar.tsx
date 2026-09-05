@@ -60,9 +60,14 @@ export function AppNavbar({
         <div className="flex items-center gap-2">
           <ThemeToggle />
           {variant === 'marketing' ? (
-            <Button size="sm" asChild>
-              <Link to={ROUTES.AUTH.LOGIN}>Sign in</Link>
-            </Button>
+            <>
+              <Button size="sm" variant="ghost" asChild>
+                <Link to={ROUTES.AUTH.REGISTER}>Sign up</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to={ROUTES.AUTH.LOGIN}>Sign in</Link>
+              </Button>
+            </>
           ) : (
             <UserMenu />
           )}

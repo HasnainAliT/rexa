@@ -52,3 +52,17 @@ Encapsulation bundles data and methods together.
     assert len(pairs) == 1
     assert pairs[0].question_text == ""
     assert "bundles" in pairs[0].student_answer
+
+
+def test_question_answer_without_reference_block():
+    text = """
+Question: What is a blockchain?
+Concepts: ledger, hash
+Answer: A blockchain is a shared ledger of records.
+"""
+    pairs = parse_exam_text(text)
+    assert len(pairs) == 1
+    assert "blockchain" in pairs[0].question_text.lower()
+    assert pairs[0].reference_answer == ""
+    assert "ledger" in pairs[0].concepts
+    assert "shared ledger" in pairs[0].student_answer

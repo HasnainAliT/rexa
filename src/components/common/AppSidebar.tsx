@@ -1,6 +1,7 @@
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { sidebarNavigation } from '@/routes/navigation'
+import { useAuth } from '@/hooks'
+import { getSidebarNavigation } from '@/routes/navigation'
 import { Logo } from './Logo'
 import { SidebarNav } from './SidebarNav'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,9 @@ export function AppSidebar({
   onNavigate,
   className,
 }: AppSidebarProps) {
+  const { user } = useAuth()
+  const groups = getSidebarNavigation(user?.role)
+
   return (
     <aside
       className={cn(
@@ -61,7 +65,7 @@ export function AppSidebar({
       )}
 
       <SidebarNav
-        groups={sidebarNavigation}
+        groups={groups}
         collapsed={collapsed}
         onNavigate={onNavigate}
       />

@@ -1,15 +1,17 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks'
 import { loginSchema, type LoginFormValues } from '@/utils'
+import { canAccessPath, homePathForRole } from '@/lib/roles'
 import { ROUTES } from '@/routes/paths'
 import { FormField } from '@/components/common'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { cn } from '@/lib/utils'
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -21,22 +23,29 @@ export function LoginPage() {
   const {
     control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { isSubmitting, errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: '', password: '', role: 'student' },
     mode: 'onBlur',
   })
 
+  const role = watch('role')
+
   const from =
-    (location.state as { from?: Location } | null)?.from?.pathname ??
-    ROUTES.APP.DASHBOARD
+    (location.state as { from?: Location } | null)?.from?.pathname ?? null
 
   const onSubmit = async (values: LoginFormValues) => {
     setError(null)
     try {
-      await login(values)
-      navigate(from, { replace: true })
+      const user = await login(values)
+      const next =
+        from && canAccessPath(user.role, from)
+          ? from
+          : homePathForRole(user.role)
+      navigate(next, { replace: true })
     } catch (err) {
       setError(
         err instanceof Error
@@ -51,7 +60,7 @@ export function LoginPage() {
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
         <p className="text-sm text-muted-foreground">
-          Sign in to continue to your RExA workspace.
+          Sign in as a student or instructor to continue.
         </p>
       </div>
 
@@ -63,6 +72,28 @@ export function LoginPage() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Sign in as</p>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant={role === 'teacher' ? 'default' : 'outline'}
+              className={cn(role === 'teacher' && 'bg-indigo-600 text-white hover:bg-indigo-500')}
+              onClick={() => setValue('role', 'teacher', { shouldValidate: true })}
+            >
+              Instructor
+            </Button>
+            <Button
+              type="button"
+              variant={role === 'student' ? 'default' : 'outline'}
+              className={cn(role === 'student' && 'bg-indigo-600 text-white hover:bg-indigo-500')}
+              onClick={() => setValue('role', 'student', { shouldValidate: true })}
+            >
+              Student
+            </Button>
+          </div>
+        </div>
+
         <FormField control={control} name="email" label="Email">
           {(field) => (
             <Input
@@ -119,6 +150,16 @@ export function LoginPage() {
           Sign in
         </Button>
       </form>
+
+      <p className="text-center text-sm text-muted-foreground">
+        New here?{' '}
+        <Link
+          to={ROUTES.AUTH.REGISTER}
+          className="font-medium text-primary hover:underline"
+        >
+          Create an account
+        </Link>
+      </p>
     </div>
   )
 }

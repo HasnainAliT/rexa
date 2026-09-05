@@ -40,7 +40,7 @@ export const batchService = {
     >('/batch/analyze', {
       question_id: payload.questionId ?? null,
       question_text: payload.questionText,
-      reference_answer: payload.referenceAnswer,
+      reference_answer: payload.referenceAnswer ?? '',
       concepts: payload.concepts ?? [],
       answers: payload.studentAnswers.map((studentAnswer) => ({
         student_answer: studentAnswer,

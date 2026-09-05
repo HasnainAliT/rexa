@@ -15,6 +15,7 @@ import {
   Download,
   FileSpreadsheet,
   FileText,
+  Trophy,
 } from 'lucide-react'
 import type { AnalysisResult, Question } from '@/types'
 import { analysisService, questionsService, reportsService } from '@/services'
@@ -184,6 +185,55 @@ export function ReportsPage() {
     }
   }, [filtered])
 
+  const betterByQuestion = useMemo(() => {
+    const groups = new Map<string, typeof filtered>()
+    for (const row of filtered) {
+      const key = row.analysis.questionId || row.analysis.questionText
+      const list = groups.get(key) ?? []
+      list.push(row)
+      groups.set(key, list)
+    }
+    return [...groups.entries()]
+      .map(([, rows]) => {
+        if (rows.length < 2) return null
+        const ranked = [...rows].sort((a, b) => {
+          if (b.analysis.stars !== a.analysis.stars) {
+            return b.analysis.stars - a.analysis.stars
+          }
+          if (b.concepts !== a.concepts) return b.concepts - a.concepts
+          return b.depth - a.depth
+        })
+        const best = ranked[0]
+        const next = ranked[1]
+        const reasons: string[] = []
+        const starGap = best.analysis.stars - next.analysis.stars
+        if (starGap > 0.05) {
+          reasons.push(
+            `${starGap.toFixed(1)} more stars (${best.analysis.stars.toFixed(1)} vs ${next.analysis.stars.toFixed(1)})`,
+          )
+        }
+        if (best.concepts > next.concepts) {
+          reasons.push(
+            `higher concept coverage (${best.concepts}% vs ${next.concepts}%)`,
+          )
+        }
+        if (best.depth > next.depth) {
+          reasons.push(`deeper reasoning (${best.depth}% vs ${next.depth}%)`)
+        }
+        if (reasons.length === 0) {
+          reasons.push('similar scores — ranked first by overall mix')
+        }
+        return {
+          question: best.analysis.questionText,
+          count: ranked.length,
+          best,
+          next,
+          reasons,
+        }
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+  }, [filtered])
+
   const assignmentOptions = useMemo(() => {
     const map = new Map<string, string>()
     for (const question of questions) {
@@ -333,7 +383,7 @@ export function ReportsPage() {
                       <Link to={ROUTES.APP.ANALYSIS}>Run analysis</Link>
                     </Button>
                     <Button variant="outline" asChild>
-                      <Link to={ROUTES.APP.BATCH}>Batch upload</Link>
+                      <Link to={ROUTES.APP.BATCH}>Class Excel</Link>
                     </Button>
                   </div>
                 }
@@ -368,6 +418,82 @@ export function ReportsPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {betterByQuestion.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    Stronger answer on the same question
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    When more than one answer was run for a question, RExA ranks
+                    them by stars, then concept coverage, then reasoning depth.
+                  </p>
+                  {betterByQuestion.map((group) => {
+                    const bestName =
+                      group.best.analysis.studentName?.trim() ||
+                      group.best.analysis.studentId ||
+                      'Stronger answer'
+                    const nextName =
+                      group.next.analysis.studentName?.trim() ||
+                      group.next.analysis.studentId ||
+                      'Next answer'
+                    return (
+                      <div
+                        key={group.question}
+                        className="rounded-lg border p-4"
+                      >
+                        <p className="line-clamp-2 text-sm font-medium">
+                          {group.question}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {group.count} answers compared
+                        </p>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <Badge className="bg-indigo-600 hover:bg-indigo-600">
+                            <Trophy className="mr-1 h-3 w-3" />
+                            Stronger: {bestName}
+                          </Badge>
+                          <StarRating
+                            value={group.best.analysis.stars}
+                            size="sm"
+                          />
+                          <span className="text-sm font-medium">
+                            {group.best.analysis.stars.toFixed(1)}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          Ahead of {nextName} because of {group.reasons.join('; ')}.
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link
+                              to={`${ROUTES.APP.REASONING}?id=${group.best.analysis.id}`}
+                            >
+                              View stronger
+                            </Link>
+                          </Button>
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link
+                              to={`${ROUTES.APP.REASONING}?id=${group.next.analysis.id}`}
+                            >
+                              View next
+                            </Link>
+                          </Button>
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link to={ROUTES.APP.COMPARE}>
+                              Compare two answers
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </CardContent>
+              </Card>
+            )}
 
             {rolePattern.length > 1 && (
               <Card>

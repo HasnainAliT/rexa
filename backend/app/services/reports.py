@@ -83,10 +83,12 @@ def generate_markdown_report(
 
     lines.append("---")
     lines.append("")
-    lines.append("### Reference Answer")
-    lines.append("")
-    lines.append(result.get("reference_answer", ""))
-    lines.append("")
+    reference = (result.get("reference_answer") or "").strip()
+    if reference:
+        lines.append("### Reference Answer")
+        lines.append("")
+        lines.append(reference)
+        lines.append("")
     lines.append("### Student Answer")
     lines.append("")
     lines.append(result.get("student_answer", ""))
@@ -206,9 +208,11 @@ def generate_pdf_report(
 
     story.append(HRFlowable(width="100%", color=colors.grey))
     story.append(Spacer(1, 10))
-    story.append(Paragraph("Reference Answer", heading_style))
-    story.append(Paragraph(escape(result.get("reference_answer", "") or "N/A"), body_style))
-    story.append(Spacer(1, 10))
+    reference = (result.get("reference_answer") or "").strip()
+    if reference:
+        story.append(Paragraph("Reference Answer", heading_style))
+        story.append(Paragraph(escape(reference), body_style))
+        story.append(Spacer(1, 10))
     story.append(Paragraph("Student Answer", heading_style))
     story.append(Paragraph(escape(result.get("student_answer", "") or "N/A"), body_style))
 

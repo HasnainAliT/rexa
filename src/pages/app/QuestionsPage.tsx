@@ -32,7 +32,7 @@ import {
 
 const questionSchema = z.object({
   text: z.string().min(1, 'Question text is required'),
-  referenceAnswer: z.string().min(1, 'Reference answer is required'),
+  referenceAnswer: z.string().optional(),
   concepts: z.string().min(1, 'Add at least one concept'),
   subject: z.string().optional(),
   difficulty: z.enum(['easy', 'medium', 'hard']),
@@ -141,7 +141,7 @@ export function QuestionsPage() {
     setEditingQuestion(question)
     reset({
       text: question.text,
-      referenceAnswer: question.referenceAnswer,
+      referenceAnswer: question.referenceAnswer ?? '',
       concepts: question.concepts.join(', '),
       subject: question.subject ?? '',
       difficulty: question.difficulty ?? 'medium',
@@ -155,7 +155,7 @@ export function QuestionsPage() {
 
     const payload = {
       text: values.text.trim(),
-      referenceAnswer: values.referenceAnswer.trim(),
+      referenceAnswer: values.referenceAnswer?.trim() ?? '',
       concepts: values.concepts
         .split(',')
         .map((concept) => concept.trim())
@@ -386,7 +386,7 @@ export function QuestionsPage() {
             <FormField
               control={control}
               name="referenceAnswer"
-              label="Reference answer"
+              label="Reference answer (optional) — used only for baseline comparison"
             >
               {(field) => (
                 <Textarea
@@ -445,7 +445,7 @@ export function QuestionsPage() {
               </FormField>
             </div>
 
-            {(errors.text || errors.referenceAnswer || errors.concepts) && (
+            {(errors.text || errors.concepts) && (
               <Alert variant="destructive">
                 <AlertDescription>
                   Please fix the highlighted fields above.

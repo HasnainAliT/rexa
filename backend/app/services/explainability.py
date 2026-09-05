@@ -25,6 +25,127 @@ def generate_explanations(
     return explanations
 
 
+def generate_improvement_brief(
+    coverage: "ConceptCoverageResult",
+    sentences: list["Sentence"],
+    support_pairs: list["SupportPair"],
+    depth_score: float,
+    stars: float,
+) -> dict:
+    """Actionable rewrite brief for the student."""
+    roles = {s.role for s in sentences}
+    missing_concepts = list(coverage.missing or [])
+    covered_concepts = list(coverage.covered or [])
+    irrelevant = [s for s in sentences if s.role in {"Other", "Irrelevant"}]
+    contradictions = [p for p in support_pairs if p.relation == "Contradicts"]
+    supports = [p for p in support_pairs if p.relation == "Supports"]
+
+    strengths: list[str] = []
+    if covered_concepts:
+        shown = ", ".join(covered_concepts[:5])
+        extra = ", and more" if len(covered_concepts) > 5 else ""
+        strengths.append(f"You already covered: {shown}{extra}.")
+    if {"Claim", "Evidence", "Explanation"} <= roles:
+        strengths.append("The answer already has a claim, evidence, and reasoning. Keep that chain.")
+    if supports:
+        n = len(supports)
+        strengths.append(f"{n} sentence{'s' if n != 1 else ''} support the main point.")
+
+    steps: list[dict] = []
+    if missing_concepts:
+        listed = ", ".join(f'"{c}"' for c in missing_concepts[:6])
+        more = ", and the other missing ideas" if len(missing_concepts) > 6 else ""
+        steps.append(
+            {
+                "priority": "high",
+                "title": "Write the missing concepts into the answer",
+                "detail": (
+                    f"Add at least one sentence that explains {listed}{more}. "
+                    "Naming a term is not enough — say what it means for this question."
+                ),
+            }
+        )
+    if "Claim" not in roles:
+        steps.append(
+            {
+                "priority": "high",
+                "title": "Start with a clear claim",
+                "detail": 'Open with one sentence that directly answers the question, for example: “X is … because …”.',
+            }
+        )
+    if "Evidence" not in roles:
+        steps.append(
+            {
+                "priority": "high",
+                "title": "Support the claim with evidence",
+                "detail": 'After the claim, add a concrete example, fact, or case. Phrases such as “for example” or “according to” help.',
+            }
+        )
+    if "Explanation" not in roles:
+        steps.append(
+            {
+                "priority": "high",
+                "title": "Explain why the evidence matters",
+                "detail": 'Add a “because / therefore / this means” sentence that links the evidence back to your claim.',
+            }
+        )
+    if "Conclusion" not in roles and len(sentences) > 2:
+        steps.append(
+            {
+                "priority": "medium",
+                "title": "Close with a conclusion",
+                "detail": "End with one sentence that restates the main answer so the argument feels finished.",
+            }
+        )
+    if len(irrelevant) >= 2:
+        steps.append(
+            {
+                "priority": "medium",
+                "title": "Cut or rewrite off-topic sentences",
+                "detail": (
+                    f"{len(irrelevant)} sentences were marked as not helping this question. "
+                    "Remove them, or rewrite them so they support the claim."
+                ),
+            }
+        )
+    if contradictions:
+        snippet = (contradictions[0].source_text or contradictions[0].target_text or "")[:140]
+        steps.append(
+            {
+                "priority": "high",
+                "title": "Fix conflicting statements",
+                "detail": f"This part may clash with the expected answer: “{snippet}”. Rewrite it so it agrees with your claim.",
+            }
+        )
+    if depth_score < 0.4:
+        steps.append(
+            {
+                "priority": "medium",
+                "title": "Go one step deeper",
+                "detail": "Do not stop at a definition. Add a second “because”, a consequence, or how the idea would be used.",
+            }
+        )
+    if not steps:
+        steps.append(
+            {
+                "priority": "low",
+                "title": "Polish a strong answer",
+                "detail": "Coverage and structure look solid. Add a second example or a short counterargument if you want to push it further.",
+            }
+        )
+
+    if stars >= 4.5:
+        summary = f"This is a strong answer ({stars:.1f} / 5). The notes below are polish, not repairs."
+    elif stars >= 3.5:
+        summary = f"This is a good answer ({stars:.1f} / 5) with a few gaps. Follow the steps to raise it."
+    elif stars >= 2.5:
+        summary = f"This answer is partly there ({stars:.1f} / 5). The steps below are what would make it complete."
+    else:
+        summary = f"This answer needs a rebuild ({stars:.1f} / 5). Start with step 1 and work down the list."
+
+    return {"summary": summary, "strengths": strengths, "steps": steps}
+
+
 def _concept_explanations(coverage: "ConceptCoverageResult") -> list[dict]:
     items: list[dict] = []
     total = len(coverage.covered) + len(coverage.missing)

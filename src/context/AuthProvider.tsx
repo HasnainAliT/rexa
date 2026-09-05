@@ -45,11 +45,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = useCallback(async (credentials: LoginCredentials) => {
     const authenticatedUser = await authService.login(credentials)
     setUser(authenticatedUser)
+    return authenticatedUser
   }, [])
 
   const register = useCallback(async (credentials: RegisterCredentials) => {
     const registeredUser = await authService.register(credentials)
     setUser(registeredUser)
+    return registeredUser
   }, [])
 
   const logout = useCallback(() => {

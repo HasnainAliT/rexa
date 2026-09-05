@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     JWT_SECRET: str = "dev-secret-change-me"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7 days
+    TEACHER_SIGNUP_CODE: str = "REXA-TEACH"
 
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"

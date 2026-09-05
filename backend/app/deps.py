@@ -62,5 +62,26 @@ def require_roles(*roles: str):
     return dependency
 
 
+TEACHER_ROLES = ("teacher", "admin")
+STUDENT_ROLES = ("student",)
+
+
+def is_teacher(user: User) -> bool:
+    return user.role in TEACHER_ROLES
+
+
+def is_student(user: User) -> bool:
+    return user.role in STUDENT_ROLES
+
+
+def is_admin(user: User) -> bool:
+    return user.role == "admin"
+
+
+def normalized_roll(user: User) -> str:
+    return (user.roll_number or "").strip().upper()
+
+
 require_admin = require_roles("admin")
-require_admin_or_analyst = require_roles("admin", "analyst")
+require_teacher_or_admin = require_roles("teacher", "admin")
+require_teacher = require_teacher_or_admin

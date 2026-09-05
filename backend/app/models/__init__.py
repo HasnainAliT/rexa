@@ -23,7 +23,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[str] = mapped_column(String(20), nullable=False, default="viewer")
+    role: Mapped[str] = mapped_column(String(20), nullable=False, default="student")
+    roll_number: Mapped[str | None] = mapped_column(String(64), nullable=True)
     avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
@@ -39,7 +40,7 @@ class Question(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     prompt: Mapped[str] = mapped_column(Text, nullable=False)
-    reference_answer: Mapped[str] = mapped_column(Text, nullable=False)
+    reference_answer: Mapped[str] = mapped_column(Text, nullable=False, default="", server_default="")
     concepts: Mapped[list] = mapped_column(JSON, default=list)
     course: Mapped[str | None] = mapped_column(String(255), nullable=True)
     difficulty: Mapped[str | None] = mapped_column(String(20), nullable=True, default="medium")

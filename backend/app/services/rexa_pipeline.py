@@ -551,7 +551,7 @@ class WeightedStarPredictor:
         support_total = len(support_pairs)
         supports = sum(1 for p in support_pairs if p.relation == "Supports")
         contradicts = sum(1 for p in support_pairs if p.relation == "Contradicts")
-        support_ratio = supports / support_total if support_total else 0.0
+        support_ratio = supports / support_total if support_total else 0.5
         contradiction_ratio = contradicts / support_total if support_total else 0.0
 
         weighted = (
@@ -621,9 +621,16 @@ class RexaPipeline:
             coverage.coverage_pct, depth_score, sentences, support_pairs
         )
 
-        from app.services.explainability import generate_explanations
+        from app.services.explainability import generate_explanations, generate_improvement_brief
 
         explanations = generate_explanations(
+            coverage=coverage,
+            sentences=sentences,
+            support_pairs=support_pairs,
+            depth_score=depth_score,
+            stars=stars,
+        )
+        improvement_brief = generate_improvement_brief(
             coverage=coverage,
             sentences=sentences,
             support_pairs=support_pairs,
@@ -654,6 +661,7 @@ class RexaPipeline:
             ],
             "reasoning_depth": depth_score,
             "explanations": explanations,
+            "improvement_brief": improvement_brief,
             "model_version": self.MODEL_VERSION,
             "question_text": question_text,
             "reference_answer": reference_answer,

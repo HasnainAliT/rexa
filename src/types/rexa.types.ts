@@ -75,7 +75,7 @@ export type QuestionDifficulty = 'easy' | 'medium' | 'hard'
 export interface Question {
   id: string
   text: string
-  referenceAnswer: string
+  referenceAnswer?: string
   concepts: string[]
   subject?: string
   difficulty?: QuestionDifficulty
@@ -85,7 +85,7 @@ export interface Question {
 
 export interface QuestionInput {
   text: string
-  referenceAnswer: string
+  referenceAnswer?: string
   concepts: string[]
   subject?: string
   difficulty?: QuestionDifficulty
@@ -94,7 +94,7 @@ export interface QuestionInput {
 export interface AnalyzeRequest {
   questionId?: string
   questionText: string
-  referenceAnswer: string
+  referenceAnswer?: string
   concepts?: string[]
   studentAnswer: string
   studentName?: string
@@ -104,7 +104,7 @@ export interface AnalyzeRequest {
 export interface BatchAnalyzeRequest {
   questionId?: string
   questionText: string
-  referenceAnswer: string
+  referenceAnswer?: string
   concepts?: string[]
   studentAnswers: string[]
 }
@@ -127,7 +127,7 @@ export interface BatchAnalyzeResult {
 export interface CompareRequest {
   questionId?: string
   questionText: string
-  referenceAnswer: string
+  referenceAnswer?: string
   concepts?: string[]
   answerA: string
   answerB: string
@@ -137,6 +137,7 @@ export interface CompareResult {
   questionText: string
   resultA: AnalysisResult
   resultB: AnalysisResult
+  summary: string[]
 }
 
 export interface AnnotationInput {
@@ -168,17 +169,31 @@ export interface ModelVersion {
   description?: string
 }
 
+export interface DashboardBand {
+  label: string
+  count: number
+  percent: number
+}
+
 export interface DashboardStats {
   totalAnalyses: number
-  avgStars: number
+  avgStars?: number
   avgCoverage: number
   avgDepth?: number
+  totalQuestions?: number
+  totalSubmissions?: number
+  analysesThisWeek?: number
+  starBands?: DashboardBand[]
+  coverageBands?: DashboardBand[]
+  empty?: boolean
 }
 
 export interface CoverageTrendPoint {
   date: string
   avgCoverage: number
   avgStars?: number
+  avgDepth?: number
+  count?: number
 }
 
 export interface RoleDistributionPoint {
@@ -186,9 +201,20 @@ export interface RoleDistributionPoint {
   count: number
 }
 
+export interface RoleSentenceExample {
+  analysisId: string
+  questionTitle: string
+  studentName?: string
+  text: string
+  role: SentenceRoleLabel
+  confidence?: number
+  reason?: string
+}
+
 export interface DashboardData {
   stats: DashboardStats
   coverageTrend: CoverageTrendPoint[]
   roleDistribution: RoleDistributionPoint[]
+  roleSentences: RoleSentenceExample[]
   recentAnalyses: AnalysisResult[]
 }

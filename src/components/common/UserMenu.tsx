@@ -2,6 +2,7 @@ import { LogOut, Settings } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks'
 import { getInitials } from '@/utils'
+import { roleLabel } from '@/lib/roles'
 import { ROUTES } from '@/routes/paths'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -36,6 +37,7 @@ export function UserMenu() {
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
+            <p className="text-xs text-muted-foreground">{roleLabel(user.role)}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

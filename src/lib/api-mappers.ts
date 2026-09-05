@@ -37,8 +37,8 @@ const RELATION_MAP: Record<string, SupportRelation> = {
   neutral: 'neutral',
 }
 
-function mapRole(role: string): SentenceRoleLabel {
-  return ROLE_MAP[role.toLowerCase()] ?? 'irrelevant'
+export function mapRole(role: string): SentenceRoleLabel {
+  return ROLE_MAP[String(role ?? '').trim().toLowerCase()] ?? 'irrelevant'
 }
 
 function mapRelation(relation: string): SupportRelation {
@@ -197,7 +197,7 @@ export function mapRexaResultToAnalysis(
     id: meta.id ?? crypto.randomUUID(),
     questionId: meta.questionId ?? undefined,
     questionText: result.question_text ?? '',
-    referenceAnswer: result.reference_answer,
+    referenceAnswer: result.reference_answer ?? '',
     studentAnswer: result.student_answer ?? '',
     studentName: meta.studentName ?? undefined,
     studentId: meta.studentId ?? undefined,
@@ -309,7 +309,7 @@ export function toBackendQuestionPayload(input: QuestionInput): Record<string, u
   return {
     title: input.text.slice(0, 120),
     prompt: input.text,
-    reference_answer: input.referenceAnswer,
+    reference_answer: input.referenceAnswer ?? '',
     concepts: input.concepts,
     course: input.subject ?? null,
     difficulty: input.difficulty ?? 'medium',
@@ -319,7 +319,7 @@ export function toBackendQuestionPayload(input: QuestionInput): Record<string, u
 export function toBackendAnalyzePayload(payload: {
   questionId?: string
   questionText: string
-  referenceAnswer: string
+  referenceAnswer?: string
   concepts?: string[]
   studentAnswer: string
   studentName?: string
@@ -328,7 +328,7 @@ export function toBackendAnalyzePayload(payload: {
   return {
     question_id: payload.questionId ?? null,
     question_text: payload.questionText,
-    reference_answer: payload.referenceAnswer,
+    reference_answer: payload.referenceAnswer ?? '',
     concepts: payload.concepts ?? [],
     student_answer: payload.studentAnswer,
     student_name: payload.studentName ?? null,
@@ -337,51 +337,121 @@ export function toBackendAnalyzePayload(payload: {
   }
 }
 
+type RawRoleSentence = {
+  analysisId?: string
+  analysis_id?: string
+  questionTitle?: string
+  question_title?: string
+  studentName?: string
+  student_name?: string
+  text?: string
+  role?: string
+  confidence?: number
+  reason?: string
+}
+
+function mapRoleSentences(items: RawRoleSentence[] | undefined) {
+  return (items ?? []).flatMap((item) => {
+    const text = String(item.text ?? '').trim()
+    if (!text) return []
+    return [
+      {
+        analysisId: item.analysisId ?? item.analysis_id ?? '',
+        questionTitle: item.questionTitle ?? item.question_title ?? 'Question',
+        studentName: item.studentName ?? item.student_name,
+        text,
+        role: mapRole(item.role ?? 'other'),
+        confidence: item.confidence,
+        reason: item.reason,
+      },
+    ]
+  })
+}
+
 export function mapDashboard(raw: unknown): DashboardData {
-  const d = raw as {
+  const root = (raw ?? {}) as Record<string, unknown>
+  const nested =
+    root.data && typeof root.data === 'object'
+      ? (root.data as Record<string, unknown>)
+      : null
+  const d = (
+    nested &&
+    (nested.roleDistribution ||
+      nested.roleSentences ||
+      nested.role_sentences ||
+      nested.totalAnalyses != null)
+      ? nested
+      : root
+  ) as {
     totalAnalyses?: number
     avgStars?: number
+    avgCoverage?: number
+    avgDepth?: number
     totalQuestions?: number
-    coverageTrend?: Array<{ date: string; avg_coverage?: number; avgCoverage?: number; avg_stars?: number; avgStars?: number }>
+    totalSubmissions?: number
+    analysesThisWeek?: number
+    starBands?: DashboardData['stats']['starBands']
+    coverageBands?: DashboardData['stats']['coverageBands']
+    coverageTrend?: Array<{ date: string; avg_coverage?: number; avgCoverage?: number; avg_stars?: number; avgStars?: number; avg_depth?: number; avgDepth?: number; count?: number }>
     roleDistribution?: Array<{ role: string; count: number }>
+    roleSentences?: RawRoleSentence[]
+    role_sentences?: RawRoleSentence[]
     recentAnalyses?: unknown[]
     stats?: DashboardData['stats']
-  }
-
-  if (d.stats) {
-    return d as unknown as DashboardData
   }
 
   const trend = (d.coverageTrend ?? []).map((point) => ({
     date: point.date,
     avgCoverage: point.avgCoverage ?? point.avg_coverage ?? 0,
     avgStars: point.avgStars ?? point.avg_stars,
+    avgDepth: point.avgDepth ?? point.avg_depth,
+    count: point.count,
   }))
 
   const avgCoverage =
-    trend.length > 0
-      ? trend.reduce((sum, point) => sum + point.avgCoverage, 0) / trend.length
-      : 0
+    typeof d.avgCoverage === 'number'
+      ? d.avgCoverage
+      : trend.length > 0
+        ? trend.reduce((sum, point) => sum + point.avgCoverage, 0) / trend.length
+        : 0
 
   const recentAnalyses = (d.recentAnalyses ?? []).map((item) => {
     const r = item as {
       id: string
       question_title?: string
       stars?: number
+      coverage?: number
+      depth?: number
       created_at?: string
       student_name?: string
     }
+    const coverageScore =
+      typeof r.coverage === 'number'
+        ? r.coverage > 1
+          ? r.coverage / 100
+          : r.coverage
+        : undefined
+    const depthScore = typeof r.depth === 'number' ? r.depth : 0.5
     // Lightweight stub AnalysisResult for dashboard tables
     return {
       id: r.id,
       questionText: r.question_title ?? 'Analysis',
       studentAnswer: r.student_name ? `Student: ${r.student_name}` : '',
       stars: r.stars ?? 0,
-      dimensions: [],
+      dimensions:
+        typeof coverageScore === 'number'
+          ? [
+              {
+                key: 'coverage',
+                label: 'Concept coverage',
+                score: coverageScore,
+              },
+            ]
+          : [],
       sentenceRoles: [],
       conceptCoverage: [],
       supportPairs: [],
-      reasoningDepth: depthFromScore(0.5),
+      reasoningDepth: depthFromScore(depthScore),
       explanations: [],
       createdAt: r.created_at ?? new Date().toISOString(),
     } satisfies AnalysisResult
@@ -390,14 +460,22 @@ export function mapDashboard(raw: unknown): DashboardData {
   return {
     stats: {
       totalAnalyses: d.totalAnalyses ?? 0,
-      avgStars: d.avgStars ?? 0,
+      avgStars: d.avgStars,
       avgCoverage,
+      avgDepth: d.avgDepth,
+      totalQuestions: d.totalQuestions,
+      totalSubmissions: d.totalSubmissions,
+      analysesThisWeek: d.analysesThisWeek ?? 0,
+      starBands: d.starBands ?? [],
+      coverageBands: d.coverageBands ?? [],
+      empty: Boolean((d as { empty?: boolean }).empty),
     },
     coverageTrend: trend,
     roleDistribution: (d.roleDistribution ?? []).map((item) => ({
       role: mapRole(item.role),
       count: item.count,
     })),
+    roleSentences: mapRoleSentences(d.roleSentences ?? d.role_sentences),
     recentAnalyses,
   }
 }

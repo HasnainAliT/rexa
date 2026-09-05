@@ -21,7 +21,11 @@ export function StarRating({
   className,
 }: StarRatingProps) {
   return (
-    <div className={cn('flex items-center gap-0.5', className)}>
+    <div
+      className={cn('flex items-center gap-0.5', className)}
+      role="img"
+      aria-label={`${value.toFixed(1)} out of ${max} stars`}
+    >
       {Array.from({ length: max }, (_, index) => {
         const filled = index < Math.round(value)
         return (

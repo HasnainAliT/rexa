@@ -4,9 +4,10 @@ export interface User {
   name: string
   avatarUrl?: string
   role: UserRole
+  rollNumber?: string
 }
 
-export type UserRole = 'admin' | 'analyst' | 'viewer'
+export type UserRole = 'admin' | 'teacher' | 'student'
 
 export interface AuthState {
   user: User | null
@@ -17,6 +18,7 @@ export interface AuthState {
 export interface LoginCredentials {
   email: string
   password: string
+  role: 'teacher' | 'student'
 }
 
 export interface RegisterCredentials {
@@ -24,10 +26,22 @@ export interface RegisterCredentials {
   email: string
   password: string
   confirmPassword: string
+  role: 'teacher' | 'student'
+  rollNumber?: string
+  institutionCode?: string
 }
 
 export interface AuthContextValue extends AuthState {
-  login: (credentials: LoginCredentials) => Promise<void>
+  login: (credentials: LoginCredentials) => Promise<User>
   logout: () => void
-  register: (credentials: RegisterCredentials) => Promise<void>
+  register: (credentials: RegisterCredentials) => Promise<User>
+}
+
+export interface ManagedUser {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+  rollNumber?: string
+  createdAt: string
 }
